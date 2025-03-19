@@ -7,6 +7,6 @@ class Environment:
 
     
     def change_influence(self,):
-        self.environmental_inf += random.uniform(-0.5, 0.5)
-        self.behavioral_inf += random.uniform(-0.5, 0.5)
+        self.environmental_inf += random.uniform(-0.15, 0.15)
+        self.behavioral_inf += random.uniform(-0.15, 0.15)
         return self.environmental_inf, self.behavioral_inf
