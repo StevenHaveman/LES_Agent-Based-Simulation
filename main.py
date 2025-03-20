@@ -11,7 +11,7 @@ def gen_random_value(range_min: float, range_max: float):
 def main(iter: int, nr_residents: int=1, nr_households: int=1, info_dump=False):
     residents = []
     households = []
-    environment = Environment(gen_random_value(-0.1, 0.2), gen_random_value(-0.1, 0.2))
+    environment = Environment()
 
     if info_dump:
         print("Environment created with starting values:")
@@ -26,7 +26,7 @@ def main(iter: int, nr_residents: int=1, nr_households: int=1, info_dump=False):
         print("\n\n")
             
     for i in range(nr_residents):
-        residents.append(Resident(i, gen_random_value(-0.1, 0.2), gen_random_value(0.9, 1.2), gen_random_value(0.9, 1.2), gen_random_value(0.9, 1.2)))
+        residents.append(Resident(i, gen_random_value(-0.1, 0.3), gen_random_value(0.9, 1.2), gen_random_value(0.9, 1.2), gen_random_value(0.9, 1.2)))
         if info_dump:
             print(f"Resident created with starting values:")
             residents[i].print_values()
