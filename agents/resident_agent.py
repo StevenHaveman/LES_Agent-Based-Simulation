@@ -23,4 +23,4 @@ class Resident(Agent):
         
     def print_values(self,):
         print(f"Attitude: {self.attitude:.2f}, Attitude modifier: {self.attitude_mod:.2f}, Environment modifier: {self.environment_mod:.2f},"
-              f"Behavioral modifier: {self.behavioral_mod:.2f}\n")
+              f"Behavioral modifier: {self.behavioral_mod:.2f}")
