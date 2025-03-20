@@ -10,3 +10,6 @@ class Environment:
         self.environmental_inf += random.uniform(-0.15, 0.15)
         self.behavioral_inf += random.uniform(-0.15, 0.15)
         return self.environmental_inf, self.behavioral_inf
+    
+    def print_values(self,):
+        print(f"Environmental influence: {self.environmental_inf:.2f}, Behavioral influence: {self.behavioral_inf:.2f}\n")
