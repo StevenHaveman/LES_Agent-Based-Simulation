@@ -11,10 +11,12 @@ class Resident(Agent):
         self.behavioral_mod = behavioral_mod
         self.solar_panels = False
 
-    def calc_decision(self, threshold, influence: tuple):
+    def calc_decision(self, threshold, influence: tuple, info_dump=False):
         decision_stat = self.attitude * self.attitude_mod + influence[0] * self.environment_mod + influence[1] * self.behavioral_mod
         # print(f"Calculation: {self.attitude} * {self.attitude_mod} + {influence[0]} * {self.environment_mod} + \
         #       {influence[1]} * {self.behavioral_mod} = {decision_stat}")
+        if info_dump:
+            print(f"Resident {self.id}, decision stat: {decision_stat}")
         if decision_stat > threshold:
             self.solar_panels = True
             return True

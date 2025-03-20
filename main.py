@@ -24,7 +24,8 @@ def main(iter: int, nr_residents: int=1, info_dump=False):
         print(f"Year: {i}")
         influence = environment.change_influence()
         for resident in residents:
-            resident.calc_decision(0.5, influence)
+            resident.calc_decision(0.5, influence, info_dump)
+        for resident in residents:
             if resident.solar_panels == True:
                 print(f"Resident {resident.id} got solar panels!")
 
