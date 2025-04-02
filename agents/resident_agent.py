@@ -2,6 +2,9 @@ from agents.agent import Agent
 import numpy as np
 import random
 
+from utilities import gen_random_value
+
+
 class Resident(Agent):
     def __init__(self, id: int, attitude: float, attitude_mod: float, environ_mod: float, behavioral_mod: float):
         super().__init__()
@@ -13,7 +16,7 @@ class Resident(Agent):
         self.attitude_mod = attitude_mod
         self.environment_mod = environ_mod
         self.behavioral_mod = behavioral_mod
-        self.solar_panels = False
+        self.solar_decision = False
 
     def calculate_behavioral_influence(self, behavioral_inf):
         """Map income vs solar panel price difference to [-0.25, 0.25]"""
@@ -32,12 +35,14 @@ class Resident(Agent):
         decision_stat = self.attitude * self.attitude_mod + influence[0] * self.environment_mod + behavioral_inf * self.behavioral_mod
         # print(f"Calculation: {self.attitude} * {self.attitude_mod} + {influence[0]} * {self.environment_mod} + "
         #       f"{behavioral_inf} * {self.behavioral_mod} = {decision_stat}")
+        if decision_stat > threshold:
+            self.solar_decision = True
+            return True
         if info_dump:
             print(f"Resident {self.id}, decision stat: {decision_stat}")
-        if decision_stat > threshold:
-            self.solar_panels = True
-            return True
         
-    def print_values(self,):
-        print(f"Attitude: {self.attitude:.2f}, Attitude modifier: {self.attitude_mod:.2f}, Environment modifier: {self.environment_mod:.2f},"
-              f"Behavioral modifier: {self.behavioral_mod:.2f}")
+    def __str__(self):
+        """Provides a string representation of the Resident."""
+        return (f"Resident {self.id}: Income={self.income}, Attitude={self.attitude:.2f}, "
+                f"Mods(Att={self.attitude_mod:.2f}, Env={self.environment_mod:.2f}, Beh={self.behavioral_mod:.2f}), "
+                f"Decided for Solar={self.solar_decision}")
