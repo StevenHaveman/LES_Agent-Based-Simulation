@@ -29,13 +29,15 @@ class Resident(Agent):
         return np.random.lognormal(mu, sigma_lognormaal)
 
     def calculate_behavioral_influence(self, solarpanel_price):
-        """Map income vs solar panel price difference to [-0.25, 0.25]"""
-        max_diff = 1000  # Bij een salaris van 1000 euro meer of minder dan de prijs van de zonnepanelen, wordt een max influence bereikt
+        """Map income vs solar panel price difference to [0, 1]"""
+        max_diff = 1000
         min_diff = -1000
 
         difference = self.income - solarpanel_price
-        normalized_diff = (difference - min_diff) / (max_diff - min_diff) * 2 - 1
-        return np.clip(normalized_diff * 0.3, -0.3, 0.3)
+        normalized_diff = (difference - min_diff) / (max_diff - min_diff)
+        
+        return np.clip(normalized_diff, 0, 1)
+
 
     def calc_ROI(self):
         """Het berekenen van de terugverdientijd gebaseerd op de formule uit de volgende bron:
@@ -47,7 +49,6 @@ class Resident(Agent):
         return self.environment.solarpanel_price * self.solarpanel_amount / savings
 
     def calc_decision(self, threshold, info_dump=False):
-        self.income = int(round(self.income * random.choice([1.00, 1.01, 1.02, 1.03, 1.04, 1.05]), -1))
         behavioral_inf = self.calculate_behavioral_influence(self.environment.solarpanel_price * self.solarpanel_amount)
         decision_stat = self.attitude * self.attitude_mod + self.environment.environmental_inf * self.environment_mod + behavioral_inf * self.behavioral_mod
 
@@ -56,6 +57,8 @@ class Resident(Agent):
             return True
         if info_dump:
             print(f"Resident {self.id}, decision stat: {decision_stat}")
+
+        self.income = int(round(self.income * random.choice([1.00, 1.01, 1.02, 1.03, 1.04, 1.05]), -1))
         
     def __str__(self):
         """Provides a string representation of the Resident."""

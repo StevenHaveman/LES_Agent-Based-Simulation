@@ -14,7 +14,7 @@ class Environment:
             if household.solar_panels:
                 nr_solarpanels += 1
 
-        self.environmental_inf = nr_solarpanels / (len(households) * 2)
+        self.environmental_inf = min(nr_solarpanels / (len(households) - 1), 1)
         self.solarpanel_price += round(random.randint(0, 20))
     
     def create_households(self, nr_households: int = 1):
@@ -44,14 +44,13 @@ class Environment:
 
         for i in range(nr_years):
             print(f"Year: {i + 1}")
-            self.change_influence(self.households)
             print(f"Influences: Env={self.environmental_inf:.3f}, Price={self.solarpanel_price}")
 
             decided_residents = 0
             for household in self.households:
                 for resident in household.residents:
                     if not resident.solar_decision: # Only residents without panels reconsider
-                        decision_made = resident.calc_decision(0.5, info_dump)
+                        decision_made = resident.calc_decision(2, info_dump)
                         if decision_made:
                             decided_residents += 1
                             if info_dump:
@@ -61,6 +60,8 @@ class Environment:
             print(f"  Decisions this year: {decided_residents}")
             print(f"  Current Environment State: \n {self}") # Show state after year using __str__
             print("-" * 40)
+
+            self.change_influence(self.households)
 
         print("\n\n" + "-" * 20 + "Simulation Finished" + "-" * 20)
     

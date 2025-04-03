@@ -12,7 +12,11 @@ class Household(Agent):
 
     def create_residents(self, environment, resident_id: int,  nr_residents: int = 1):
         for i in range(nr_residents):
-            self.residents.append(Resident(resident_id, gen_random_value(-0.1, 0.3), gen_random_value(0.9, 1.2), gen_random_value(0.9, 1.2), gen_random_value(0.9, 1.2), environment))
+            self.residents.append(Resident(resident_id, gen_random_value(0, 1), gen_random_value(0, 2), gen_random_value(0, 2), gen_random_value(0, 2), environment))
+
+    def calc_avg_decision(self):
+        for resident in self.residents:
+            if 
 
     def __str__(self):
         """Provides a string representation of the Household."""
