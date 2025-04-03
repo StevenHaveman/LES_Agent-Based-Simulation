@@ -35,11 +35,13 @@ class Resident(Agent):
 
         difference = self.income - solarpanel_price
         normalized_diff = (difference - min_diff) / (max_diff - min_diff)
+        roi = self.calc_roi()
+        influence_roi = max(0, 0.25 - 0.025 * roi)  # Maps ROI [0,10] → Influence [0.25, 0]
         
-        return np.clip(normalized_diff, 0, 1)
+        return np.clip(normalized_diff + influence_roi, 0, 1)
 
 
-    def calc_ROI(self):
+    def calc_roi(self):
         """Het berekenen van de terugverdientijd gebaseerd op de formule uit de volgende bron:
         
         https://pure-energie.nl/kennisbank/zonnepanelen-terugverdienen/#:~:text=Gemiddelde%20terugverdientijd%20zonnepanelen,
