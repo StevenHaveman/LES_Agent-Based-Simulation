@@ -5,8 +5,7 @@ class Environment:
     def __init__(self, environmental_inf: float = 0.0):
         self.households = []
         self.environmental_inf = environmental_inf
-        self.solarpanel_price = random.randint(2600, 3900) # Gebaseerd op gemiddelde kosten van 6-10 zonnepanelen
-        self.behavioral_inf = self.solarpanel_price
+        self.solarpanel_price = [2600, 3300, 3900] # Gebaseerd op gemiddelde kosten van 6-10 zonnepanelen
 
     
     def change_influence(self, households: list):
@@ -16,8 +15,7 @@ class Environment:
                 nr_solarpanels += 1
 
         self.environmental_inf = nr_solarpanels / (len(households) * 2)
-        self.behavioral_inf += round(random.randint(0, 100))
-        return self.environmental_inf, self.behavioral_inf
+        self.solarpanel_price = [price + round(random.randint(0, 100)) for price in self.solarpanel_price]
     
     def create_households(self, nr_households: int = 1):
         for i in range(nr_households):
@@ -46,14 +44,14 @@ class Environment:
 
         for i in range(nr_years):
             print(f"Year: {i + 1}")
-            influence = self.change_influence(self.households)
-            print(f"Influences: Env={influence[0]:.3f}, Price={influence[1]}")
+            self.change_influence(self.households)
+            print(f"Influences: Env={self.environmental_inf:.3f}, Price={self.solarpanel_price}")
 
             decided_residents = 0
             for household in self.households:
                 for resident in household.residents:
                     if not resident.solar_decision: # Only residents without panels reconsider
-                        decision_made = resident.calc_decision(0.5, influence, info_dump)
+                        decision_made = resident.calc_decision(0.5, self, info_dump)
                         if decision_made:
                             decided_residents += 1
                             if info_dump:
