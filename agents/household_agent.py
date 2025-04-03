@@ -15,8 +15,13 @@ class Household(Agent):
             self.residents.append(Resident(resident_id, gen_random_value(0, 1), gen_random_value(0, 2), gen_random_value(0, 2), gen_random_value(0, 2), environment))
 
     def calc_avg_decision(self):
+        total_score = 0
         for resident in self.residents:
-            if 
+            total_score += int(resident.solar_decision)
+        avg_score = total_score / len(self.residents)
+
+        if avg_score > 0.5:
+            self.solar_panels = True
 
     def __str__(self):
         """Provides a string representation of the Household."""

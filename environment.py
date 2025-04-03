@@ -50,11 +50,15 @@ class Environment:
             for household in self.households:
                 for resident in household.residents:
                     if not resident.solar_decision: # Only residents without panels reconsider
-                        decision_made = resident.calc_decision(2, info_dump)
-                        if decision_made:
+                        resident.calc_decision(2, info_dump)
+                        if resident.solar_decision:
                             decided_residents += 1
                             if info_dump:
-                                print(f"Resident {resident.id} decided to get solar panels!")
+                                print(f"Resident {resident.id} wants to get solar panels!")
+
+                household.calc_avg_decision()
+                if household.solar_panels and info_dump:
+                    print(f"Household {household.id} got solar panels!")
 
             print(f"\nEnd of Year {i + 1}:")
             print(f"  Decisions this year: {decided_residents}")
