@@ -2,39 +2,46 @@ from agents.agent import Agent
 import numpy as np
 import random
 
-from utilities import gen_random_value
-
 
 class Resident(Agent):
     def __init__(self, id: int, attitude: float, attitude_mod: float, environ_mod: float, behavioral_mod: float):
         super().__init__()
         self.id = id
         self.attitude = attitude
-        salary = np.random.normal(3300, 700) # Salaris gebaseerd op mediaan inkomen en standaarddeviatie
+        salary = self.calc_salary()
         self.income = max(round(salary, -2), 0)
 
         self.attitude_mod = attitude_mod
         self.environment_mod = environ_mod
         self.behavioral_mod = behavioral_mod
         self.solar_decision = False
+        self.solarpanel_amount = random.choice([0, 1, 2])
 
-    def calculate_behavioral_influence(self, behavioral_inf):
+    def calc_salary(self):
+        median = 3300 # Gebaseerd op mediaan inkomen Nederland anno 2024
+        sigma_normal = 700 # Gebaseerd op standaarddeviatie inkomen Nederland anno 2024
+        mu = np.log(median)
+        sigma_lognormaal = np.sqrt(np.log(1 + (sigma_normal / median) ** 2))
+
+        return np.random.lognormal(mu, sigma_lognormaal)
+
+    def calculate_behavioral_influence(self, solarpanel_price):
+        print(self.income)
         """Map income vs solar panel price difference to [-0.25, 0.25]"""
         max_diff = 1000  # Bij een salaris van 1000 euro meer of minder dan de prijs van de zonnepanelen, wordt een max influence bereikt
         min_diff = -1000
 
-        difference = self.income - behavioral_inf
+        difference = self.income - solarpanel_price
         normalized_diff = (difference - min_diff) / (max_diff - min_diff) * 2 - 1
         influence = np.clip(normalized_diff * 0.3, -0.3, 0.3)
 
         return influence
 
-    def calc_decision(self, threshold, influence: tuple, info_dump=False):
+    def calc_decision(self, threshold, environment, info_dump=False):
         self.income = int(round(self.income * random.choice([1.00, 1.01, 1.02, 1.03, 1.04, 1.05]), -1))
-        behavioral_inf = self.calculate_behavioral_influence(influence[1])
-        decision_stat = self.attitude * self.attitude_mod + influence[0] * self.environment_mod + behavioral_inf * self.behavioral_mod
-        # print(f"Calculation: {self.attitude} * {self.attitude_mod} + {influence[0]} * {self.environment_mod} + "
-        #       f"{behavioral_inf} * {self.behavioral_mod} = {decision_stat}")
+        behavioral_inf = self.calculate_behavioral_influence(environment.solarpanel_price[self.solarpanel_amount])
+        decision_stat = self.attitude * self.attitude_mod + environment.environmental_inf * self.environment_mod + behavioral_inf * self.behavioral_mod
+        
         if decision_stat > threshold:
             self.solar_decision = True
             return True
