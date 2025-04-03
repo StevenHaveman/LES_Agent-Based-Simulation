@@ -5,8 +5,8 @@ class Environment:
     def __init__(self, environmental_inf: float = 0.0):
         self.households = []
         self.environmental_inf = environmental_inf
-        self.solarpanel_price = [2600, 3300, 3900] # Gebaseerd op gemiddelde kosten van 6-10 zonnepanelen
-
+        self.solarpanel_price = 410 # Gebaseerd op gemiddelde kosten van een zonnepaneel in Nederland
+        self.energy_price = 0.32 #https://www.overstappen.nl/energie/stroomprijs/#:~:text=Momenteel%20betreft%20de%20stroomprijs%20gemiddeld,variabel%20energiecontract%20van%2020%20energieleveranciers.
     
     def change_influence(self, households: list):
         nr_solarpanels = 0
@@ -15,7 +15,7 @@ class Environment:
                 nr_solarpanels += 1
 
         self.environmental_inf = nr_solarpanels / (len(households) * 2)
-        self.solarpanel_price = [price + round(random.randint(0, 100)) for price in self.solarpanel_price]
+        self.solarpanel_price += round(random.randint(0, 20))
     
     def create_households(self, nr_households: int = 1):
         for i in range(nr_households):
@@ -28,10 +28,10 @@ class Environment:
         remainder = nr_residents % n_households
 
         for household in self.households:
-            household.create_residents(counter, base_residents)
+            household.create_residents(self, counter, base_residents)
             counter += 1
         for _ in range(remainder):
-            random.choice(nr_households).create_residents(counter, 1)
+            random.choice(nr_households).create_residents(self, counter, 1)
             counter += 1
 
     def create_environment(self, nr_residents: int = 1, nr_households: int = 1):
@@ -51,7 +51,7 @@ class Environment:
             for household in self.households:
                 for resident in household.residents:
                     if not resident.solar_decision: # Only residents without panels reconsider
-                        decision_made = resident.calc_decision(0.5, self, info_dump)
+                        decision_made = resident.calc_decision(0.5, info_dump)
                         if decision_made:
                             decided_residents += 1
                             if info_dump:

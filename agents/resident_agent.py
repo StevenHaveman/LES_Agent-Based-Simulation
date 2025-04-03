@@ -4,18 +4,21 @@ import random
 
 
 class Resident(Agent):
-    def __init__(self, id: int, attitude: float, attitude_mod: float, environ_mod: float, behavioral_mod: float):
+    def __init__(self, id: int, attitude: float, attitude_mod: float, environ_mod: float, behavioral_mod: float, environment):
         super().__init__()
         self.id = id
-        self.attitude = attitude
+        self.environment = environment
         salary = self.calc_salary()
         self.income = max(round(salary, -2), 0)
 
+        self.solarpanel_amount = random.choice([6, 8, 10])
+        self.energy_generation = random.randint(298, 425)
+
+        self.attitude = attitude
         self.attitude_mod = attitude_mod
         self.environment_mod = environ_mod
         self.behavioral_mod = behavioral_mod
         self.solar_decision = False
-        self.solarpanel_amount = random.choice([0, 1, 2])
 
     def calc_salary(self):
         median = 3300 # Gebaseerd op mediaan inkomen Nederland anno 2024
@@ -26,22 +29,28 @@ class Resident(Agent):
         return np.random.lognormal(mu, sigma_lognormaal)
 
     def calculate_behavioral_influence(self, solarpanel_price):
-        print(self.income)
         """Map income vs solar panel price difference to [-0.25, 0.25]"""
         max_diff = 1000  # Bij een salaris van 1000 euro meer of minder dan de prijs van de zonnepanelen, wordt een max influence bereikt
         min_diff = -1000
 
         difference = self.income - solarpanel_price
         normalized_diff = (difference - min_diff) / (max_diff - min_diff) * 2 - 1
-        influence = np.clip(normalized_diff * 0.3, -0.3, 0.3)
+        return np.clip(normalized_diff * 0.3, -0.3, 0.3)
 
-        return influence
-
-    def calc_decision(self, threshold, environment, info_dump=False):
-        self.income = int(round(self.income * random.choice([1.00, 1.01, 1.02, 1.03, 1.04, 1.05]), -1))
-        behavioral_inf = self.calculate_behavioral_influence(environment.solarpanel_price[self.solarpanel_amount])
-        decision_stat = self.attitude * self.attitude_mod + environment.environmental_inf * self.environment_mod + behavioral_inf * self.behavioral_mod
+    def calc_ROI(self):
+        """Het berekenen van de terugverdientijd gebaseerd op de formule uit de volgende bron:
         
+        https://pure-energie.nl/kennisbank/zonnepanelen-terugverdienen/#:~:text=Gemiddelde%20terugverdientijd%20zonnepanelen,
+        -Hoeveel%20jaren%20doe&text=Na%20deze%20jaren%20heb%20je,winst%20maakt%20met%20jouw%20zonnepanelen.
+        """
+        savings = self.energy_generation * self.solarpanel_amount * self.environment.energy_price
+        return self.environment.solarpanel_price * self.solarpanel_amount / savings
+
+    def calc_decision(self, threshold, info_dump=False):
+        self.income = int(round(self.income * random.choice([1.00, 1.01, 1.02, 1.03, 1.04, 1.05]), -1))
+        behavioral_inf = self.calculate_behavioral_influence(self.environment.solarpanel_price * self.solarpanel_amount)
+        decision_stat = self.attitude * self.attitude_mod + self.environment.environmental_inf * self.environment_mod + behavioral_inf * self.behavioral_mod
+
         if decision_stat > threshold:
             self.solar_decision = True
             return True

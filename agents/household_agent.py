@@ -10,9 +10,9 @@ class Household(Agent):
         self.solar_panels = solar_panels
         self.residents = []
 
-    def create_residents(self, resident_id: int,  nr_residents: int = 1):
+    def create_residents(self, environment, resident_id: int,  nr_residents: int = 1):
         for i in range(nr_residents):
-            self.residents.append(Resident(resident_id, gen_random_value(-0.1, 0.3), gen_random_value(0.9, 1.2), gen_random_value(0.9, 1.2), gen_random_value(0.9, 1.2)))
+            self.residents.append(Resident(resident_id, gen_random_value(-0.1, 0.3), gen_random_value(0.9, 1.2), gen_random_value(0.9, 1.2), gen_random_value(0.9, 1.2), environment))
 
     def __str__(self):
         """Provides a string representation of the Household."""
