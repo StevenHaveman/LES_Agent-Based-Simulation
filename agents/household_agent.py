@@ -7,12 +7,15 @@ class Household(Agent):
     def __init__(self, solar_panels: bool, id: int):
         super().__init__()
         self.id = id
-        self.solar_panels = solar_panels
         self.residents = []
 
+        self.solar_panels = solar_panels
+        self.solarpanel_amount = random.choice([6, 8, 10])
+        self.energy_generation = random.randint(298, 425)
+
     def create_residents(self, environment, resident_id: int,  nr_residents: int = 1):
-        for i in range(nr_residents):
-            self.residents.append(Resident(resident_id, gen_random_value(0, 1), gen_random_value(0, 2), gen_random_value(0, 2), gen_random_value(0, 2), environment))
+        for _ in range(nr_residents):
+            self.residents.append(Resident(resident_id, gen_random_value(0, 1), gen_random_value(0, 2), gen_random_value(0, 2), gen_random_value(0, 2), environment, self))
 
     def calc_avg_decision(self):
         total_score = 0
