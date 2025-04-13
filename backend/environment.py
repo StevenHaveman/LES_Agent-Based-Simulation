@@ -1,5 +1,5 @@
 import random
-from agents.household_agent import Household
+from backend.agents.household_agent import Household
 
 class Environment:
     """

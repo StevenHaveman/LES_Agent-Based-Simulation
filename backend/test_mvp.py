@@ -1,8 +1,7 @@
 import pytest
-import numpy as np
-from agents.resident_agent import Resident
-from agents.household_agent import Household
-from environment import Environment
+from backend.agents.resident_agent import Resident
+from backend.agents.household_agent import Household
+from backend.environment import Environment
 
 def test_resident_initialization():
     resident = Resident(1, 0.2, 1.0, 1.1, 0.9)
