@@ -54,11 +54,11 @@ class Resident(Agent):
 
         if decision_stat > threshold:
             self.solar_decision = True
-            return True
         if info_dump:
             print(f"Resident {self.id}, decision stat: {decision_stat}")
 
         self.income = int(round(self.income * random.choice([1.00, 1.01, 1.02, 1.03, 1.04, 1.05]), -1))
+        return self.solar_decision
         
     def __str__(self):
         """Provides a string representation of the Resident."""
