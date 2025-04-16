@@ -15,11 +15,11 @@ class Household(Agent):
         solarpanel_amount (int): The number of solar panels the household would install (e.g., 6, 8, 10).
         energy_generation (int): Estimated energy generation per panel per year (kWh).
     """
-    def __init__(self, model, solar_panels=False):
+    def __init__(self, model):
         super().__init__(model)
         self.residents = []
 
-        self.solar_panels = solar_panels
+        self.solar_panels = False
         self.solarpanel_amount = random.choice([6, 8, 10])
         self.energy_generation = random.randint(298, 425)
 
@@ -45,7 +45,6 @@ class Household(Agent):
                 self  # link naar household
             )
             self.residents.append(resident)
-            self.model.schedule.add(resident)
             next_id += 1
         return next_id
 
@@ -74,12 +73,15 @@ class Household(Agent):
         self.calc_avg_decision()
 
     def __str__(self):
+        """
+        Returns a string representation of the household's state, including 
+        the number of residents, their decisions, and whether solar panels are installed.
+            """ 
         resident_count = len(self.residents)
         residents_with_panels = sum(1 for res in self.residents if res.solar_decision)
-        has_panels = self.solar_panels or (residents_with_panels > 0)
 
         details = (f"Household {self.unique_id}: \n"
-                   f"  Solar Panels Installed: {has_panels}\n"
+                   f"  Solar Panels Installed: {self.solar_panels}\n"
                    f"  Number of Residents: {resident_count}\n"
                    f"  Residents who decided for panels: {residents_with_panels}")
         return details

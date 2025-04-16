@@ -59,20 +59,30 @@ class Resident(Agent):
         return np.random.lognormal(mu, sigma_lognormaal)
     
     def calc_decision(self, threshold, info_dump=False):
-        behavioral_inf = self.calculate_behavioral_influence(
-            self.environment.solarpanel_price * self.household.solarpanel_amount
-        )
-        decision_stat = (
-            self.attitude * self.attitude_mod +
-            self.environment.environmental_inf * self.environment_mod +
-            behavioral_inf * self.behavioral_mod
-        )
+        """
+        Calculates whether the resident decides to adopt solar panels based on
+        attitude, environmental influence, and behavioral factors, compared against a threshold.
+
+        If the decision score exceeds the threshold, the resident's `solar_decision`
+        attribute is set to True. Otherwise, the resident's income might slightly increase.
+
+        Args:
+            threshold (float): The value the decision statistic must exceed for a positive decision.
+            info_dump (bool, optional): If True, prints debug information. Defaults to False.
+
+        Returns:
+            bool | None: True if the decision is positive, None otherwise.
+        """
+
+        behavioral_inf = self.calculate_behavioral_influence(self.environment.solarpanel_price * self.household.solarpanel_amount)
+        decision_stat = self.attitude * self.attitude_mod + self.environment.environmental_inf * self.environment_mod + behavioral_inf * self.behavioral_mod
 
         if decision_stat > threshold:
             self.solar_decision = True
-
+            self.environment.decided_residents += 1
+            return True
         if info_dump:
-            print(f"Resident {self.unique_id}, decision stat: {decision_stat:.2f}")
+            print(f"Resident {self.id}, decision stat: {decision_stat}")
 
         self.income = int(round(self.income * random.choice([1.00, 1.01, 1.02, 1.03, 1.04, 1.05]), -1))
 
