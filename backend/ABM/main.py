@@ -1,4 +1,4 @@
-from backend.environment import Environment
+from backend.ABM.environment import Environment
 
 def main(nr_years: int = 30, nr_residents: int=1, nr_households: int=1, info_dump=False):
     """

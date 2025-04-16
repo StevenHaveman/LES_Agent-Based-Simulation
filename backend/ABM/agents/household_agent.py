@@ -1,6 +1,6 @@
 import random
-from backend.agents.resident_agent import Resident
-from backend.utilities import gen_random_value
+from backend.ABM.agents.resident_agent import Resident
+from backend.ABM.utilities import gen_random_value
 
 class Household():
     """
