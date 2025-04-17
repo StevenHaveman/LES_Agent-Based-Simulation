@@ -1,7 +1,7 @@
 import random
 from mesa import Model
-from agents.household_agent_mesa import Household
-from agents.resident_agent_mesa import Resident
+from backend.ABM.agents.household_agent_mesa import Household
+from backend.ABM.agents.resident_agent_mesa import Resident
 from utilities import gen_random_value
 
 class SolarAdoptionModel(Model):
