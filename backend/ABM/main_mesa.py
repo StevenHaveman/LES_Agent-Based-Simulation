@@ -1,4 +1,4 @@
-from backend.ABM.environment_mesa import SolarAdoptionModel
+from environment_mesa import SolarAdoptionModel
 
 def main():
     model = SolarAdoptionModel(nr_households=10, nr_residents=10)
