@@ -1,7 +1,8 @@
 import React from "react";
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import { homePageRoute } from "./homepage";
+import {configRoute} from "./homepage.jsx";
+
 
 export const rootRoute = createRootRoute({
     component: () => (
@@ -12,4 +13,4 @@ export const rootRoute = createRootRoute({
     ),
 });
 
-export const routeTree = rootRoute.addChildren([homePageRoute]);
+export const routeTree = rootRoute.addChildren([configRoute]);

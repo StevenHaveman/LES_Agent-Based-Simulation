@@ -1,8 +1,12 @@
-from environment_mesa import SolarAdoptionModel
+# main_mesa.py
+from backend.ABM.environment_mesa import SolarAdoptionModel
 
-def main():
-    model = SolarAdoptionModel(nr_households=10, nr_residents=10)
-    for year in range(30):
+def run_simulation(nr_households=10, nr_residents=10, simulation_years=30):
+    model = SolarAdoptionModel(nr_households=nr_households, nr_residents=nr_residents)
+
+    simulation_output = []
+
+    for year in range(simulation_years):
         print(f"=== Jaar {year+1} ===")
         print(f"Environmental Influence: {model.environmental_inf}")
         print(f"Solar Panel Price: {model.solarpanel_price:.2f}")
@@ -16,5 +20,6 @@ def main():
 
         model.step()
 
-if __name__ == "__main__":
-    main()
+
+
+    return simulation_output
