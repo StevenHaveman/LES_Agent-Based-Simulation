@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import "../styles/ConfigForm.css";
+import configFormController from "../../controller/ConfigFormController.js";
+
 
 const ConfigForm = () => {
     const [formData, setFormData] = useState({
@@ -11,16 +13,27 @@ const ConfigForm = () => {
     });
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
+        const {name, value} = e.target;
+        setFormData({...formData, [name]: value});
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Simulatie gestart met:", formData);
+        try {
+            await configFormController.startSimulation(formData);
+
+
+            console.log("✅ Simulatie succesvol gestart met de volgende waarden:");
+            console.table({
+                AantalHuishoudens: formData.nr_households,
+                AantalBewoners: formData.nr_residents,
+                SimulatieduurJaren: formData.simulation_years,
+            });
+        } catch (error) {
+            alert("Er ging iets mis bij het starten van de simulatie.");
+            console.error("❌ Simulatie mislukt:", error);
+        }
+
     };
 
     return (
