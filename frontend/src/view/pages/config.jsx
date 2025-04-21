@@ -12,7 +12,7 @@ export const configRoute = createRoute({
     component: function Config() {
         return (
             <>
-                <Navbar></Navbar>
+                <Navbar title={"MVP Config"}></Navbar>
                 <ConfigForm></ConfigForm>
             </>
         );
