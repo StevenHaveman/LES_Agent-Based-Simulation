@@ -23,7 +23,7 @@ const ConfigForm = () => {
             await configFormController.startSimulation(formData);
 
 
-            console.log("✅ Simulatie succesvol gestart met de volgende waarden:");
+            console.log("Simulatie succesvol gestart met de volgende waarden:");
             console.table({
                 AantalHuishoudens: formData.nr_households,
                 AantalBewoners: formData.nr_residents,
@@ -31,7 +31,7 @@ const ConfigForm = () => {
             });
         } catch (error) {
             alert("Er ging iets mis bij het starten van de simulatie.");
-            console.error("❌ Simulatie mislukt:", error);
+            console.error("Simulatie mislukt:", error);
         }
 
     };
