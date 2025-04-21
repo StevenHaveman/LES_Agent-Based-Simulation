@@ -9,10 +9,10 @@ import ConfigForm from "../components/ConfigForm.jsx";
 export const configRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/",
-    component: function Index() {
+    component: function Config() {
         return (
             <>
-                <Navbar></Navbar>
+                <Navbar title={"MVP Config"}></Navbar>
                 <ConfigForm></ConfigForm>
             </>
         );

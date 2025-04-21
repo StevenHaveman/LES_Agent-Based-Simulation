@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import "../styles/ConfigForm.css";
 import configFormController from "../../controller/ConfigFormController.js";
+import { useNavigate } from "@tanstack/react-router";
 
 
 const ConfigForm = () => {
@@ -11,6 +12,8 @@ const ConfigForm = () => {
         nr_residents: 10,
         simulation_years: 30
     });
+    const navigate = useNavigate();
+
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -29,6 +32,7 @@ const ConfigForm = () => {
                 AantalBewoners: formData.nr_residents,
                 SimulatieduurJaren: formData.simulation_years,
             });
+            await navigate({to: "/overview"});
         } catch (error) {
             alert("Er ging iets mis bij het starten van de simulatie.");
             console.error("Simulatie mislukt:", error);
