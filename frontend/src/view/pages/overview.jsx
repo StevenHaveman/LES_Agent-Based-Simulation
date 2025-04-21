@@ -17,7 +17,6 @@ export const overviewRoute = createRoute({
                 <div className="overview-container">
                     <MapPreview></MapPreview>
                     <GraphicsView> </GraphicsView>
-
                 </div>
             </>
         );

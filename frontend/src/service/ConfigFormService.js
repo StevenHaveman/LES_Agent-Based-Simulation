@@ -1,6 +1,6 @@
 const API_URL = "http://127.0.0.1:5000";
-class ConfigFormService {
 
+class ConfigFormService {
 
     async startSimulation(config) {
         const response = await fetch(`${API_URL}/simulation`, {
@@ -13,6 +13,16 @@ class ConfigFormService {
 
         if (!response.ok) {
             throw new Error("Simulatie starten mislukt");
+        }
+        return await response.json();
+    }
+
+
+    async getSimulationGraphicResults() {
+        const response = await fetch(`${API_URL}/simulation/graphics`);
+
+        if (!response.ok) {
+            throw new Error("Simulatiedata ophalen mislukt");
         }
 
         return await response.json();
