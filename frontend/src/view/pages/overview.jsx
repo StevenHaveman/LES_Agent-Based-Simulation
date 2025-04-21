@@ -6,14 +6,13 @@ import "../styles/global.css"
 import ConfigForm from "../components/ConfigForm.jsx";
 
 
-export const configRoute = createRoute({
+export const overviewRoute  = createRoute({
     getParentRoute: () => rootRoute,
-    path: "/",
-    component: function Index() {
+    path: "/overview",
+    component: function Overview() {
         return (
             <>
-                <Navbar></Navbar>
-                <ConfigForm></ConfigForm>
+
             </>
         );
     },
