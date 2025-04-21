@@ -1,11 +1,11 @@
+# app.py
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from backend.ABM.main_mesa import run_simulation
+from backend.ABM.main_mesa import run_simulation, graphics_data
 
 app = Flask(__name__)
+CORS(app, resources={r"/simulation*": {"origins": "http://localhost:5173"}})
 
-# Sta alleen frontend localhost toe
-CORS(app, resources={r"/simulation": {"origins": "http://localhost:5173"}})
 
 @app.route('/simulation', methods=['POST'])
 def start_simulation():
@@ -20,6 +20,13 @@ def start_simulation():
 
     result = run_simulation(nr_households, nr_residents, simulation_years)
     return jsonify({"status": "ok", "result": result})
+
+
+@app.route("/simulation/graphics", methods=["GET"])
+def get_graphics_data():
+    if not graphics_data:
+        return jsonify({"error": "No simulation data available"}), 400
+    return jsonify(graphics_data)
 
 
 if __name__ == '__main__':

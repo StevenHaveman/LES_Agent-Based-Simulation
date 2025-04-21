@@ -7,3 +7,15 @@ body {
     font-family: Arial, sans-serif;
 
 }
+
+.overview-container {
+    display: flex;
+    flex-direction: row;
+    height: calc(100vh - 60px);
+    width: 100vw;
+}
+
+.overview-container > * {
+    flex: 1;
+    overflow: auto;
+}

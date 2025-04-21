@@ -4,18 +4,21 @@ import {rootRoute} from "./root";
 import "../styles/global.css"
 import Navbar from "../components/Navbar.jsx";
 import MapPreview from "../components/MapPreview.jsx";
+import GraphicsView from "../components/GraphicsView.jsx";
 
 
-
-
-export const overviewRoute  = createRoute({
+export const overviewRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/overview",
     component: function Overview() {
         return (
             <>
                 <Navbar title={"MVP Overview"}></Navbar>
-                <MapPreview></MapPreview>
+                <div className="overview-container">
+                    <MapPreview></MapPreview>
+                    <GraphicsView> </GraphicsView>
+
+                </div>
             </>
         );
     },
