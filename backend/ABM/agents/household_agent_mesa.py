@@ -20,11 +20,11 @@ class Household(Agent):
         super().__init__(model)
         self.residents = []
 
-        self.solar_panels = False
+        self.solar_panels = None
         self.solarpanel_amount = random.choice([6, 8, 10])
         self.energy_generation = random.randint(298, 425)
 
-    def create_residents(self, start_resident_id: int, nr_residents: int):
+    def create_residents(self, nr_residents: int):
         """
         Create and add Resident agents to the household, and add them to the model schedule.
 
@@ -34,10 +34,8 @@ class Household(Agent):
         Returns:
             int: The next available resident ID.
         """
-        next_id = start_resident_id
         for _ in range(nr_residents):
             resident = Resident(
-                next_id,
                 gen_random_value(0, 1),
                 gen_random_value(0, 2),
                 gen_random_value(0, 2),
@@ -45,9 +43,9 @@ class Household(Agent):
                 self.model,
                 self  # link naar household
             )
+            if self.solar_panels:
+                resident.solar_decision = True
             self.residents.append(resident)
-            next_id += 1
-        return next_id
 
     def calc_avg_decision(self):
         """

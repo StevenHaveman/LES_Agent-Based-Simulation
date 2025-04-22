@@ -28,25 +28,18 @@ class SolarAdoptionModel(Model):
 
         for i in range(nr_households):
             hh = Household(self)
-            hh.solar_panels = False
+            hh.solar_panels = random.random() < 0.15 # 15% kans dat een huis bij voorbaat zonnepanelen heeft, 85% kans van niet
             hh.solarpanel_amount = self.random.choice([6, 8, 10])
             hh.energy_generation = self.random.randint(298, 425)
 
             self.households.append(hh)
             # self.add_agent(hh)  # voeg toe aan het model (dus aan self.agents)
 
-            n_res = base + (1 if i < remainder else 0)
-            for _ in range(n_res):
-                res = Resident(
-                    gen_random_value(0, 1),
-                    gen_random_value(0, 2),
-                    gen_random_value(0, 2),
-                    gen_random_value(0, 2),
-                    self,
-                    hh
-                )
-                hh.residents.append(res)
-                self.residents.append(res)
+            nr_res = base + (1 if i < remainder else 0)
+            hh.create_residents(nr_res)
+            self.residents.append(hh.residents)
+
+        self.update_environmental_influence()
 
     def step(self):
         """
@@ -91,11 +84,10 @@ class SolarAdoptionModel(Model):
         total_residents = sum(len(h.residents) for h in self.households)
         residents_with_panels = sum(sum(1 for r in h.residents if r.solar_decision) for h in self.households)
         households_with_panels = sum(1 for h in self.households if h.solar_panels or any(r.solar_decision for r in h.residents))
-        return (f"      Environment State:\n"
-                f"        Total Residents who would like Panels: {residents_with_panels} / {total_residents}\n"
-                f"        Households: {households_with_panels} / {total_households} with panels\n"
-                f"        Environmental Influence: {self.environmental_inf:.3f}\n"
-                f"        Current Solar Panel Price: {self.solarpanel_price}\n") # Use the price variable directly
+        return (f"    Total Residents who would like Panels: {residents_with_panels} / {total_residents}\n"
+                f"    Households: {households_with_panels} / {total_households} with panels\n"
+                f"    Environmental Influence: {self.environmental_inf:.3f}\n"
+                f"    Current Solar Panel Price: {self.solarpanel_price}\n") # Use the price variable directly
 
 
 

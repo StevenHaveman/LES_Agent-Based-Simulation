@@ -1,4 +1,3 @@
-# main_mesa.py
 from environment_mesa import SolarAdoptionModel
 
 def run_simulation(nr_households=10, nr_residents=10, simulation_years=30):
@@ -8,8 +7,8 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30):
 
     for year in range(simulation_years):
         print(f"=== Jaar {year + 1} ===")
-        print(f"Environmental Influence: {model.environmental_inf}")
-        print(f"Solar Panel Price: {model.solarpanel_price:.2f}")
+        print(f"Current Environment State: ")
+        print(model)
 
         model.step()
 
@@ -19,6 +18,7 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30):
         print(model)
         print("-" * 40)
 
+
     return simulation_output
 
-run_simulation(5, 5, 5)
+run_simulation(20, 20, 30)
