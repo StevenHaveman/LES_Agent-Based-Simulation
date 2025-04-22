@@ -19,3 +19,7 @@ body {
     flex: 1;
     overflow: auto;
 }
+
+.overview-container:nth-child(1){
+    background-color: #A4FA8F;
+}

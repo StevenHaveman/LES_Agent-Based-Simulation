@@ -12,7 +12,7 @@ class ConfigFormService {
         });
 
         if (!response.ok) {
-            throw new Error("Simulatie starten mislukt");
+            throw new Error("Starting simulation failed");
         }
         return await response.json();
     }
@@ -22,7 +22,7 @@ class ConfigFormService {
         const response = await fetch(`${API_URL}/overview`);
 
         if (!response.ok) {
-            throw new Error("Simulatiedata ophalen mislukt");
+            throw new Error("Fetching simulation graphic results failed");
         }
 
         return await response.json();

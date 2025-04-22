@@ -1,11 +1,10 @@
-# app.py
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from backend.ABM.main_mesa import run_simulation, graphics_data
 
 app = Flask(__name__)
-CORS(app, resources={r"/simulation*": {"origins": "http://localhost:5173"}})
 
+CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
 
 @app.route('/config', methods=['POST'])
 def start_simulation():
