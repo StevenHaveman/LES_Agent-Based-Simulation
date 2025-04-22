@@ -71,24 +71,41 @@ class SolarAdoptionModel(Model):
         self.environmental_inf = min(nr_solarpanels / (len(self.households) - 1), 1)
         self.solarpanel_price += round(random.randint(0, 20))
 
-    def collect_yearly_data(self, year):
-        # Flatten the list of residents
+    def collect_start_of_year_data(self, year):
         all_residents = [resident for household in self.residents for resident in household]
-
         residents_with_panels = sum(res.solar_decision for res in all_residents)
         households_with_panels = sum(hh.solar_panels for hh in self.households)
 
+        start_state = {
+            "residents_for_panels": residents_with_panels,
+            "households_with_panels": households_with_panels,
+            "environmental_influence": round(self.environmental_inf, 3),
+            "solar_panel_price": self.solarpanel_price
+        }
+
         data = {
             "year": year,
-            "environmental_influence": round(self.environmental_inf, 3),
-            "solar_panel_price": self.solarpanel_price,
             "decisions_this_year": self.decided_residents,
-            "residents_for_panels": residents_with_panels,
-            "households_with_panels": households_with_panels
+            "start_state": start_state,
         }
 
         self.yearly_stats.append(data)
         return data
+
+    def collect_end_of_year_data(self, data):
+        all_residents = [resident for household in self.residents for resident in household]
+        residents_with_panels = sum(res.solar_decision for res in all_residents)
+        households_with_panels = sum(hh.solar_panels for hh in self.households)
+
+        end_state = {
+            "residents_for_panels": residents_with_panels,
+            "households_with_panels": households_with_panels,
+            "environmental_influence": round(self.environmental_inf, 3),
+            "solar_panel_price": self.solarpanel_price,
+            "decisions_this_year": self.decided_residents
+        }
+
+        data["end_state"] = end_state
 
     def __str__(self):
         """
