@@ -1,9 +1,11 @@
 import random
 from agents.household_agent import Household
+from utilities import settings
 
 class Environment:
     def __init__(self, environmental_inf: float = 0.0):
         self.households = []
+        self.timestep = 0
         self.environmental_inf = environmental_inf
         self.solarpanel_price = 410 # Gebaseerd op gemiddelde kosten van een zonnepaneel in Nederland
         self.energy_price = 0.32 #https://www.overstappen.nl/energie/stroomprijs/#:~:text=Momenteel%20betreft%20de%20stroomprijs%20gemiddeld,variabel%20energiecontract%20van%2020%20energieleveranciers.
@@ -34,7 +36,7 @@ class Environment:
             random.choice(nr_households).create_residents(self, counter, 1)
             counter += 1
 
-    def create_environment(self, nr_residents: int = 1, nr_households: int = 1):
+    def create_environment(self, nr_residents, nr_households):
         self.create_households(nr_households)
         self.distribute_residents(nr_residents, nr_households)
 
@@ -68,6 +70,11 @@ class Environment:
             self.change_influence(self.households)
 
         print("\n\n" + "-" * 20 + "Simulation Finished" + "-" * 20)
+
+    def data_collction(self):
+        timestep_data = {
+            "timestep": self.timestep,
+        }
     
     def __str__(self):
         """Provides a string representation of the Environment's current state."""

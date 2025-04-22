@@ -1,0 +1,3 @@
+NUM_AGENTS : 10 # Number of agents in the simulation
+NUM_HOUSEHOLDS: 10 # Number of households in the simulation
+SIM_DURATION: 25 # Duration of the simulation in years
