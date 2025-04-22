@@ -23,3 +23,10 @@ body {
 .overview-container:nth-child(1){
     background-color: #A4FA8F;
 }
+
+.detail-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
