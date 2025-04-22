@@ -23,7 +23,7 @@ class SolarAdoptionModel(Model):
     def create_agents(self, nr_households: int, nr_residents: int):
         """
         Creates a specified number of Household agents and distributes residents among them.
-        Also initializes the environmental influence and solar panel price.    
+        Also initializes the environmental influence and solar panel price.
         """
         base = nr_residents // nr_households
         remainder = nr_residents % nr_households
@@ -104,21 +104,21 @@ class SolarAdoptionModel(Model):
         self.yearly_stats.append(data)
         return data
 
+    def __str__(self):
+        """
+        Provides a string representation of the Environment's current state.
 
-def __str__(self):
-    """
-    Provides a string representation of the Environment's current state.
+        Returns:
+            str: A summary string of the environment status.
+        """
 
-    Returns:
-        str: A summary string of the environment status.
-    """
-    total_households = len(self.households)
-    total_residents = sum(len(h.residents) for h in self.households)
-    residents_with_panels = sum(sum(1 for r in h.residents if r.solar_decision) for h in self.households)
-    households_with_panels = sum(
-        1 for h in self.households if h.solar_panels or any(r.solar_decision for r in h.residents))
-    return (f"  Environment State:\n"
-            f"    Total Residents who would like Panels: {residents_with_panels} / {total_residents}\n"
-            f"    Households: {households_with_panels} / {total_households} with panels\n"
-            f"    Environmental Influence: {self.environmental_inf:.3f}\n"
-            f"    Current Solar Panel Price: {self.solarpanel_price}\n")  # Use the price variable directly
+        total_households = len(self.households)
+        total_residents = sum(len(h.residents) for h in self.households)
+        residents_with_panels = sum(sum(1 for r in h.residents if r.solar_decision) for h in self.households)
+        households_with_panels = sum(
+            1 for h in self.households if h.solar_panels or any(r.solar_decision for r in h.residents))
+        return (f"  Environment State:\n"
+                f"    Total Residents who would like Panels: {residents_with_panels} / {total_residents}\n"
+                f"    Households: {households_with_panels} / {total_households} with panels\n"
+                f"    Environmental Influence: {self.environmental_inf:.3f}\n"
+                f"    Current Solar Panel Price: {self.solarpanel_price}\n")  # Use the price variable directly
