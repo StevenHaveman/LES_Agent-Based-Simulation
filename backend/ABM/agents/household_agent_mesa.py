@@ -1,8 +1,7 @@
 from mesa import Agent
 import random
-from agents.resident_agent_mesa import Resident
-from utilities import gen_random_value
-
+from backend.ABM.agents.resident_agent_mesa import Resident
+from backend.ABM.utilities import gen_random_value
 
 class Household(Agent):
     """

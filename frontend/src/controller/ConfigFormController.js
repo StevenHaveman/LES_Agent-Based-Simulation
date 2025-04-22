@@ -17,6 +17,17 @@ class ConfigFormController {
         }
     }
 
+    async getSimulationGraphicResults() {
+        try {
+            const result = await this.service.getSimulationGraphicResults();
+            console.log("Simulatie grafieken gelukt");
+            return result;
+        } catch (error) {
+            console.error("Simulatie grafieken ophalen mislukt:", error);
+            throw error;
+        }
+    }
+
 
 
 }
