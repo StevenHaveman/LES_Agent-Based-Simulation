@@ -7,7 +7,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/simulation*": {"origins": "http://localhost:5173"}})
 
 
-@app.route('/simulation', methods=['POST'])
+@app.route('/config', methods=['POST'])
 def start_simulation():
     data = request.get_json()
 
@@ -22,7 +22,7 @@ def start_simulation():
     return jsonify({"status": "ok", "result": result})
 
 
-@app.route("/simulation/graphics", methods=["GET"])
+@app.route("/overview", methods=["GET"])
 def get_graphics_data():
     if not graphics_data:
         return jsonify({"error": "No simulation data available"}), 400
