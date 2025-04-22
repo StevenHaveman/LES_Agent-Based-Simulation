@@ -26,16 +26,11 @@ const ConfigForm = () => {
             await configFormController.startSimulation(formData);
 
 
-            console.log("Simulatie succesvol gestart met de volgende waarden:");
-            console.table({
-                AantalHuishoudens: formData.nr_households,
-                AantalBewoners: formData.nr_residents,
-                SimulatieduurJaren: formData.simulation_years,
-            });
+            console.log("Simulation succesvol:");
             await navigate({to: "/overview"});
         } catch (error) {
-            alert("Er ging iets mis bij het starten van de simulatie.");
-            console.error("Simulatie mislukt:", error);
+            alert("Something went wrong");
+            console.error("Simulation went wrong", error);
         }
 
     };
@@ -45,12 +40,12 @@ const ConfigForm = () => {
             <div className="form-wrapper">
                 <section className="form-card">
                     <header className="form-header">
-                        <h1 className="form-title">Configureer de simulatie</h1>
-                        <p className="form-subtitle">Vul de startwaardes in</p>
+                        <h1 className="form-title">Configure Simulation</h1>
+                        <p className="form-subtitle">Put Starting Values</p>
                     </header>
                     <form onSubmit={handleSubmit} className="form-body">
                         <div className="form-group">
-                            <label htmlFor="nr_households" className="form-label">Aantal huishoudens</label>
+                            <label htmlFor="nr_households" className="form-label">Number of Households</label>
                             <input
                                 type="number"
                                 id="nr_households"
@@ -65,7 +60,7 @@ const ConfigForm = () => {
 
 
                         <div className="form-group">
-                            <label htmlFor="nr_residents" className="form-label">Aantal bewoners</label>
+                            <label htmlFor="nr_residents" className="form-label">Number of residents</label>
                             <input
                                 type="number"
                                 id="nr_residents"
@@ -80,7 +75,7 @@ const ConfigForm = () => {
 
 
                         <div className="form-group">
-                            <label htmlFor="simulation_years" className="form-label">Simulatieduur (jaren)</label>
+                            <label htmlFor="simulation_years" className="form-label">Duration of Simulation(years)</label>
                             <input
                                 type="number"
                                 id="simulation_years"
@@ -97,7 +92,7 @@ const ConfigForm = () => {
                             type="submit"
                             className="form-button"
                         >
-                            Start simulatie
+                            Start Simulation
                         </button>
                     </form>
                 </section>
