@@ -81,15 +81,12 @@ class Resident(Agent):
             self.solar_decision = True
             self.environment.decided_residents += 1
             return True
-        if info_dump:
-            print(f"Resident {self.id}, decision stat: {decision_stat}")
 
         self.income = int(round(self.income * random.choice([1.00, 1.01, 1.02, 1.03, 1.04, 1.05]), -1))
 
     def step(self):
         if not self.solar_decision:
-            # print(f"Resident {self.unique_id} is considering solar panels.")
-            self.calc_decision(threshold=2, info_dump=False)
+            self.calc_decision(threshold=2)
 
     def calc_roi(self):
         """
