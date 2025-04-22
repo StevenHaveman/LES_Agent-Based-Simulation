@@ -24,7 +24,7 @@ class Household(Agent):
         self.solarpanel_amount = random.choice([6, 8, 10])
         self.energy_generation = random.randint(298, 425)
 
-    def create_residents(self, start_resident_id: int, nr_residents: int = 1):
+    def create_residents(self, start_resident_id: int, nr_residents: int):
         """
         Create and add Resident agents to the household, and add them to the model schedule.
 
