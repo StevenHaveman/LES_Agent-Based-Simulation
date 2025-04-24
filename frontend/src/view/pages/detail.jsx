@@ -1,20 +1,26 @@
 import React from "react";
-import {createRoute} from "@tanstack/react-router";
-import {rootRoute} from "./root";
-import "../styles/global.css"
+import { createRoute } from "@tanstack/react-router";
+import { rootRoute } from "./root";
+import "../styles/detailpage.css";
 
 export const detailRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/detail",
     component: function Overview() {
         return (
-            <>
-                <div className={"detail-container"}>
-                <h1> Detailscherm </h1>
+            <div className="parent-container">
+                <div className="list-container">
+                    <h3>households</h3>
+                    <h3>residents</h3>
                 </div>
-
-            </>
-        )
-            ;
+                <div className="map-container">
+                    <h3>map</h3>
+                </div>
+                <div className="info-container">
+                    <h3>household info </h3>
+                    <h3> resident info</h3>
+                </div>
+            </div>
+        );
     },
 });
