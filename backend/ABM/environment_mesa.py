@@ -1,6 +1,6 @@
 import random
 from mesa import Model
-from agents.household_agent_mesa import Household
+from backend.ABM.agents.household_agent_mesa import Household
 
 
 class SolarAdoptionModel(Model):
