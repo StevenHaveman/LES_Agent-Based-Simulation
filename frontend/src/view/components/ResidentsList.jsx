@@ -1,9 +1,13 @@
 import React from 'react';
+import "../styles/ResidentsList.css";
 
 const ResidentsList = ({ residents }) => {
     return (
         <div>
-            <h2>Residents</h2>
+            <h1 class="h1-with-icon">
+                Residents
+                <img src="/INNO/Residents_icon.png" alt="Residents Icon" class="Residents_icon" />
+            </h1>
             {residents && residents.length > 0 ? (
                 <ul>
                     {residents.map((resident, index) => (

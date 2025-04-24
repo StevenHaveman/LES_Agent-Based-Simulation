@@ -1,0 +1,10 @@
+.Residents_icon {
+    width: 50px; 
+    height: 50px;
+}
+
+.h1-with-icon {
+    display: 'flex';
+    align-Items: 'center'; 
+    gap: 10px; 
+}

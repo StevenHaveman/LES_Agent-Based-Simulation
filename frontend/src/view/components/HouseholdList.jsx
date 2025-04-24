@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import "../styles/HouseholdList.css";
 
 const HouseholdList = ({ onSelectResidents }) => {
     const [households, setHouseholds] = useState([]);
@@ -26,15 +27,17 @@ const HouseholdList = ({ onSelectResidents }) => {
 
     return (
         <div>
-            <h1>Huishoudens</h1>
-            <img src="frontend/public/House_icon.png" alt="House Icon" style={{ width: '50px', height: '50px' }} />
-            <ul style={{ maxHeight: '300px', overflowY: 'scroll' }}>
+            <h1 class="h1-with-icon">
+                Households
+                <img src="/INNO/House_icon.png" alt="House Icon" class="house_icon" />
+            </h1>
+            <ul class="household-list-container">
                 {households.map((household) => (
                     <li key={household.id}>
                         <h2>{household.name}</h2>
                         <p>{household.address}</p>
                         <button onClick={() => handleViewResidents(household)}>
-                            Bekijk bewoners
+                            Check Residents
                         </button>
                     </li>
                 ))}
