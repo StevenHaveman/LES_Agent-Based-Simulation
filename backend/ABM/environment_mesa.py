@@ -28,9 +28,7 @@ class SolarAdoptionModel(Model):
 
         for i in range(nr_households):
             hh = Household(self)
-            hh.solar_panels = random.random() < 0.15 # 15% kans dat een huis bij voorbaat zonnepanelen heeft, 85% kans van niet
-            hh.solarpanel_amount = self.random.choice([6, 8, 10])
-            hh.energy_generation = self.random.randint(298, 425)
+            hh.solar_panels = random.random() < 0.32 # https://www.netbeheernederland.nl/artikelen/nieuws/netbeheerders-zien-aantal-huishoudens-met-zonnepanelen-verder-groeien-2023#:~:text=De%20netbeheerders%20tellen%20inmiddels%20op,in%20ons%20land%20zonnepanelen%20heeft.
 
             self.households.append(hh)
             # self.add_agent(hh)  # voeg toe aan het model (dus aan self.agents)

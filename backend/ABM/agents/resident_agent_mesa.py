@@ -80,7 +80,6 @@ class Resident(Agent):
         if decision_stat > threshold:
             self.solar_decision = True
             self.environment.decided_residents += 1
-            return True
 
         self.income = int(round(self.income * random.choice([1.00, 1.01, 1.02, 1.03, 1.04, 1.05]), -1))
 

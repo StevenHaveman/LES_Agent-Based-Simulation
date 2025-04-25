@@ -22,7 +22,7 @@ class Environment:
         """
         self.households = []
         self.environmental_inf = environmental_inf
-        self.solarpanel_price = 410 # Gebaseerd op gemiddelde kosten van een zonnepaneel in Nederland
+        self.solarpanel_price = 410 # https://www.milieucentraal.nl/energie-besparen/zonnepanelen/kosten-en-opbrengst-zonnepanelen/#:~:text=Bij%20een%20set%20van%206,bij%2010%20ongeveer%20%E2%82%AC%20390.
         self.energy_price = 0.32 #https://www.overstappen.nl/energie/stroomprijs/#:~:text=Momenteel%20betreft%20de%20stroomprijs%20gemiddeld,variabel%20energiecontract%20van%2020%20energieleveranciers.
     
     def change_influence(self, households: list):
