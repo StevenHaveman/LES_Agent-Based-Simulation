@@ -8,11 +8,21 @@ class ConfigFormController {
     async startSimulation(config) {
         try {
             const result = await this.service.startSimulation(config);
-            console.log("Simulatie gelukt met deze waardes:");
-            console.table(config);
+            console.log("Simulation started successfully");
             return result;
         } catch (error) {
-            console.error("Simulatie mislukt:", error);
+            console.error("Simulation Failed", error);
+            throw error;
+        }
+    }
+
+    async getOverview() {
+        try {
+            const result = await this.service.getSimulationGraphicResults();
+            console.log("Simulation overview fetched successfully");
+            return result;
+        } catch (error) {
+            console.error("Simulation overview fetch failed:", error);
             throw error;
         }
     }

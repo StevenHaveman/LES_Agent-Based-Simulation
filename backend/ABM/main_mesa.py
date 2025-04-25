@@ -1,24 +1,36 @@
-from environment_mesa import SolarAdoptionModel
+from backend.ABM.environment_mesa import SolarAdoptionModel
+
+# TODO DENK DAT DIT IN EEN DATA CLASSE MOET GAAN GEBEUREN ZODDAT DE DATA IN DE GUI KAN WORDEN GETOONT EN HET OP EEN PLEK IS.
+graphics_data = []
+households_data = []
 
 def run_simulation(nr_households=10, nr_residents=10, simulation_years=30):
-    model = SolarAdoptionModel(nr_households, nr_residents)
+    global graphics_data
+    global households_data
+    
+    graphics_data.clear()
 
-    simulation_output = []
+    model = SolarAdoptionModel(nr_households=nr_households, nr_residents=nr_residents)
 
     for year in range(simulation_years):
-        print(f"=== Jaar {year + 1} ===")
-        print(f"Current Environment State: ")
+        print(f"=== Year {year + 1} ===")
+        print("Current Environment State (begin):")
         print(model)
+
+        data = model.collect_start_of_year_data(year + 1)
 
         model.step()
 
         print(f"\nEnd of Year {year + 1}:")
         print(f"  Decisions this year: {model.decided_residents}")
-        print(f"  Current Environment State:") # Show state after year using __str__
+        print("  Current Environment State (end):")
         print(model)
         print("-" * 40)
 
+        model.collect_end_of_year_data(data)
 
-    return simulation_output
+        graphics_data.append(data)
 
-run_simulation(20, 20, 30)
+    households_data.clear()
+    households_data.extend(model.collect_household_information())
+    return {"message": "Simulation completed"}
