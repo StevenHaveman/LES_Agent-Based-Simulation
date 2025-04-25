@@ -26,7 +26,7 @@ const HouseholdList = ({ onSelectResidents }) => {
     };
 
     return (
-        <div>
+        <div class="container">
             <h1 class="h1-with-icon">
                 Households
                 <img src="/INNO/House_icon.png" alt="House Icon" class="house_icon" />
