@@ -9,7 +9,13 @@
 }
 
 .h1-with-icon {
-    display: 'flex';
-    align-Items: 'center'; 
+    display: flex;
+    align-Items: center;
+
     gap: 10px; 
+}
+.container{
+    display: flex;
+    flex-flow: column;
+    background-color: #F8E6CE;
 }

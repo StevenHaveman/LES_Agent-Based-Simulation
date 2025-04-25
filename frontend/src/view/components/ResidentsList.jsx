@@ -3,7 +3,7 @@ import "../styles/ResidentsList.css";
 
 const ResidentsList = ({ residents }) => {
     return (
-        <div>
+        <div className="container">
             <h1 class="h1-with-icon">
                 Residents
                 <img src="/INNO/Residents_icon.png" alt="Residents Icon" class="Residents_icon" />
