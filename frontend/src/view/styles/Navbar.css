@@ -1,0 +1,25 @@
+.navbar {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 80px;
+    background-color: #A49C52;
+    padding: 0 20px;
+}
+
+.navbar .logo {
+    height: 50px;
+    width: auto;
+}
+
+.navbar-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.navbar h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #fff;
+}
