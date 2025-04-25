@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from backend.ABM.main_mesa import run_simulation, graphics_data
+from backend.ABM.main_mesa import run_simulation, graphics_data, households_data
 
 app = Flask(__name__)
 
@@ -26,6 +26,12 @@ def get_graphics_data():
     if not graphics_data:
         return jsonify({"error": "No simulation data available"}), 400
     return jsonify(graphics_data)
+
+@app.route('/fetch_households', methods=['GET'])
+def fetch_households():
+    if not households_data:
+        return jsonify({"error": "No household data available"}), 400
+    return jsonify(households_data)
 
 
 if __name__ == '__main__':

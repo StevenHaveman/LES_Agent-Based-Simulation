@@ -107,6 +107,25 @@ class SolarAdoptionModel(Model):
 
         data["end_state"] = end_state
 
+        
+    def collect_household_information(self):
+        """
+        Verzamelt informatie over alle huishoudens in het model en retourneert deze in JSON-formaat.
+
+        Returns:
+            list: Een lijst van huishoudens met hun details en bewoners.
+        """
+        households_data = []
+        for household in self.households:
+            household_data = {
+                "id": household.unique_id,
+                "name": f"Household {household.unique_id}",
+                "address": f"Straat {household.unique_id}, Stad",
+                "residents": [{"name": f"Resident {i}", "income": resident.income, "Solar_decision": resident.solar_decision} for i, resident in enumerate(household.residents, start=1)]
+            }
+            households_data.append(household_data)
+        return households_data
+
     def __str__(self):
         """
    Provides a string representation of the Environment's current state.
