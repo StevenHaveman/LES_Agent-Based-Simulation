@@ -1,9 +1,30 @@
+/**
+ * Component to display a list of households.
+ *
+ * Props:
+ * @param {Function} onSelectResidents - Callback function to handle the selection of residents from a household.
+ *
+ * State:
+ * @property {Array} households - An array of household objects fetched from the backend.
+ * Each household object should have the following properties:
+ * - {number} id - The unique identifier of the household.
+ * - {string} name - The name of the household.
+ * - {string} address - The address of the household.
+ * - {Array} residents - An array of resident objects belonging to the household.
+ *
+ * Returns:
+ * A React component that displays a list of households and allows viewing their residents.
+ */
+
 import React, { useEffect, useState } from 'react';
 import "../styles/HouseholdList.css";
 
 const HouseholdList = ({ onSelectResidents }) => {
     const [households, setHouseholds] = useState([]);
 
+    /**
+     * Fetches the list of households from the backend API.
+     */
     useEffect(() => {
         const fetchHouseholds = async () => {
             try {
@@ -21,17 +42,21 @@ const HouseholdList = ({ onSelectResidents }) => {
         fetchHouseholds();
     }, []);
 
+    /**
+     * Handles the selection of residents from a household.
+     * @param {Object} household - The selected household object.
+     */
     const handleViewResidents = (household) => {
         onSelectResidents(household.residents);
     };
 
     return (
-        <div class="container">
-            <h1 class="h1-with-icon">
+        <div className="container">
+            <h1 className="h1-with-icon">
                 Households
-                <img src="/INNO/House_icon.png" alt="House Icon" class="house_icon" />
+                <img src="/INNO/House_icon.png" alt="House Icon" className="house_icon" />
             </h1>
-            <ul class="household-list-container">
+            <ul className="household-list-container">
                 {households.map((household) => (
                     <li key={household.id}>
                         <h2>{household.name}</h2>

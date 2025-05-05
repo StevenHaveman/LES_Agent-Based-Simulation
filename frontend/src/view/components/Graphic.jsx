@@ -1,3 +1,24 @@
+/**
+ * Component to display a simulation graph based on the provided data.
+ *
+ * Props:
+ * @param {string} title - The title of the graph. Defaults to "Simulation Graph".
+ * @param {string} yAxisKey - The key for the Y-axis data. Defaults to "solar_panel_price".
+ * Valid keys include:
+ * - "decisions_this_year"
+ * - "environmental_influence"
+ * - "households_with_panels"
+ * - "residents_for_panels"
+ * - "solar_panel_price"
+ *
+ * State:
+ * @property {Array} simulationData - The data fetched for the simulation graph.
+ * @property {boolean} loading - Indicates whether the data is still being loaded.
+ *
+ * Returns:
+ * A React component that renders a line chart with the simulation data.
+ */
+
 import React, { useState, useEffect } from "react";
 import {
     LineChart,
@@ -26,6 +47,9 @@ const Graphic = ({ title = "Simulation Graph", yAxisKey = "solar_panel_price" })
 
     const yKey = validKeys.includes(yAxisKey) ? yAxisKey : validKeys[0];
 
+    /**
+     * Fetches the simulation data from the controller.
+     */
     useEffect(() => {
         const fetchData = async () => {
             try {
