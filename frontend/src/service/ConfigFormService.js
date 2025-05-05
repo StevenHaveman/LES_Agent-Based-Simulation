@@ -1,7 +1,15 @@
 const API_URL = "http://127.0.0.1:5000";
 
 class ConfigFormService {
-
+    /**
+     * Starts the simulation with the provided configuration.
+     * @param {Object} config - The configuration object containing simulation parameters.
+     * @param {number} config.nr_households - Number of households.
+     * @param {number} config.nr_residents - Number of residents per household.
+     * @param {number} config.simulation_years - Number of simulation years.
+     * @returns {Promise<Object>} - The result of the simulation.
+     * @throws {Error} - Throws an error if the API call fails.
+     */
     async startSimulation(config) {
         const response = await fetch(`${API_URL}/config`, {
             method: "POST",
@@ -17,7 +25,11 @@ class ConfigFormService {
         return await response.json();
     }
 
-
+    /**
+     * Fetches the graphical results of the simulation.
+     * @returns {Promise<Object>} - The graphical data of the simulation.
+     * @throws {Error} - Throws an error if the API call fails.
+     */
     async getSimulationGraphicResults() {
         const response = await fetch(`${API_URL}/overview`);
 
@@ -29,5 +41,6 @@ class ConfigFormService {
     }
 }
 
+// Exporting an instance of ConfigFormService.
 const configFormService = new ConfigFormService();
 export default configFormService;
