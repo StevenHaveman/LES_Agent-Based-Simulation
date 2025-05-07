@@ -1,7 +1,7 @@
 from mesa import Agent
 import random
 from agents.resident_agent import Resident
-from utilities import gen_random_value
+import utilities
 
 class Household(Agent):
     """
@@ -17,11 +17,12 @@ class Household(Agent):
     """
     def __init__(self, model):
         super().__init__(model)
+        self.config = utilities.choose_config()
         self.residents = []
 
         self.solar_panels = None
-        self.solarpanel_amount = random.choice([6, 8, 10])
-        self.energy_generation = random.randint(298, 425)
+        self.solarpanel_amount = random.choice(self.config['solar_panel_amount_options'])
+        self.energy_generation = random.randint(*self.config['energy_generation_range'])
 
     def create_residents(self, nr_residents: int):
         """
@@ -35,10 +36,6 @@ class Household(Agent):
         """
         for _ in range(nr_residents):
             resident = Resident(
-                gen_random_value(0, 1),
-                gen_random_value(0, 2),
-                gen_random_value(0, 2),
-                gen_random_value(0, 2),
                 self.model,
                 self  # link naar household
             )
@@ -58,7 +55,7 @@ class Household(Agent):
         total_score = sum(int(resident.solar_decision) for resident in self.residents)
         avg_score = total_score / len(self.residents)
 
-        if avg_score > 0.5:
+        if avg_score > self.config['household_decision_threshold']:
             self.solar_panels = True
 
     def step(self):

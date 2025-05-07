@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from backend.ABM.main import run_simulation, graphics_data, households_data
+from main import run_simulation, graphics_data, households_data
+import config
 
 app = Flask(__name__)
 
@@ -11,9 +12,9 @@ def start_simulation():
     data = request.get_json()
 
     try:
-        nr_households = int(data.get("nr_households", 10))
-        nr_residents = int(data.get("nr_residents", 10))
-        simulation_years = int(data.get("simulation_years", 30))
+        nr_households = int(data.get("nr_households", config["nr_households"]))
+        nr_residents = int(data.get("nr_residents", config["nr_residents"]))
+        simulation_years = int(data.get("simulation_years", config["simulation_years"]))
     except ValueError as e:
         return jsonify({"status": "error", "message": "Ongeldige input: " + str(e)}), 400
 

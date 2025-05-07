@@ -1,15 +1,17 @@
 import random
 from mesa import Model
 from agents.household_agent import Household
+import utilities
 
 
 class SolarAdoptionModel(Model):
     def __init__(self, nr_households, nr_residents):
         super().__init__()
+        self.config = utilities.choose_config()
 
-        self.environmental_inf = 0.0
-        self.solarpanel_price = 410  # Gebaseerd op gemiddelde kosten van een zonnepaneel in Nederland
-        self.energy_price = 0.32  # https://www.overstappen.nl/energie/stroomprijs/#:~:text=Momenteel%20betreft%20de%20stroomprijs%20gemiddeld,variabel%20energiecontract%20van%2020%20energieleveranciers.
+        self.environmental_inf = self.config['environmental_influence']
+        self.solarpanel_price = self.config['solar_panel_price']
+        self.energy_price = self.config['energy_price'] 
         self.decided_residents = 0
 
         self.households = []  # gewone Python-lijst voor filteren/gemak
@@ -28,7 +30,7 @@ class SolarAdoptionModel(Model):
 
         for i in range(nr_households):
             hh = Household(self)
-            hh.solar_panels = random.random() < 0.32 # https://www.netbeheernederland.nl/artikelen/nieuws/netbeheerders-zien-aantal-huishoudens-met-zonnepanelen-verder-groeien-2023#:~:text=De%20netbeheerders%20tellen%20inmiddels%20op,in%20ons%20land%20zonnepanelen%20heeft.
+            hh.solar_panels = random.random() < self.config['initial_solarpanel_chance']
 
             self.households.append(hh)
             # self.add_agent(hh)  # voeg toe aan het model (dus aan self.agents)
@@ -67,7 +69,7 @@ class SolarAdoptionModel(Model):
                 nr_solarpanels += 1
 
         self.environmental_inf = min(nr_solarpanels / (len(self.households) - 1), 1)
-        self.solarpanel_price += round(random.randint(0, 20))
+        self.solarpanel_price += round(random.randint(*self.config['solarpanel_price_increase']))
 
     def collect_start_of_year_data(self, year):
         all_residents = [resident for household in self.residents for resident in household]

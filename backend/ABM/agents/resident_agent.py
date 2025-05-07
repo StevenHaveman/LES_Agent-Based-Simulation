@@ -1,6 +1,8 @@
 from mesa import Agent
 import numpy as np
 import random
+import utilities
+import config
 
 class Resident(Agent):
     """
@@ -18,7 +20,7 @@ class Resident(Agent):
         solar_decision (bool): Whether the resident has decided in favor of solar panels. Initially False.
     """
 
-    def __init__(self, attitude, attitude_mod, environ_mod, behavioral_mod, model, household):
+    def __init__(self, model, household):
         """
         Initializes a Resident agent.
 
@@ -32,17 +34,27 @@ class Resident(Agent):
             household (Household): The household object this resident belongs to.
         """
         super().__init__(model)
+        self.config = utilities.choose_config()
+
         self.household = household
         self.environment = model
 
         salary = self.calc_salary()
         self.income = max(round(salary, -2), 0)
 
-        self.attitude = attitude
-        self.attitude_mod = attitude_mod
-        self.environment_mod = environ_mod
-        self.behavioral_mod = behavioral_mod
+        if self.config == config.config_default:
+            self.attitude = utilities.gen_random_value(0, 1)
+            self.attitude_mod = utilities.gen_random_value(0, 2)
+            self.environment_mod = utilities.gen_random_value(0, 2)
+            self.behavioral_mod = utilities.gen_random_value(0, 2)
+        elif self.config == config.config_custom:
+            self.attitude = config['attitude']
+            self.attitude_mod = config['attitude_mod']
+            self.environment_mod = config['environment_mod']
+            self.behavioral_mod = config['behavioral_mod']
+
         self.solar_decision = False
+        self.decision_threshold = self.config['decision_threshold'] 
 
     def calc_salary(self):
         """
@@ -52,13 +64,13 @@ class Resident(Agent):
         Returns:
             float: A randomly generated salary value.
         """
-        median = 3300  # Based on Dutch median income (2024)
-        sigma_normal = 700  # Based on Dutch standard deviation (2024)
+        median = self.config['median_income']
+        sigma_normal = self.config['sigma_normal']
         mu = np.log(median)
         sigma_lognormaal = np.sqrt(np.log(1 + (sigma_normal / median) ** 2))
         return np.random.lognormal(mu, sigma_lognormaal)
     
-    def calc_decision(self, threshold, info_dump=False):
+    def calc_decision(self):
         """
         Calculates whether the resident decides to adopt solar panels based on
         attitude, environmental influence, and behavioral factors, compared against a threshold.
@@ -77,15 +89,15 @@ class Resident(Agent):
         behavioral_inf = self.calculate_behavioral_influence(self.environment.solarpanel_price * self.household.solarpanel_amount)
         decision_stat = self.attitude * self.attitude_mod + self.environment.environmental_inf * self.environment_mod + behavioral_inf * self.behavioral_mod
 
-        if decision_stat > threshold:
+        if decision_stat > self.decision_threshold:
             self.solar_decision = True
             self.environment.decided_residents += 1
 
-        self.income = int(round(self.income * random.choice([1.00, 1.01, 1.02, 1.03, 1.04, 1.05]), -1))
+        self.income = int(round(self.income * random.choice(self.config['raise_income']), -1))
 
     def step(self):
         if not self.solar_decision:
-            self.calc_decision(threshold=2)
+            self.calc_decision()
 
     def calc_roi(self):
         """

@@ -1,5 +1,5 @@
 from environment import SolarAdoptionModel
-import config
+import utilities
 
 # TODO DENK DAT DIT IN EEN DATA CLASSE MOET GAAN GEBEUREN ZODDAT DE DATA IN DE GUI KAN WORDEN GETOONT EN HET OP EEN PLEK IS.
 graphics_data = []
@@ -37,4 +37,5 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30):
     return {"message": "Simulation completed"}
 
 if __name__ == "__main__":
-    run_simulation()
+    config = utilities.choose_config()
+    run_simulation(config['nr_households'], config['nr_residents'], config['simulation_years'])
