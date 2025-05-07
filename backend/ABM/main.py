@@ -1,17 +1,40 @@
-from backend.ABM.environment import Environment
+from environment import SolarAdoptionModel
+import config
 
-def main(nr_years: int = 30, nr_residents: int=1, nr_households: int=1, info_dump=False):
-    """
-    Initializes and runs the solar panel adoption simulation.
+# TODO DENK DAT DIT IN EEN DATA CLASSE MOET GAAN GEBEUREN ZODDAT DE DATA IN DE GUI KAN WORDEN GETOONT EN HET OP EEN PLEK IS.
+graphics_data = []
+households_data = []
 
-    Args:
-        nr_years (int, optional): Number of years to simulate. Defaults to 30.
-        nr_residents (int, optional): Total number of residents to create. Defaults to 100.
-        nr_households (int, optional): Total number of households to create. Defaults to 50.
-        info_dump (bool, optional): Whether to print detailed simulation logs. Defaults to False.
-    """
-    environment = Environment()
-    environment.create_environment(nr_residents, nr_households)
-    environment.simulate(nr_years, info_dump)
+def run_simulation(nr_households=10, nr_residents=10, simulation_years=30):
+    global graphics_data
+    global households_data
+    
+    graphics_data.clear()
 
-main(30, 10, 10, info_dump=False)
+    model = SolarAdoptionModel(nr_households=nr_households, nr_residents=nr_residents)
+
+    for year in range(simulation_years):
+        print(f"=== Year {year + 1} ===")
+        print("Current Environment State (begin):")
+        print(model)
+
+        data = model.collect_start_of_year_data(year + 1)
+
+        model.step()
+
+        print(f"\nEnd of Year {year + 1}:")
+        print(f"  Decisions this year: {model.decided_residents}")
+        print("  Current Environment State (end):")
+        print(model)
+        print("-" * 40)
+
+        model.collect_end_of_year_data(data)
+
+        graphics_data.append(data)
+
+    households_data.clear()
+    households_data.extend(model.collect_household_information())
+    return {"message": "Simulation completed"}
+
+if __name__ == "__main__":
+    run_simulation()

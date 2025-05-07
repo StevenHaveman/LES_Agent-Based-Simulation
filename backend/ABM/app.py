@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from backend.ABM.main_mesa import run_simulation, graphics_data, households_data
+from backend.ABM.main import run_simulation, graphics_data, households_data
 
 app = Flask(__name__)
 
