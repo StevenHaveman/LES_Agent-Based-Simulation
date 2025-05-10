@@ -52,21 +52,18 @@ const HouseholdList = ({ onSelectResidents }) => {
 
     return (
         <div className="container">
-            <h1 className="h1-with-icon">
-                Households
-                <img src="/INNO/House_icon.png" alt="House Icon" className="house_icon" />
-            </h1>
-            <ul className="household-list-container">
-                {households.map((household) => (
-                    <li key={household.id}>
-                        <h2>{household.name}</h2>
-                        <p>{household.address}</p>
-                        <button onClick={() => handleViewResidents(household)}>
-                            Check Residents
-                        </button>
-                    </li>
-                ))}
-            </ul>
+            <div className="list">
+                <ul className="household-list-container">
+                    {households.map((household) => (
+                        <li key={household.id} className="household-list-item">
+                            <div className="household-entry">
+                                <img src="/INNO/House_icon.png" alt="House icon" className="house_icon" />
+                                <h2>{household.name}</h2>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </div>
     );
 };

@@ -1,21 +1,57 @@
-.house_icon {
-    width: 50px; 
-    height: 50px;
+.container {
+    display: flex;
+    flex-direction: column;
+    background-color: #F8E6CE;
+    border: 1px solid black;
+    max-height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.header {
+    border: 1px solid black;
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.list {
+    border: 3px solid black;
+    width: 100%;
+    max-height: 100vh;
+    overflow-y: auto;
 }
 
 .household-list-container {
-    max-height: 700px; /* Max hoogte van de lijst  <<<<<<< TODO Moet nog netter gedaan worden*/
-    overflow-y: scroll;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.household-list-item {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    border: 1px solid black;
+    padding: 10px;
+}
+
+.household-entry {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.house_icon {
+    vertical-align: middle;
+    width: 37px;
+    height: 37px;
 }
 
 .h1-with-icon {
     display: flex;
-    align-Items: center;
-
-    gap: 10px; 
-}
-.container{
-    display: flex;
-    flex-flow: column;
-    background-color: #F8E6CE;
+    align-items: center;
+    gap: 10px;
 }
