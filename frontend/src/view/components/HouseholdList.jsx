@@ -16,15 +16,13 @@
  * A React component that displays a list of households and allows viewing their residents.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import "../styles/HouseholdList.css";
 
-const HouseholdList = ({ onSelectResidents }) => {
+const HouseholdList = ({onSelectResidents}) => {
     const [households, setHouseholds] = useState([]);
+    const [selectedHouseholdId, setSelectedHouseholdId] = useState(null);
 
-    /**
-     * Fetches the list of households from the backend API.
-     */
     useEffect(() => {
         const fetchHouseholds = async () => {
             try {
@@ -42,11 +40,8 @@ const HouseholdList = ({ onSelectResidents }) => {
         fetchHouseholds();
     }, []);
 
-    /**
-     * Handles the selection of residents from a household.
-     * @param {Object} household - The selected household object.
-     */
     const handleViewResidents = (household) => {
+        setSelectedHouseholdId(household.id);
         onSelectResidents(household.residents);
     };
 
@@ -55,9 +50,13 @@ const HouseholdList = ({ onSelectResidents }) => {
             <div className="list">
                 <ul className="household-list-container">
                     {households.map((household) => (
-                        <li key={household.id} className="household-list-item">
+                        <li
+                            key={household.id}
+                            className={`household-list-item ${selectedHouseholdId === household.id ? 'selected' : ''}`}
+                            onClick={() => handleViewResidents(household)}
+                        >
                             <div className="household-entry">
-                                <img src="/INNO/House_icon.png" alt="House icon" className="house_icon" />
+                                <img src="/INNO/House_icon.png" alt="House icon" className="house_icon"/>
                                 <h2>{household.name}</h2>
                             </div>
                         </li>
