@@ -41,7 +41,7 @@ const HouseholdList = ({onSelectResidents}) => {
     }, []);
 
     const handleViewResidents = (household) => {
-        setSelectedHouseholdId(household.id); // ✅ markeer als geselecteerd
+        setSelectedHouseholdId(household.id);
         onSelectResidents(household.residents);
     };
 
