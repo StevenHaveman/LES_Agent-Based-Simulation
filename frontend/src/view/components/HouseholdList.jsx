@@ -18,6 +18,8 @@
 
 import React, {useEffect, useState} from 'react';
 import "../styles/HouseholdList.css";
+import "../styles/SharedListStyles.css";
+import detailController from "../../controller/DetailController.js";
 
 const HouseholdList = ({onSelectResidents}) => {
     const [households, setHouseholds] = useState([]);
@@ -26,11 +28,7 @@ const HouseholdList = ({onSelectResidents}) => {
     useEffect(() => {
         const fetchHouseholds = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:5000/fetch_households');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch households');
-                }
-                const data = await response.json();
+                const data = await detailController.fetch_households();
                 setHouseholds(data);
             } catch (error) {
                 console.error('Error fetching households:', error);
@@ -52,11 +50,11 @@ const HouseholdList = ({onSelectResidents}) => {
                     {households.map((household) => (
                         <li
                             key={household.id}
-                            className={`household-list-item ${selectedHouseholdId === household.id ? 'selected' : ''}`}
+                            className={`list-item ${selectedHouseholdId === household.id ? 'selected' : ''}`}
                             onClick={() => handleViewResidents(household)}
                         >
-                            <div className="household-entry">
-                                <img src="/INNO/House_icon.png" alt="House icon" className="house_icon"/>
+                            <div className="entry">
+                                <img src="/INNO/Household_icon.png" alt="House icon" className="icon"/>
                                 <h2>{household.name}</h2>
                             </div>
                         </li>
