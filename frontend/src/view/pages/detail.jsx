@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { createRoute } from "@tanstack/react-router";
 import { rootRoute } from "./root";
 import "../styles/detailpage.css";
@@ -9,11 +9,12 @@ export const detailRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/detail",
     component: function Overview() {
+        const [selectedResidents, setSelectedResidents] = useState([]);
         return (
             <div className="parent-container">
                 <div className="list-container">
-                    <HouseholdList> </HouseholdList>
-                    <ResidentsList> </ResidentsList>
+                    <HouseholdList onSelectResidents={setSelectedResidents} />
+                    <ResidentsList residents={selectedResidents} />
                 </div>
                 <div className="map-container">
                     <h3>map</h3>

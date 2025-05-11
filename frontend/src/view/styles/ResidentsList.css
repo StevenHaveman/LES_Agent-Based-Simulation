@@ -1,19 +1,49 @@
-.Residents_icon {
-    width: 50px; 
-    height: 50px;
+.container {
+    display: flex;
+    flex-direction: column;
+    background-color: #F8E6CE;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.list {
+    width: 100%;
+    max-height: 100vh;
+    overflow-y: auto;
+}
+
+.resident-list-container {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.resident-list-item {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 10px;
+}
+
+.resident-entry {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.resident_icon {
+    vertical-align: middle;
+    width: 37px;
+    height: 37px;
 }
 
 .h1-with-icon {
     display: flex;
-    align-Items: center;
-    gap: 10px; 
+    align-items: center;
+    gap: 10px;
 }
 
-.container{
-    display: flex;
-    flex-flow: column;
-    background-color: #F8E6CE;
-    height: 100%;
-    width: 100%;
-    border: 1px solid black;
+.resident-list-item.selected {
+    background-color: #e6caa3;
 }
