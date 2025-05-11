@@ -14,6 +14,7 @@
 
 
 import "../styles/ResidentsList.css";
+import "../styles/SharedListStyles.css";
 import React, { useState } from 'react';
 const ResidentsList = ({ residents }) => {
     const [selectedResidentIndex, setSelectedResidentIndex] = useState(null);
@@ -31,11 +32,11 @@ const ResidentsList = ({ residents }) => {
                         residents.map((resident, index) => (
                             <li
                                 key={index}
-                                className={`resident-list-item ${selectedResidentIndex === index ? 'selected' : ''}`}
+                                className={`list-item ${selectedResidentIndex === index ? 'selected' : ''}`}
                                 onClick={() => handleResidentClick(resident, index)}
                             >
-                                <div className="resident-entry">
-                                    <img src="/INNO/Resident_icon.png" alt="Resident icon" className="resident_icon" />
+                                <div className="entry">
+                                    <img src="/INNO/Resident_icon.png" alt="Resident icon" className="icon" />
                                     <h2>{resident.name}</h2>
                                 </div>
                             </li>
