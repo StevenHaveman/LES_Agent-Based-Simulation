@@ -21,7 +21,6 @@ class SolarAdoptionModel(Model):
 
         self.create_agents(nr_households, nr_residents)
         self.generate_streets()
-        print(len(self.streets))
 
     def create_agents(self, nr_households: int, nr_residents: int):
         """
@@ -67,7 +66,6 @@ class SolarAdoptionModel(Model):
             remaining -= value
 
         if remaining > 0:
-            # self.streets.append(self.households[pointer: pointer + value])
             for i in range(pointer, self.config['nr_households']):
                 chosen_list = random.randint(0, len(self.streets) - 1)
                 self.streets[chosen_list].append(self.households[i])
