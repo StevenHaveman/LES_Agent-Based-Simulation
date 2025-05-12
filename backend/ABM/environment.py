@@ -16,9 +16,12 @@ class SolarAdoptionModel(Model):
 
         self.households = []  # gewone Python-lijst voor filteren/gemak
         self.residents = []  # gewone Python-lijst voor filteren/gemak
+        self.streets = []
         self.yearly_stats = []
 
         self.create_agents(nr_households, nr_residents)
+        self.generate_streets()
+        print(len(self.streets))
 
     def create_agents(self, nr_households: int, nr_residents: int):
         """
@@ -40,6 +43,35 @@ class SolarAdoptionModel(Model):
             self.residents.append(hh.residents)
 
         self.update_environmental_influence()
+
+    def generate_streets(self,):
+        """
+        Generate a list of (street_name, household_count) where the total households sum up to total_households.
+        The number of streets is not fixed, and household counts are randomly assigned with occasional large streets.
+        """
+        pointer = 0
+        remaining = self.config['nr_households']
+        min_households = self.config['min_nr_houses']
+        max_households = self.config['max_nr_houses']
+
+        while remaining >= min_households:
+            # 20% chance to pick a large household count (closer to max)
+            if random.random() < 0.2:
+                value = random.randint(int(max_households * 0.7), max_households)
+            else:
+                value = random.randint(min_households, int(max_households * 0.6))
+
+            value = min(value, remaining)
+            self.streets.append(self.households[pointer: pointer + value])
+            pointer += value
+            remaining -= value
+
+        if remaining > 0:
+            # self.streets.append(self.households[pointer: pointer + value])
+            for i in range(pointer, self.config['nr_households']):
+                chosen_list = random.randint(0, len(self.streets) - 1)
+                self.streets[chosen_list].append(self.households[i])
+
 
     def step(self):
         """

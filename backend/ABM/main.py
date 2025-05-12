@@ -34,8 +34,15 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30):
 
     households_data.clear()
     households_data.extend(model.collect_household_information())
+    return len(model.streets)
     return {"message": "Simulation completed"}
 
 if __name__ == "__main__":
     config = utilities.choose_config()
-    run_simulation(config['nr_households'], config['nr_residents'], config['simulation_years'])
+    total = 0
+    for i in range(500):
+        nr_streets = run_simulation(config['nr_households'], config['nr_residents'], config['simulation_years'])
+        total += nr_streets
+
+    print(total / 500)
+        
