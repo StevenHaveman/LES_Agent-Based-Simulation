@@ -87,7 +87,9 @@ class Resident(Agent):
         """
 
         behavioral_inf = self.calculate_behavioral_influence(self.environment.solarpanel_price * self.household.solarpanel_amount)
-        decision_stat = self.attitude * self.attitude_mod + self.environment.environmental_inf * self.environment_mod + behavioral_inf * self.behavioral_mod
+        decision_stat = (self.attitude * self.attitude_mod
+                          + self.environment.environmental_inf * self.environment_mod
+                            + behavioral_inf * self.behavioral_mod) / 6 # Divide by 6 to normalize stat to 0-1
 
         if decision_stat > self.decision_threshold:
             self.solar_decision = True
