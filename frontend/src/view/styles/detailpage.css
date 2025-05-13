@@ -14,7 +14,6 @@ body {
 }
 
 .parent-container > div {
-    border: 1px solid #000;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -32,7 +31,7 @@ body {
 .list-container h3 {
     flex: 1;
     text-align: center;
-    border: 1px solid #333;
+
     margin: 5px;
     box-sizing: border-box;
     display: flex;
@@ -42,8 +41,7 @@ body {
 }
 
 .map-container {
-
-    border: 1px solid #000;
+    background-color: #A4FA8F;
 }
 
 .list-container {
@@ -57,7 +55,7 @@ body {
 .list-container h3 {
     flex: 1;
     text-align: center;
-    border: 1px solid #333;
+
     box-sizing: border-box;
     display: flex;
     justify-content: center;
