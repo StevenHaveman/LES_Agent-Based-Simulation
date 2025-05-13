@@ -2,17 +2,27 @@ import React, { useEffect, useRef, useState } from 'react';
 import "../styles/HouseholdMap.css";
 import detailController from "../../controller/DetailController.js";
 
+/**
+ * HouseholdMap component
+ * Displays households as clickable icons on a canvas map with random positions.
+ * Selecting an icon updates the selected household and residents.
+ *
+ * Props:
+ * - onSelectResidents: function to pass selected residents to parent
+ * - onSelectHousehold: function to pass selected household to parent
+ * - selectedHouseholdId: ID of the currently selected household (used for highlighting)
+ */
 const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdId }) => {
     const [households, setHouseholds] = useState([]);
     const canvasRef = useRef(null);
     const householdPositions = useRef({});
     const iconRef = useRef(null);
 
-    // Fetch households
+
     useEffect(() => {
         const fetchHouseholds = async () => {
             try {
-                const data = await detailController.fetch_households();
+                const data = await detailController.fetch_households(); // Backend call
                 setHouseholds(data);
             } catch (error) {
                 console.error('Error fetching households:', error);
@@ -21,7 +31,7 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
         fetchHouseholds();
     }, []);
 
-    // Load icon image once
+    // Load household icon image once, then trigger initial draw
     useEffect(() => {
         const icon = new Image();
         icon.src = "/INNO/Household_icon.png";
@@ -31,7 +41,7 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
         };
     }, []);
 
-    // Generate household positions only once
+    // Generate and store random positions for each household when data is loaded
     useEffect(() => {
         if (households.length > 0 && canvasRef.current) {
             const canvas = canvasRef.current;
@@ -40,44 +50,47 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
 
             const newPositions = {};
             households.forEach(household => {
-                const x = Math.random() * (width - 40);
+                const x = Math.random() * (width - 40); // Leave margin
                 const y = Math.random() * (height - 40);
-                newPositions[household.id] = { x, y, width: 32, height: 32 };
+                newPositions[household.id] = { x, y, width: 32, height: 32 }; // Fixed icon size
             });
+
             householdPositions.current = newPositions;
 
             if (iconRef.current) {
-                drawCanvas();
+                drawCanvas(); // Draw with new positions
             }
         }
     }, [households]);
 
-    // Redraw when selection changes
+    // Redraw canvas when selected household changes (to update highlighting)
     useEffect(() => {
         if (iconRef.current) {
             drawCanvas();
         }
     }, [selectedHouseholdId]);
 
+    // Draw all households and highlight selected one
     const drawCanvas = () => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
 
-        // Resize canvas
         canvas.width = canvas.offsetWidth;
         canvas.height = canvas.offsetHeight;
-        ctx.fillStyle = "#b0f5a0";
+
+
+        ctx.fillStyle = "#b0f5a0"; // Light green background
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw icons and selection
+        // Draw each household icon and highlight if selected
         households.forEach((household) => {
             const pos = householdPositions.current[household.id];
             if (!pos) return;
 
-            // Draw icon
+            // Draw household icon at assigned position
             ctx.drawImage(iconRef.current, pos.x, pos.y, 32, 32);
 
-            // Highlight selected household
+            // If selected, draw a circle around the icon
             if (household.id === selectedHouseholdId) {
                 ctx.beginPath();
                 ctx.strokeStyle = "black";
@@ -88,11 +101,13 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
         });
     };
 
+    // Handle clicks on the canvas to detect household selection
     const handleCanvasClick = (event) => {
         const rect = canvasRef.current.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
 
+        // Check if click is within bounds of any household icon
         for (const [id, pos] of Object.entries(householdPositions.current)) {
             if (
                 x >= pos.x && x <= pos.x + pos.width &&
@@ -101,13 +116,14 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
                 const selected = households.find(h => h.id.toString() === id);
                 if (selected) {
                     onSelectResidents(selected.residents);
-                    onSelectHousehold(selected); // Sync with list
+                    onSelectHousehold(selected);
                 }
                 break;
             }
         }
     };
 
+    // Render the canvas element
     return (
         <canvas
             ref={canvasRef}

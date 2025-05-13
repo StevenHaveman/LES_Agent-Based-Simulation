@@ -21,7 +21,7 @@ const ResidentsList = ({ residents }) => {
 
     const handleResidentClick = (resident, index) => {
         console.log(`Resident clicked: ${resident.name}`);
-        setSelectedResidentIndex(index); // update the selected resident
+        setSelectedResidentIndex(index);
     };
 
     return (
