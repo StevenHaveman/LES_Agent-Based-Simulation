@@ -95,11 +95,12 @@ class Resident(Agent):
             self.solar_decision = True
             self.environment.decided_residents += 1
 
-        self.income = int(round(self.income * random.choice(self.config['raise_income']), -1))
 
     def step(self):
         if not self.solar_decision:
             self.calc_decision()
+            
+        self.income = int(round(self.income * random.choice(self.config['raise_income']), -1))
 
     def calc_roi(self):
         """

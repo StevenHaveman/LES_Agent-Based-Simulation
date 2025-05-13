@@ -84,6 +84,7 @@ class SolarAdoptionModel(Model):
             hh.calc_avg_decision()
 
         self.update_subjective_norm()
+        self.solarpanel_price += round(random.randint(*self.config['solarpanel_price_increase']))
 
     def update_subjective_norm(self):
         """
@@ -99,7 +100,6 @@ class SolarAdoptionModel(Model):
                 nr_solarpanels += 1
 
         self.subjective_norm = min(nr_solarpanels / (len(self.households) - 1), 1)
-        self.solarpanel_price += round(random.randint(*self.config['solarpanel_price_increase']))
 
     def collect_start_of_year_data(self, year):
         all_residents = [resident for household in self.residents for resident in household]
