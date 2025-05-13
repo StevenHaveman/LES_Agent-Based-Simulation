@@ -9,7 +9,7 @@ def test_resident_initialization():
     assert 0 <= resident.income  # Income should be non-negative
     assert resident.attitude == 0.2
     assert resident.attitude_mod == 1.0
-    assert resident.environment_mod == 1.1
+    assert resident.subj_norm_mod == 1.1
     assert resident.behavioral_mod == 0.9
     assert not resident.solar_panels
     print("test_resident_initialization passed!")

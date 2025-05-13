@@ -15,7 +15,7 @@ class Resident(Agent):
         income (float): The resident's calculated annual income, rounded to the nearest 100.
         attitude (float): Base attitude towards solar panels (e.g., environmental concern).
         attitude_mod (float): Modifier for the attitude component in decision making.
-        environment_mod (float): Modifier for the environmental influence component.
+        subj_norm_mod (float): Modifier for the environmental influence component.
         behavioral_mod (float): Modifier for the behavioral influence component.
         solar_decision (bool): Whether the resident has decided in favor of solar panels. Initially False.
     """
@@ -28,7 +28,7 @@ class Resident(Agent):
             unique_id (int): Unique identifier for the resident.
             attitude (float): Base attitude towards solar panels.
             attitude_mod (float): Modifier for the attitude component.
-            environ_mod (float): Modifier for the environmental influence component.
+            subj_norm_mod (float): Modifier for the environmental influence component.
             behavioral_mod (float): Modifier for the behavioral influence component.
             model (Model): The simulation model object (used instead of 'environment').
             household (Household): The household object this resident belongs to.
@@ -45,12 +45,12 @@ class Resident(Agent):
         if self.config == config.config_default:
             self.attitude = utilities.gen_random_value(0, 1)
             self.attitude_mod = utilities.gen_random_value(0, 2)
-            self.environment_mod = utilities.gen_random_value(0, 2)
+            self.subj_norm_mod = utilities.gen_random_value(0, 2)
             self.behavioral_mod = utilities.gen_random_value(0, 2)
         elif self.config == config.config_custom:
             self.attitude = config['attitude']
             self.attitude_mod = config['attitude_mod']
-            self.environment_mod = config['environment_mod']
+            self.subj_norm_mod = config['subj_norm_mod']
             self.behavioral_mod = config['behavioral_mod']
 
         self.solar_decision = False
@@ -88,7 +88,7 @@ class Resident(Agent):
 
         behavioral_inf = self.calculate_behavioral_influence(self.environment.solarpanel_price * self.household.solarpanel_amount)
         decision_stat = (self.attitude * self.attitude_mod
-                          + self.environment.environmental_inf * self.environment_mod
+                          + self.environment.subjective_norm * self.subj_norm_mod
                             + behavioral_inf * self.behavioral_mod) / 6 # Divide by 6 to normalize stat to 0-1
 
         if decision_stat > self.decision_threshold:

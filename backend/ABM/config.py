@@ -7,7 +7,7 @@ config_default = {
     "simulation_years": 30,
 
     # Environment parameters
-    "environmental_influence": 0.0, # Initial environmental influence (0-1)
+    "subjective_norm": 0.0, # Initial environmental influence (0-1)
     "solar_panel_price": 410, # Initial price of solar panels (in euros), based on Dutch market data
     "energy_price": 0.32, # https://www.overstappen.nl/energie/stroomprijs/#:~:text=Momenteel%20betreft%20de%20stroomprijs%20gemiddeld,variabel%20energiecontract%20van%2020%20energieleveranciers.
     "initial_solarpanel_chance": 0.32, # https://www.netbeheernederland.nl/artikelen/nieuws/netbeheerders-zien-aantal-huishoudens-met-zonnepanelen-verder-groeien-2023#:~:text=De%20netbeheerders%20tellen%20inmiddels%20op,in%20ons%20land%20zonnepanelen%20heeft.
@@ -27,7 +27,7 @@ config_default = {
     'decision_threshold': 0.5, # Decision threshold for investing in sustainable energy
     'attitude': None,
     'attitude_mod': None,
-    'environment_mod': None,
+    'subj_norm_mod': None,
     'behavioral_mod': None
 }
 
@@ -38,7 +38,7 @@ config_custom = {
     "simulation_years": 1,
 
     # Environment parameters
-    "environmental_influence": 0.0, # Initial environmental influence (0-1)
+    "subjective_norm": 0.0, # Initial environmental influence (0-1)
     "solar_panel_price": 410, # Initial price of solar panels (in euros), based on Dutch market data
     "energy_price": 0.32, # https://www.overstappen.nl/energie/stroomprijs/#:~:text=Momenteel%20betreft%20de%20stroomprijs%20gemiddeld,variabel%20energiecontract%20van%2020%20energieleveranciers.
     "initial_solarpanel_chance": 0.32, # https://www.netbeheernederland.nl/artikelen/nieuws/netbeheerders-zien-aantal-huishoudens-met-zonnepanelen-verder-groeien-2023#:~:text=De%20netbeheerders%20tellen%20inmiddels%20op,in%20ons%20land%20zonnepanelen%20heeft.
@@ -58,6 +58,6 @@ config_custom = {
     'decision_threshold': 0.5, # Decision threshold for investing in sustainable energy
     'attitude': None,
     'attitude_mod': None,
-    'environment_mod': None,
+    'subj_norm_mod': None,
     'behavioral_mod': None
 }

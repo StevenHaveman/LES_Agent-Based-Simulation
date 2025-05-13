@@ -9,7 +9,7 @@ class SolarAdoptionModel(Model):
         super().__init__()
         self.config = utilities.choose_config()
 
-        self.environmental_inf = self.config['environmental_influence']
+        self.subjective_norm = self.config['subjective_norm']
         self.solarpanel_price = self.config['solar_panel_price']
         self.energy_price = self.config['energy_price'] 
         self.decided_residents = 0
@@ -41,7 +41,7 @@ class SolarAdoptionModel(Model):
             hh.create_residents(nr_res)
             self.residents.append(hh.residents)
 
-        self.update_environmental_influence()
+        self.update_subjective_norm()
 
     def generate_streets(self,):
         """
@@ -83,9 +83,9 @@ class SolarAdoptionModel(Model):
         for hh in self._agents_by_type[Household]:
             hh.calc_avg_decision()
 
-        self.update_environmental_influence()
+        self.update_subjective_norm()
 
-    def update_environmental_influence(self):
+    def update_subjective_norm(self):
         """
         Updates the environmental influence based on the current adoption rate
         of solar panels among households. Also slightly increases solar panel price.
@@ -98,7 +98,7 @@ class SolarAdoptionModel(Model):
             if household.solar_panels == True:
                 nr_solarpanels += 1
 
-        self.environmental_inf = min(nr_solarpanels / (len(self.households) - 1), 1)
+        self.subjective_norm = min(nr_solarpanels / (len(self.households) - 1), 1)
         self.solarpanel_price += round(random.randint(*self.config['solarpanel_price_increase']))
 
     def collect_start_of_year_data(self, year):
@@ -109,7 +109,7 @@ class SolarAdoptionModel(Model):
         start_state = {
             "residents_for_panels": residents_with_panels,
             "households_with_panels": households_with_panels,
-            "environmental_influence": round(self.environmental_inf, 3),
+            "subjective_norm": round(self.subjective_norm, 3),
             "solar_panel_price": self.solarpanel_price
         }
 
@@ -130,7 +130,7 @@ class SolarAdoptionModel(Model):
         end_state = {
             "residents_for_panels": residents_with_panels,
             "households_with_panels": households_with_panels,
-            "environmental_influence": round(self.environmental_inf, 3),
+            "subjective_norm": round(self.subjective_norm, 3),
             "solar_panel_price": self.solarpanel_price,
             "decisions_this_year": self.decided_residents
         }
@@ -170,5 +170,5 @@ class SolarAdoptionModel(Model):
             1 for h in self.households if h.solar_panels or any(r.solar_decision for r in h.residents))
         return (f"    Total Residents who would like Panels: {residents_with_panels} / {total_residents}\n"
                 f"    Households: {households_with_panels} / {total_households} with panels\n"
-                f"    Environmental Influence: {self.environmental_inf:.3f}\n"
+                f"    Subjective Norm: {self.subjective_norm:.3f}\n"
                 f"    Current Solar Panel Price: {self.solarpanel_price}\n")  # Use the price variable directly
