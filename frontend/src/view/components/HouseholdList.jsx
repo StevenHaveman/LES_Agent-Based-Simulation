@@ -21,9 +21,8 @@ import "../styles/HouseholdList.css";
 import "../styles/SharedListStyles.css";
 import detailController from "../../controller/DetailController.js";
 
-const HouseholdList = ({onSelectResidents}) => {
+const HouseholdList = ({ onSelectResidents, onSelectHousehold, selectedHouseholdId }) => {
     const [households, setHouseholds] = useState([]);
-    const [selectedHouseholdId, setSelectedHouseholdId] = useState(null);
 
     useEffect(() => {
         const fetchHouseholds = async () => {
@@ -34,13 +33,12 @@ const HouseholdList = ({onSelectResidents}) => {
                 console.error('Error fetching households:', error);
             }
         };
-
         fetchHouseholds();
     }, []);
 
     const handleViewResidents = (household) => {
-        setSelectedHouseholdId(household.id);
         onSelectResidents(household.residents);
+        onSelectHousehold(household);
     };
 
     return (
