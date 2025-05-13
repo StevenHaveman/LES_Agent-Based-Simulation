@@ -14,6 +14,7 @@ config_default = {
     "solarpanel_price_increase": (0, 20), # Random increase in solar panel price per year (in euros)
     "min_nr_houses": 20,
     "max_nr_houses": 60,
+    "subj_norm_level": "District", # District, Street, Direct
 
     # Household Agent parameters
     "solar_panel_amount_options": [6, 8, 10], # Number of solar panels a household can choose to install

@@ -93,7 +93,7 @@ class SolarAdoptionModel(Model):
 
         Args:
             households (list[Household]): The list of households in the simulation.
-        """
+        """ 
         nr_solarpanels = 0
         for household in self.households:
             if household.solar_panels == True:
