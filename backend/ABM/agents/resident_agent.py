@@ -41,6 +41,7 @@ class Resident(Agent):
 
         salary = self.calc_salary()
         self.income = max(round(salary, -2), 0)
+        self.subj_norm = self.config['subjective_norm']
 
         if self.config == config.config_default:
             self.attitude = utilities.gen_random_value(0, 1)
