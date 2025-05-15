@@ -1,0 +1,26 @@
+import DetailService from '../service/DetailService.js';
+
+class DetailController{
+
+    constructor(service) {
+        this.service = service;
+    }
+
+    async fetch_households(config) {
+        try {
+            const result = await this.service.fetchHouseholds(config);
+            console.log("Households fetched successfully");
+            return result;
+        } catch (error) {
+            console.error("Fetching households failed", error);
+            throw error;
+        }
+
+    }
+
+
+}
+
+// Exporting an instance of DetailController with the service injected.
+const detailController = new DetailController(DetailService);
+export default detailController;

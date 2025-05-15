@@ -1,0 +1,28 @@
+.map-preview-half {
+    width: 50vw;
+    height: calc(100vh - 80px);
+    background-color: #A4FA8F;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+
+}
+
+.map-preview-half:hover {
+    background-color: #6dcf5c;
+}
+
+.map-preview-content {
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-align: center;
+    padding: 1rem;
+    color: #1e1e1e;
+    transition: color 0.3s ease;
+}
+
+.map-preview-half:hover .map-preview-content {
+    color: #ffffff;
+}
