@@ -20,7 +20,6 @@ const GraphicsView = () => {
         <div className="graphics-view-container">
             <Graphic title="Solar Panel Price" yAxisKey="solar_panel_price" />
             <Graphic title="Decisions For Solar Panels" yAxisKey="decisions_this_year" />
-            <Graphic title="Environmental Influence" yAxisKey="environmental_influence" />
             <Graphic title="Households with Solar Panels" yAxisKey="households_with_panels" />
             <Graphic title="Residents for Solar Panels" yAxisKey="residents_for_panels" />
         </div>

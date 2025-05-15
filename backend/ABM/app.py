@@ -2,12 +2,14 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from main import run_simulation, graphics_data, households_data
 import config
+import utilities
 
 # Initialize the Flask application
 app = Flask(__name__)
 
+chosen_config = utilities.choose_config()
 # Configure CORS to allow connections from the frontend
-CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 
 @app.route('/config', methods=['POST'])
 def start_simulation():
@@ -25,9 +27,9 @@ def start_simulation():
     data = request.get_json()
 
     try:
-        nr_households = int(data.get("nr_households", config["nr_households"]))
-        nr_residents = int(data.get("nr_residents", config["nr_residents"]))
-        simulation_years = int(data.get("simulation_years", config["simulation_years"]))
+        nr_households = int(data.get("nr_households", chosen_config["nr_households"]))
+        nr_residents = int(data.get("nr_residents", chosen_config["nr_residents"]))
+        simulation_years = int(data.get("simulation_years", chosen_config["simulation_years"]))
     except ValueError as e:
         # Return an error message for invalid input
         return jsonify({"status": "error", "message": "Invalid input: " + str(e)}), 400
