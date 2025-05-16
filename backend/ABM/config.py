@@ -15,7 +15,7 @@ configs = {
         "solarpanel_price_increase": (0, 20), # Random increase in solar panel price per year (in euros)
         "min_nr_houses": 20,
         "max_nr_houses": 60,
-        "subj_norm_level": "District", # District, Street, Direct
+        "subj_norm_level": "Street", # District, Street, Direct
 
         # Household Agent parameters
         "solar_panel_amount_options": [6, 8, 10], # Number of solar panels a household can choose to install
@@ -35,9 +35,9 @@ configs = {
 
     1: {
         # Main simulation startup parameters
-        "nr_households": 5, # https://www.cbs.nl/nl-nl/visualisaties/dashboard-bevolking/woonsituatie/huishoudens-nu#:~:text=Begin%202024%20waren%20er%208,gemiddelde%20huishoudensgrootte%20nog%203%2C49.
-        "nr_residents": 5,
-        "simulation_years": 30,
+        "nr_households": 10, # https://www.cbs.nl/nl-nl/visualisaties/dashboard-bevolking/woonsituatie/huishoudens-nu#:~:text=Begin%202024%20waren%20er%208,gemiddelde%20huishoudensgrootte%20nog%203%2C49.
+        "nr_residents": 10,
+        "simulation_years": 10,
 
         # Environment parameters
         "subjective_norm": 0.0, # Initial environmental influence (0-1)
@@ -47,7 +47,7 @@ configs = {
         "solarpanel_price_increase": (0, 20), # Random increase in solar panel price per year (in euros)
         "min_nr_houses": 20,
         "max_nr_houses": 60,
-        "subj_norm_level": "District", # District, Street, Direct
+        "subj_norm_level": "Direct", # District, Street, Direct
 
         # Household Agent parameters
         "solar_panel_amount_options": [6, 8, 10], # Number of solar panels a household can choose to install

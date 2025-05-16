@@ -20,6 +20,9 @@ class Household(Agent):
         self.config_id, self.config = utilities.choose_config()
         self.residents = []
 
+        self.skip_prev = False
+        self.skip_next = False
+
         self.solar_panels = None
         self.solarpanel_amount = random.choice(self.config['solar_panel_amount_options'])
         self.energy_generation = random.randint(*self.config['energy_generation_range'])

@@ -79,10 +79,10 @@ class SolarAdoptionModel(Model):
                         nr_solarpanels += 1
             subj_norm = min(nr_solarpanels / (len(self.households) - 1), 1)
 
-        for street in self.streets:
-            for house in street:
-                for resident in house.residents:
-                    resident.subj_norm = subj_norm
+            for street in self.streets:
+                for house in street:
+                    for resident in house.residents:
+                        resident.subj_norm = subj_norm
 
         if subj_norm_level == "Street":
             for i in range(len(self.streets)):
@@ -91,6 +91,7 @@ class SolarAdoptionModel(Model):
                     if house.solar_panels:
                         nr_solarpanels += 1
                     subj_norm = min(nr_solarpanels / (len(self.streets[i]) - 1), 1)
+
                 for house in self.streets[i]:
                     for resident in house.residents:
                         resident.subj_norm = subj_norm
@@ -98,15 +99,21 @@ class SolarAdoptionModel(Model):
         if subj_norm_level == "Direct":
             for i in range(len(self.streets)):
                 for j in range(len(self.streets[i])):
-                    try:
-                        if self.streets[i][j - 1].solar_panels:
-                            for resident in self.streets[i][j - 1].residents:
-                                resident.subj_norm += 0.5
-                        if self.streets[i][j + 1].solar_panels:
-                            for resident in self.streets[i][j - 1].residents:
-                                resident.subj_norm += 0.5
-                    except IndexError:
-                        pass
+                    skip = any(res.subj_norm >= 1.0 for res in self.streets[i][j].residents)
+
+                    if skip:
+                        continue
+
+                    if j > 0 and self.streets[i][j - 1].solar_panels and not self.streets[i][j].skip_prev:
+                        for resident in self.streets[i][j].residents:
+                            resident.subj_norm += 0.5
+                        self.streets[i][j].skip_prev = True
+
+                    # Check next house
+                    if j < len(self.streets[i]) - 1 and self.streets[i][j + 1].solar_panels and not self.streets[i][j].skip_next:
+                        for resident in self.streets[i][j].residents:
+                            resident.subj_norm += 0.5
+                        self.streets[i][j].skip_next = True
 
     def step(self):
         """
