@@ -7,7 +7,7 @@ import utilities
 class SolarAdoptionModel(Model):
     def __init__(self, nr_households, nr_residents):
         super().__init__()
-        self.config = utilities.choose_config()
+        self.config_id, self.config = utilities.choose_config()
 
         self.solarpanel_price = self.config['solar_panel_price']
         self.energy_price = self.config['energy_price'] 
@@ -20,6 +20,7 @@ class SolarAdoptionModel(Model):
 
         self.create_agents(nr_households, nr_residents)
         self.generate_streets()
+        self.update_subjective_norm()
 
     def create_agents(self, nr_households: int, nr_residents: int):
         """
@@ -39,8 +40,6 @@ class SolarAdoptionModel(Model):
             nr_res = base + (1 if i < remainder else 0)
             hh.create_residents(nr_res)
             self.residents.append(hh.residents)
-
-        self.update_subjective_norm()
 
     def generate_streets(self,):
         """
@@ -69,6 +68,46 @@ class SolarAdoptionModel(Model):
                 chosen_list = random.randint(0, len(self.streets) - 1)
                 self.streets[chosen_list].append(self.households[i])
 
+    def update_subjective_norm(self):           
+        subj_norm_level = self.config['subj_norm_level']
+
+        if subj_norm_level == "District":
+            nr_solarpanels = 0
+            for i in range(len(self.streets)):
+                for house in self.streets[i]:
+                    if house.solar_panels:
+                        nr_solarpanels += 1
+            subj_norm = min(nr_solarpanels / (len(self.households) - 1), 1)
+
+        for street in self.streets:
+            for house in street:
+                for resident in house.residents:
+                    resident.subj_norm = subj_norm
+
+        if subj_norm_level == "Street":
+            for i in range(len(self.streets)):
+                nr_solarpanels = 0
+                for house in self.streets[i]:
+                    if house.solar_panels:
+                        nr_solarpanels += 1
+                    subj_norm = min(nr_solarpanels / (len(self.streets[i]) - 1), 1)
+                for house in self.streets[i]:
+                    for resident in house.residents:
+                        resident.subj_norm = subj_norm
+        
+        if subj_norm_level == "Direct":
+            for i in range(len(self.streets)):
+                for j in range(len(self.streets[i])):
+                    try:
+                        if self.streets[i][j - 1].solar_panels:
+                            for resident in self.streets[i][j - 1].residents:
+                                resident.subj_norm += 0.5
+                        if self.streets[i][j + 1].solar_panels:
+                            for resident in self.streets[i][j - 1].residents:
+                                resident.subj_norm += 0.5
+                    except IndexError:
+                        pass
+
     def step(self):
         """
         Executes a step for each household and resident in the model.
@@ -84,21 +123,6 @@ class SolarAdoptionModel(Model):
         self.update_subjective_norm()
         self.solarpanel_price += round(random.randint(*self.config['solarpanel_price_increase']))
 
-    # def update_subjective_norm(self):
-    #     """
-    #     Updates the environmental influence based on the current adoption rate
-    #     of solar panels among households. Also slightly increases solar panel price.
-
-    #     Args:
-    #         households (list[Household]): The list of households in the simulation.
-    #     """ 
-    #     nr_solarpanels = 0
-    #     for household in self.households:
-    #         if household.solar_panels == True:
-    #             nr_solarpanels += 1
-
-    #     self.subjective_norm = min(nr_solarpanels / (len(self.households) - 1), 1)
-
     def collect_start_of_year_data(self, year):
         all_residents = [resident for household in self.residents for resident in household]
         residents_with_panels = sum(res.solar_decision for res in all_residents)
@@ -107,7 +131,6 @@ class SolarAdoptionModel(Model):
         start_state = {
             "residents_for_panels": residents_with_panels,
             "households_with_panels": households_with_panels,
-            "subjective_norm": round(self.subjective_norm, 3),
             "solar_panel_price": self.solarpanel_price
         }
 
@@ -128,7 +151,6 @@ class SolarAdoptionModel(Model):
         end_state = {
             "residents_for_panels": residents_with_panels,
             "households_with_panels": households_with_panels,
-            "subjective_norm": round(self.subjective_norm, 3),
             "solar_panel_price": self.solarpanel_price,
             "decisions_this_year": self.decided_residents
         }
@@ -168,48 +190,6 @@ class SolarAdoptionModel(Model):
             1 for h in self.households if h.solar_panels or any(r.solar_decision for r in h.residents))
         return (f"    Total Residents who would like Panels: {residents_with_panels} / {total_residents}\n"
                 f"    Households: {households_with_panels} / {total_households} with panels\n"
-                f"    Subjective Norm: {self.subjective_norm:.3f}\n"
                 f"    Current Solar Panel Price: {self.solarpanel_price}\n")  # Use the price variable directly
-    
-
-    def calc_subj_norm(self):           
-        subj_norm_level = self.config['subj_norm_level']
-
-        if subj_norm_level == "District":
-            nr_solarpanels = 0
-            for i in range(len(self.streets)):
-                for house in self.streets[i]:
-                    if house.solar_panels:
-                        nr_solarpanels += 1
-            subj_norm = min(nr_solarpanels / (len(self.households) - 1), 1)
-
-        for street in self.streets:
-            for house in street:
-                for resident in house.residents:
-                    resident.subj_norm = subj_norm
-
-        if subj_norm_level == "Street":
-            for i in range(len(self.streets)):
-                nr_solarpanels = 0
-                for house in self.streets[i]:
-                    if house.solar_panels:
-                        nr_solarpanels += 1
-                    subj_norm = min(nr_solarpanels / (len(self.streets[i]) - 1), 1)
-                for house in self.streets[i]:
-                    for resident in house.residents:
-                        resident.subj_norm = subj_norm
-        
-        if subj_norm_level == "Direct":
-            for i in range(len(self.streets)):
-                for j in range(len(self.streets[i])):
-                    try:
-                        if self.streets[i][j - 1].solar_panels:
-                            for resident in self.streets[i][j - 1].residents:
-                                resident.subj_norm += 0.5
-                        if self.streets[i][j + 1].solar_panels:
-                            for resident in self.streets[i][j - 1].residents:
-                                resident.subj_norm += 0.5
-                    except IndexError:
-                        pass
         
         

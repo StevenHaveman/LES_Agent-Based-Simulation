@@ -37,7 +37,7 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30):
     return {"message": "Simulation completed"}
 
 if __name__ == "__main__":
-    config = utilities.choose_config()
+    config_id, config = utilities.choose_config()
     nr_streets = run_simulation(config['nr_households'], config['nr_residents'], config['simulation_years'])
 
         

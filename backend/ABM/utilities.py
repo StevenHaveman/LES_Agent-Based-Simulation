@@ -15,9 +15,6 @@ def gen_random_value(range_min: float, range_max: float):
     return random.uniform(range_min, range_max) 
 
 def choose_config():
-    if config.CONFIG_DEFAULT:
-        selected_config = config.config_default
-    else:
-        selected_config = config.config_custom
-
-    return selected_config
+    chosen_config = config.CHOSEN_CONFIG
+    config_data = config.configs.get(chosen_config, config.configs[0])
+    return chosen_config, config_data

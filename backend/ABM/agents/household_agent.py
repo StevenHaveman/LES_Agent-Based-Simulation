@@ -17,7 +17,7 @@ class Household(Agent):
     """
     def __init__(self, model):
         super().__init__(model)
-        self.config = utilities.choose_config()
+        self.config_id, self.config = utilities.choose_config()
         self.residents = []
 
         self.solar_panels = None
