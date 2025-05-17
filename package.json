@@ -12,8 +12,6 @@
   },
   "private": true,
   "dependencies": {
-    "@tanstack/react-router": "^1.120.3",
-    "@tanstack/router-plugin": "^1.120.3",
     "react": "^19.1.0"
   }
 }

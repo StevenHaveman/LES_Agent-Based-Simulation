@@ -1,15 +1,12 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from main import run_simulation, graphics_data, households_data
-import config
-import utilities
+from backend.ABM.main_mesa import run_simulation, graphics_data, households_data
 
 # Initialize the Flask application
 app = Flask(__name__)
 
-chosen_config = utilities.choose_config()
 # Configure CORS to allow connections from the frontend
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
 
 @app.route('/config', methods=['POST'])
 def start_simulation():
@@ -27,9 +24,10 @@ def start_simulation():
     data = request.get_json()
 
     try:
-        nr_households = int(data.get("nr_households", chosen_config["nr_households"]))
-        nr_residents = int(data.get("nr_residents", chosen_config["nr_residents"]))
-        simulation_years = int(data.get("simulation_years", chosen_config["simulation_years"]))
+        # Retrieve configuration parameters and convert them to integers
+        nr_households = int(data.get("nr_households", 10))
+        nr_residents = int(data.get("nr_residents", 10))
+        simulation_years = int(data.get("simulation_years", 30))
     except ValueError as e:
         # Return an error message for invalid input
         return jsonify({"status": "error", "message": "Invalid input: " + str(e)}), 400
