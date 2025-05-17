@@ -37,7 +37,6 @@ body {
     align-items: stretch;
 }
 
-
 .info-container {
     display: flex;
     flex-direction: column;
@@ -46,13 +45,38 @@ body {
 
 }
 
-.info-container h3 {
+.info-container > * {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
-    border: 1px solid #333;
     box-sizing: border-box;
     margin: 0;
+}
+
+
+.household-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.tabs {
+    height: 10%;
+    background-color: #F8E6CE;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    width: 100%;
+}
+
+.household-info {
+    height: 90%;
+    background-color: white; /* ter onderscheid */
+    border: 1px solid black;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

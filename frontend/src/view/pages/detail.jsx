@@ -5,6 +5,7 @@ import "../styles/detailpage.css";
 import HouseholdList from "../components/HouseholdList";
 import ResidentsList from "../components/ResidentsList";
 import HouseholdMap from "../components/HouseholdMap.jsx";
+import HouseholdWindow from "../components/HouseholdWindow.jsx";
 
 
 export const detailRoute = createRoute({
@@ -44,12 +45,20 @@ export const detailRoute = createRoute({
                         selectedHouseholdId={selectedHouseholdId}
                     />
                 </div>
-
-
                 <div className="info-container">
-                    <h3>household info</h3>
-                    <h3>resident info</h3>
+                    <div className="household-container">
+                        <div className="tabs">
+                            <HouseholdWindow selectedHouseholdId={selectedHouseholdId} />
+                        </div>
+                        <div className="household-info">
+                            <h3>Household Info</h3>
+                        </div>
+                    </div>
+                    <div className="resident-container">
+                        <h3>Resident Info</h3>
+                    </div>
                 </div>
+
             </div>
         );
     },
