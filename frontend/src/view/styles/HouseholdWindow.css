@@ -1,0 +1,18 @@
+.window-container {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    height: 100%;
+}
+
+.info-tab {
+    background-color: #f7e7cf;
+    width: 250px;
+    text-align: left;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid black
+}
+
