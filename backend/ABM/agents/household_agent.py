@@ -1,82 +1,80 @@
-from mesa import Agent
 import random
-from agents.resident_agent import Resident
-import utilities
+from backend.ABM.agents.resident_agent import Resident
+from backend.ABM.utilities import gen_random_value
 
-class Household(Agent):
+class Household():
     """
-    A Mesa-compatible Household agent that contains Resident agents.
+    Represents a household unit, containing residents.
 
     Attributes:
-        unique_id (int): Unique identifier from the Mesa Agent class.
-        model (Model): The model in which this agent is embedded.
+        id (int): Unique identifier for the household.
         residents (list[Resident]): A list of Resident agents belonging to this household.
         solar_panels (bool): Whether the household has decided to install solar panels.
         solarpanel_amount (int): The number of solar panels the household would install (e.g., 6, 8, 10).
         energy_generation (int): Estimated energy generation per panel per year (kWh).
     """
-    def __init__(self, model):
-        super().__init__(model)
-        self.config = utilities.choose_config()
-        self.residents = []
-
-        self.solar_panels = None
-        self.solarpanel_amount = random.choice(self.config['solar_panel_amount_options'])
-        self.energy_generation = random.randint(*self.config['energy_generation_range'])
-
-    def create_residents(self, nr_residents: int):
+    def __init__(self, solar_panels: bool, id: int):
         """
-        Create and add Resident agents to the household, and add them to the model schedule.
+        Initializes a Household agent.
 
         Args:
-            start_resident_id (int): The starting ID for the new residents.
-            nr_residents (int): Number of residents to create.
+            solar_panels (bool): Initial state of solar panel installation.
+            id (int): Unique identifier for the household.
+        """
+        self.id = id
+        self.residents = []
+
+        self.solar_panels = solar_panels
+        self.solarpanel_amount = random.choice([6, 8, 10])
+        self.energy_generation = random.randint(298, 425)
+
+    def create_residents(self, environment, resident_id: int,  nr_residents: int = 1):
+        """
+        Creates and adds Resident agents to the household.
+
+        Args:
+            environment (Environment): The simulation environment object.
+            resident_start_id (int): The starting ID for the new residents.
+            nr_residents (int, optional): The number of residents to create. Defaults to 1.
+
         Returns:
-            int: The next available resident ID.
+            int: The next available resident ID after creating the residents.
         """
         for _ in range(nr_residents):
-            resident = Resident(
-                self.model,
-                self  # link naar household
-            )
-            if self.solar_panels:
-                resident.solar_decision = True
-            self.residents.append(resident)
+            self.residents.append(Resident(resident_id, gen_random_value(0, 1), gen_random_value(0, 2), gen_random_value(0, 2), gen_random_value(0, 2), environment, self))
 
     def calc_avg_decision(self):
         """
         Determines if the household installs solar panels based on the average
-        decision of its residents. If the average score is greater than 0.5,
-        the household installs panels.
+        decision of its residents. If the average score (percentage of residents
+        who decided 'yes') is greater than 0.5, the household installs panels.
         """
-        if not self.residents:
-            return
-
-        total_score = sum(int(resident.solar_decision) for resident in self.residents)
+        total_score = 0
+        for resident in self.residents:
+            total_score += int(resident.solar_decision)
         avg_score = total_score / len(self.residents)
 
-        if avg_score > self.config['household_decision_threshold']:
+        if avg_score > 0.5:
             self.solar_panels = True
-
-    def step(self):
-        """
-        Step function for the household. Executes a step for each resident.
-        """
-        for resident in self.residents:
-            resident.step()
-
-        self.calc_avg_decision()
 
     def __str__(self):
         """
-        Returns a string representation of the household's state, including 
-        the number of residents, their decisions, and whether solar panels are installed.
-            """ 
+        Provides a string representation of the Household agent.
+
+        Returns:
+            str: A string summarizing the household's status and residents.
+        """
         resident_count = len(self.residents)
         residents_with_panels = sum(1 for res in self.residents if res.solar_decision)
+        has_panels = self.solar_panels or (residents_with_panels > 0)
 
-        details = (f"Household {self.unique_id}: \n"
-                   f"  Solar Panels Installed: {self.solar_panels}\n"
+        details = (f"Household {self.id}: \n"
+                   f"  Solar Panels Installed: {has_panels}\n"
                    f"  Number of Residents: {resident_count}\n"
                    f"  Residents who decided for panels: {residents_with_panels}")
+        # Optionally add details for each resident (can be verbose for many residents)
+        # for resident in self.residents:
+        #     details += f"\n    - {resident}" # Uses Resident's __str__
         return details
+
+    

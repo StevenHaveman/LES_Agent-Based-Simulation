@@ -30,11 +30,9 @@ import {
     ResponsiveContainer,
     Legend
 } from "recharts";
-
+import configFormController from "../../controller/ConfigFormController.js";
 import "../styles/Graphic.css";
-import overviewController from "../../controller/OverviewController.js";
 
-// List of keys allowed for the Y-axis
 const validKeys = [
     "decisions_this_year",
     "environmental_influence",
@@ -47,49 +45,41 @@ const Graphic = ({ title = "Simulation Graph", yAxisKey = "solar_panel_price" })
     const [simulationData, setSimulationData] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Ensure the provided key is valid, otherwise fall back to the default key
     const yKey = validKeys.includes(yAxisKey) ? yAxisKey : validKeys[0];
 
     /**
-     * Fetch simulation data on component mount
+     * Fetches the simulation data from the controller.
      */
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await overviewController.getOverview();
-                setSimulationData(result); // Set the fetched data
-                setLoading(false); // Mark loading as complete
+                const result = await configFormController.getOverview();
+                setSimulationData(result);
+                setLoading(false);
             } catch (error) {
                 console.error("Error fetching simulation data", error);
-                setLoading(false); // Still mark loading as complete on error
+                setLoading(false);
             }
         };
         fetchData();
     }, []);
 
-    // Show loading indicator while data is being fetched
     if (loading) {
         return <div>Loading...</div>;
     }
 
-    /**
-     * Flatten the simulation data into a format usable by Recharts.
-     * For each year, create two entries: one for the start state and one for the end state.
-     */
     const flattenedData = simulationData.flatMap(d => [
         { year: d.year, state: "Start", value: d.start_state[yKey] },
         { year: d.year, state: "End", value: d.end_state[yKey] }
     ]);
 
-    // Calculate min and max Y values from the flattened dataset
     const yValues = flattenedData.map(d => d.value);
     const yMinRaw = Math.min(...yValues);
     const yMaxRaw = Math.max(...yValues);
 
-    // Adjust Y-axis limits based on the type of data
     const yMin = yKey === "environmental_influence"
-        ? Math.floor(yMinRaw * 10) / 10  // round to 1 decimal
-        : Math.floor(yMinRaw);          // round to integer
+        ? Math.floor(yMinRaw * 10) / 10
+        : Math.floor(yMinRaw);
 
     const yMax = yKey === "environmental_influence"
         ? Math.ceil(yMaxRaw * 10) / 10
@@ -97,50 +87,18 @@ const Graphic = ({ title = "Simulation Graph", yAxisKey = "solar_panel_price" })
 
     return (
         <div className="map-preview-container">
-            {/* Chart title */}
             <h2 className={"graphic-title"}>{title}</h2>
-
-            {/* Responsive container ensures the chart adapts to screen size */}
             <ResponsiveContainer width="100%" height={400}>
-                <LineChart
-                    data={flattenedData}
-                    margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
-                >
-                    {/* Background grid for better readability */}
+                <LineChart data={flattenedData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
-
-                    {/* X-axis setup: based on year, with tick count matching data length */}
-                    <XAxis
-                        dataKey="year"
-                        type="number"
-                        domain={['dataMin', 'dataMax']}
-                        tickCount={simulationData.length}
-                    />
-
-                    {/* Y-axis setup: custom formatter and decimal support if needed */}
+                    <XAxis dataKey="year" type="number" domain={['dataMin', 'dataMax']} tickCount={simulationData.length} />
                     <YAxis
                         domain={[yMin, yMax]}
-                        tickFormatter={value => (
-                            yKey === "environmental_influence"
-                                ? value.toFixed(2)
-                                : Math.round(value)
-                        )}
+                        tickFormatter={value => (yKey === "environmental_influence" ? value.toFixed(2) : Math.round(value))}
                         allowDecimals={yKey === "environmental_influence"}
                     />
-
-                    {/* Tooltip shows formatted value based on data type */}
-                    <Tooltip
-                        formatter={value =>
-                            yKey === "environmental_influence"
-                                ? value.toFixed(2)
-                                : value
-                        }
-                    />
-
-                    {/* Automatically generates legend for lines */}
+                    <Tooltip formatter={(value) => (yKey === "environmental_influence" ? value.toFixed(2) : value)} />
                     <Legend />
-
-                    {/* Line for start-of-year values */}
                     <Line
                         type="monotone"
                         dataKey="value"
@@ -151,8 +109,6 @@ const Graphic = ({ title = "Simulation Graph", yAxisKey = "solar_panel_price" })
                         dot={{ r: 4 }}
                         activeDot={{ r: 6 }}
                     />
-
-                    {/* Line for end-of-year values */}
                     <Line
                         type="monotone"
                         dataKey="value"
