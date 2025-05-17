@@ -12,29 +12,40 @@
  * A React component that displays a list of residents or a message if no residents are available.
  */
 
-import React from 'react';
-import "../styles/ResidentsList.css";
 
+import "../styles/ResidentsList.css";
+import "../styles/SharedListStyles.css";
+import React, { useState } from 'react';
 const ResidentsList = ({ residents }) => {
+    const [selectedResidentIndex, setSelectedResidentIndex] = useState(null);
+
+    const handleResidentClick = (resident, index) => {
+        console.log(`Resident clicked: ${resident.name}`);
+        setSelectedResidentIndex(index);
+    };
+
     return (
         <div className="container">
-            <h1 className="h1-with-icon">
-                Residents
-                <img src="/INNO/Residents_icon.png" alt="Residents Icon" className="Residents_icon" />
-            </h1>
-            {residents && residents.length > 0 ? (
-                <ul>
-                    {residents.map((resident, index) => (
-                        <li key={index}>
-                            <strong>Name:</strong> {resident.name} <br />
-                            <strong>Income:</strong> {resident.income} <br />
-                            <strong>solar_decision:</strong> {resident.solar_decision ? "Yes" : "No"}
-                        </li>
-                    ))}
+            <div className="list">
+                <ul className="resident-list-container">
+                    {residents && residents.length > 0 ? (
+                        residents.map((resident, index) => (
+                            <li
+                                key={index}
+                                className={`list-item ${selectedResidentIndex === index ? 'selected' : ''}`}
+                                onClick={() => handleResidentClick(resident, index)}
+                            >
+                                <div className="entry">
+                                    <img src="/INNO/Resident_icon.png" alt="Resident icon" className="icon" />
+                                    <h2>{resident.name}</h2>
+                                </div>
+                            </li>
+                        ))
+                    ) : (
+                        <p>No residents available.</p>
+                    )}
                 </ul>
-            ) : (
-                <p>No residents available.</p>
-            )}
+            </div>
         </div>
     );
 };

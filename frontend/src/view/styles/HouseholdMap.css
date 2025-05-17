@@ -1,0 +1,14 @@
+.container-map {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #b0f5a0;
+    height: 100%;
+    width: 100%;
+}
+
+.household-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}

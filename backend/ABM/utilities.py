@@ -1,5 +1,5 @@
 import random
-
+import config
 
 def gen_random_value(range_min: float, range_max: float):
     """
@@ -13,3 +13,11 @@ def gen_random_value(range_min: float, range_max: float):
         float: A random float between range_min and range_max.
     """
     return random.uniform(range_min, range_max) 
+
+def choose_config():
+    if config.CONFIG_DEFAULT:
+        selected_config = config.config_default
+    else:
+        selected_config = config.config_custom
+
+    return selected_config
