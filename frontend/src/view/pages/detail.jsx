@@ -5,6 +5,8 @@ import "../styles/detailpage.css";
 import HouseholdList from "../components/HouseholdList";
 import ResidentsList from "../components/ResidentsList";
 import HouseholdMap from "../components/HouseholdMap.jsx";
+import HouseholdNavbar from "../components/HouseholdNavbar.jsx";
+import HouseholdDecisions from "../components/HouseholdDecisions.jsx";
 import HouseholdWindow from "../components/HouseholdWindow.jsx";
 
 
@@ -13,17 +15,17 @@ export const detailRoute = createRoute({
     path: "/detail",
 
     component: function Overview() {
-        // State to hold selected residents for selected household
         const [selectedResidents, setSelectedResidents] = useState([]);
-
-        // State to hold the ID of the currently selected household
         const [selectedHouseholdId, setSelectedHouseholdId] = useState(null);
+        const [showHouseholdContent, setShowHouseholdContent] = useState(false);
+        const [window, setWindow] = useState("");
 
-        // handles household and resident selection from either list or map
         const handleHouseholdSelect = (household) => {
             setSelectedHouseholdId(household.id);
             setSelectedResidents(household.residents);
         };
+
+        const handleShowContent = () => setShowHouseholdContent(true);
 
         return (
             <div className="parent-container">
@@ -37,7 +39,6 @@ export const detailRoute = createRoute({
                     <ResidentsList residents={selectedResidents} />
                 </div>
 
-
                 <div className="map-container">
                     <HouseholdMap
                         onSelectResidents={setSelectedResidents}
@@ -48,17 +49,20 @@ export const detailRoute = createRoute({
                 <div className="info-container">
                     <div className="household-container">
                         <div className="tabs">
-                            <HouseholdWindow selectedHouseholdId={selectedHouseholdId} />
+                            <HouseholdNavbar window={window} setWindow={setWindow} />
                         </div>
-                        <div className="household-info">
-                            <h3>Household Info</h3>
+                        <div className="household-window">
+                            <HouseholdWindow
+                                window={window}
+                                setWindow={setWindow}
+                                selectedHouseholdId={selectedHouseholdId}
+                            />
                         </div>
                     </div>
                     <div className="resident-container">
                         <h3>Resident Info</h3>
                     </div>
                 </div>
-
             </div>
         );
     },

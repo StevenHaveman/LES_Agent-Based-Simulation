@@ -1,0 +1,29 @@
+.decisions-container {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.solar-panels{
+    display: flex;
+
+    width: 100%;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.solar_panel_icon {
+    vertical-align: middle;
+    width: 75px;
+    height: 75px;
+    margin-right: 10px;
+}
+
+.text-green {
+    color: green;
+}
+.text-red {
+    color: red;
+}
