@@ -20,15 +20,23 @@ const HouseholdDecisions = ({ selectedHouseholdId, visible }) => {
     if (!visible) {
         return null;
     }
+
     const selectedHousehold = households.find(h => h.id === selectedHouseholdId);
 
+    // Check of er een resident is met Solar_decision === true
+    const hasSolarDecision = selectedHousehold
+        ? selectedHousehold.residents.some(resident => resident.Solar_decision === true)
+        : false;
+
     return (
-       <div className="decisions-container">
-           <div className="solar-panels">
-               <h3>img </h3>
-               <h3> yk</h3>
-           </div>
-       </div>
+        <div className="decisions-container">
+            <div className="solar-panels">
+                <img src="/INNO/solar_panel.png" alt="Solar Panel" className="solar_panel_icon"/>
+                <h2 className={hasSolarDecision ? "text-green" : "text-red"}>
+                    {hasSolarDecision ? "Yes" : "No"}
+                </h2>
+            </div>
+        </div>
     );
 };
 

@@ -13,9 +13,7 @@ const HouseholdWindow = ({ window, setWindow, selectedHouseholdId }) => {
     };
 
     return (
-        <div>
-            {renderContent()}
-        </div>
+            renderContent()
     );
 };
 
