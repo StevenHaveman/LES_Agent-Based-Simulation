@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import "../styles/HouseholdDecisions.css"
+import "../styles/HouseholdInfo.css";
 import detailController from "../../controller/DetailController.js";
 
-const HouseholdDecisions = ({ selectedHouseholdId, visible }) => {
+const HouseholdInfo = ({ selectedHouseholdId, visible }) => {
     const [households, setHouseholds] = useState([]);
 
     useEffect(() => {
@@ -23,21 +23,14 @@ const HouseholdDecisions = ({ selectedHouseholdId, visible }) => {
 
     const selectedHousehold = households.find(h => h.id === selectedHouseholdId);
 
-    // Check of er een resident is met Solar_decision === true
-    const hasSolarDecision = selectedHousehold
-        ? selectedHousehold.residents.some(resident => resident.Solar_decision === true)
-        : false;
-
     return (
-        <div className="decisions-container">
-            <div className="solar-panels">
-                <img src="/INNO/solar_panel.png" alt="Solar Panel" className="solar_panel_icon"/>
-                <h2 className={hasSolarDecision ? "text-green" : "text-red"}>
-                    {hasSolarDecision ? "Yes" : "No"}
-                </h2>
+        <div className="info-container">
+            <div className="info">
+                <h3>Naam: {selectedHousehold ? selectedHousehold.name : ""}</h3>
+                <h3>Adres: {selectedHousehold ? selectedHousehold.address : ""}</h3>
             </div>
         </div>
     );
 };
 
-export default HouseholdDecisions;
+export default HouseholdInfo;

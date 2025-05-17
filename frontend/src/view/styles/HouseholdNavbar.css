@@ -5,9 +5,9 @@
     height: 100%;
 }
 
-.decisions-tab {
+.decisions-tab, .info-tab {
     background-color: #f7e7cf;
-    width: 250px;
+    width: 150px;
     text-align: left;
     height: 100%;
     display: flex;
@@ -16,6 +16,6 @@
     border-right: 1px solid black
 }
 
-.decisions-tab.selected {
+.decisions-tab.selected, .info-tab.selected {
     background-color: #e6caa3;
 }
