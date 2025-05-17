@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import "../styles/HouseholdContent.css";
+import "../styles/HouseholdDecisions.css";
 import detailController from "../../controller/DetailController.js";
 
-const HouseholdContent = ({ selectedHouseholdId, visible }) => {
+const HouseholdDecisions = ({ selectedHouseholdId, visible }) => {
     const [households, setHouseholds] = useState([]);
 
     useEffect(() => {
@@ -23,11 +23,13 @@ const HouseholdContent = ({ selectedHouseholdId, visible }) => {
     const selectedHousehold = households.find(h => h.id === selectedHouseholdId);
 
     return (
-
-        <h3>{selectedHousehold
-            ? `${selectedHousehold.name} - Decisions `
-            : "Selecteer een household"}</h3>
+       <div className="decisions-container">
+           <div className="solar-panels">
+               <h3>img </h3>
+               <h3> yk</h3>
+           </div>
+       </div>
     );
 };
 
-export default HouseholdContent;
+export default HouseholdDecisions;

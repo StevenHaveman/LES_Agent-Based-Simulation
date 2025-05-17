@@ -1,4 +1,4 @@
-.window-container {
+.navbar-container {
     display: flex;
     align-items: flex-start;
     width: 100%;
@@ -16,3 +16,6 @@
     border-right: 1px solid black
 }
 
+.decisions-tab.selected {
+    background-color: #e6caa3;
+}

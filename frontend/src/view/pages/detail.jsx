@@ -5,8 +5,9 @@ import "../styles/detailpage.css";
 import HouseholdList from "../components/HouseholdList";
 import ResidentsList from "../components/ResidentsList";
 import HouseholdMap from "../components/HouseholdMap.jsx";
+import HouseholdNavbar from "../components/HouseholdNavbar.jsx";
+import HouseholdDecisions from "../components/HouseholdDecisions.jsx";
 import HouseholdWindow from "../components/HouseholdWindow.jsx";
-import HouseholdContent from "../components/HouseholdContent.jsx";
 
 
 export const detailRoute = createRoute({
@@ -17,6 +18,7 @@ export const detailRoute = createRoute({
         const [selectedResidents, setSelectedResidents] = useState([]);
         const [selectedHouseholdId, setSelectedHouseholdId] = useState(null);
         const [showHouseholdContent, setShowHouseholdContent] = useState(false);
+        const [window, setWindow] = useState("");
 
         const handleHouseholdSelect = (household) => {
             setSelectedHouseholdId(household.id);
@@ -47,12 +49,13 @@ export const detailRoute = createRoute({
                 <div className="info-container">
                     <div className="household-container">
                         <div className="tabs">
-                            <HouseholdWindow onShowContent={handleShowContent} />
+                            <HouseholdNavbar window={window} setWindow={setWindow} />
                         </div>
-                        <div className="household-info">
-                            <HouseholdContent
+                        <div className="household-window">
+                            <HouseholdWindow
+                                window={window}
+                                setWindow={setWindow}
                                 selectedHouseholdId={selectedHouseholdId}
-                                visible={showHouseholdContent}
                             />
                         </div>
                     </div>

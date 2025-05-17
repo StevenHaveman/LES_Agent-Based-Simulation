@@ -71,12 +71,9 @@ body {
     width: 100%;
 }
 
-.household-info {
+.household-window {
     height: 90%;
     background-color: white; /* ter onderscheid */
     border: 1px solid black;
     width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }

@@ -1,0 +1,8 @@
+.deciscontainer {
+    display: flex;
+    flex-direction: column;
+    background-color: #F8E6CE;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}

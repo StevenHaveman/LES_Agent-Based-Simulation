@@ -1,12 +1,20 @@
 import React from "react";
-import "../styles/HouseholdWindow.css";
+import HouseholdDecisions from "./HouseholdDecisions";
 
-const HouseholdWindow = ({ onShowContent }) => {
+const HouseholdWindow = ({ window, setWindow, selectedHouseholdId }) => {
+    const renderContent = () => {
+        switch (window) {
+            case "decision":
+                return <HouseholdDecisions selectedHouseholdId={selectedHouseholdId} visible={true} />;
+
+            default:
+                return null;
+        }
+    };
+
     return (
-        <div className="window-container">
-            <div className="decisions-tab" onClick={onShowContent}>
-                <h4>Decisions</h4>
-            </div>
+        <div>
+            {renderContent()}
         </div>
     );
 };
