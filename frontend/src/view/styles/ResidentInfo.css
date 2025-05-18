@@ -11,3 +11,9 @@
     flex-direction: column;
 
 }
+
+.select-resident-hint{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

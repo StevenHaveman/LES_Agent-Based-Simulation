@@ -7,7 +7,7 @@ const HouseholdNavbar = ({ householdWindow, setHouseholdWindow}) => {
     return (
         <div className="navbar-container">
             <div
-                className={`info-tab-household${householdWindow === "info" ? " selected" : ""}`}
+                className={`info-tab${householdWindow === "info" ? " selected" : ""}`}
                 onClick={() => setHouseholdWindow("info")}>
                 <h4> Info </h4>
             </div>

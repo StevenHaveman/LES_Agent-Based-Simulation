@@ -5,7 +5,7 @@ import "./ResidentInfo.jsx";
 import ResidentInfo from "./ResidentInfo.jsx";
 
 const ResidentWindow = ({ residentWindow, residents, selectedResidentIndex }) => {
-    if (!residentWindow) return null;
+
 
     const renderContent = () => {
         switch (residentWindow) {
@@ -17,7 +17,11 @@ const ResidentWindow = ({ residentWindow, residents, selectedResidentIndex }) =>
                     />
                 );
             default:
-                return null;
+                return (
+                    <div className="select-household-hint">
+                        <h3>Click on a resident </h3>
+                    </div>
+                );
         }
     };
 

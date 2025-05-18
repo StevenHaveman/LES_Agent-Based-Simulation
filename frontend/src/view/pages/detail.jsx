@@ -15,11 +15,10 @@ export const detailRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/detail",
 
-    component: function Overview() {
+    component: function Detail() {
         const [selectedResidents, setSelectedResidents] = useState([]);
         const [selectedHouseholdId, setSelectedHouseholdId] = useState(null);
         const [selectedResidentIndex, setSelectedResidentIndex] = useState(null);
-        const [showHouseholdContent, setShowHouseholdContent] = useState(false);
         const [householdWindow, setHouseholdWindow] = useState("");
         const [residentWindow, setResidentWindow] = useState("");
 
@@ -28,7 +27,6 @@ export const detailRoute = createRoute({
             setSelectedResidents(household.residents);
         };
 
-        const handleShowContent = () => setShowHouseholdContent(true);
 
         return (
             <div className="parent-container">

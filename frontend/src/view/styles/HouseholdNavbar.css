@@ -5,7 +5,7 @@
     height: 100%;
 }
 
-.decisions-tab, .info-tab-household {
+.decisions-tab, .info-tab {
     background-color: #f7e7cf;
     width: 150px;
     text-align: left;
@@ -13,7 +13,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-right: 1px solid black
+
 }
 
 .decisions-tab.selected, .info-tab.selected {

@@ -3,18 +3,12 @@ import HouseholdDecisions from "./HouseholdDecisions";
 import "../styles/HouseholdWindow.css";
 import HouseholdInfo from "./HouseholdInfo.jsx";
 
-
 const HouseholdWindow = ({ householdWindow, selectedHouseholdId }) => {
-
-    if (!householdWindow) {
-        return null;
-    }
-
 
     if (!selectedHouseholdId) {
         return (
             <div className="select-household-hint">
-                <h3>Klik op een huishouden</h3>
+                <h3> Click on a household</h3>
             </div>
         );
     }
@@ -30,13 +24,21 @@ const HouseholdWindow = ({ householdWindow, selectedHouseholdId }) => {
                 );
             case "info":
                 return (
-                   <HouseholdInfo selectedHouseholdId={selectedHouseholdId} visible={true}/>
+                    <HouseholdInfo
+                        selectedHouseholdId={selectedHouseholdId}
+                        visible={true}
+                    />
+                );
+            default:
+                return (
+                    <div className="select-household-hint">
+                        <h3>Click on a household </h3>
+                    </div>
                 );
 
-            default:
-                return "idk";
         }
     };
+
 
     return renderContent();
 };

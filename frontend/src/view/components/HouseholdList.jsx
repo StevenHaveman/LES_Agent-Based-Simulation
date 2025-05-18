@@ -19,10 +19,10 @@ const HouseholdList = ({ onSelectResidents, onSelectHousehold, selectedHousehold
     useEffect(() => {
         const fetchHouseholds = async () => {
             try {
-                const data = await detailController.fetch_households(); // API call to get household data
-                setHouseholds(data); // Store retrieved households in state
+                const data = await detailController.fetch_households();
+                setHouseholds(data);
             } catch (error) {
-                console.error('Error fetching households:', error); // Log any errors
+                console.error('Error fetching households:', error);
             }
         };
         fetchHouseholds();
@@ -30,8 +30,8 @@ const HouseholdList = ({ onSelectResidents, onSelectHousehold, selectedHousehold
 
     // Handle the selection of a household (user clicks on a list item)
     const handleViewResidents = (household) => {
-        onSelectResidents(household.residents); // Pass residents to parent
-        onSelectHousehold(household);           // Pass household to parent
+        onSelectResidents(household.residents);
+        onSelectHousehold(household);
     };
 
     return (

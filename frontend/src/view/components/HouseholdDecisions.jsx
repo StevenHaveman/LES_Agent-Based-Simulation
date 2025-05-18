@@ -23,7 +23,7 @@ const HouseholdDecisions = ({ selectedHouseholdId, visible }) => {
 
     const selectedHousehold = households.find(h => h.id === selectedHouseholdId);
 
-    // Check of er een resident is met Solar_decision === true
+
     const hasSolarDecision = selectedHousehold
         ? selectedHousehold.residents.some(resident => resident.Solar_decision === true)
         : false;
