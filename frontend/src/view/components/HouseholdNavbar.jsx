@@ -1,22 +1,21 @@
-import React, { useEffect } from "react";
+
 import "../styles/HouseholdNavbar.css";
 
-const HouseholdNavbar = ({ window, setWindow }) => {
+const HouseholdNavbar = ({ householdWindow, setHouseholdWindow}) => {
 
 
     return (
         <div className="navbar-container">
             <div
-                className={`info-tab${window === "info" ? " selected" : ""}`}
-                onClick={() => setWindow("info")}>
+                className={`info-tab-household${householdWindow === "info" ? " selected" : ""}`}
+                onClick={() => setHouseholdWindow("info")}>
                 <h4> Info </h4>
             </div>
             <div
-                className={`decisions-tab${window === "decision" ? " selected" : ""}`}
-                onClick={() => setWindow("decision")}>
+                className={`decisions-tab${householdWindow === "decision" ? " selected" : ""}`}
+                onClick={() => setHouseholdWindow("decision")}>
                 <h4>Decisions</h4>
             </div>
-
         </div>
     );
 };
