@@ -56,9 +56,10 @@ body {
 }
 
 
-.household-container {
+.household-container , .resident-container {
     display: flex;
     flex-direction: column;
+
 }
 
 .tabs {
@@ -71,7 +72,7 @@ body {
     width: 100%;
 }
 
-.household-window {
+.household-window, .resident-window {
     height: 90%;
     background-color: white; /* ter onderscheid */
     border: 1px solid black;

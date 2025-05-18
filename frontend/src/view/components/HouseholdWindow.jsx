@@ -4,9 +4,9 @@ import "../styles/HouseholdWindow.css";
 import HouseholdInfo from "./HouseholdInfo.jsx";
 
 
-const HouseholdWindow = ({ window, setWindow, selectedHouseholdId }) => {
+const HouseholdWindow = ({ householdWindow, selectedHouseholdId }) => {
 
-    if (!window) {
+    if (!householdWindow) {
         return null;
     }
 
@@ -20,7 +20,7 @@ const HouseholdWindow = ({ window, setWindow, selectedHouseholdId }) => {
     }
 
     const renderContent = () => {
-        switch (window) {
+        switch (householdWindow) {
             case "decision":
                 return (
                     <HouseholdDecisions
@@ -34,7 +34,7 @@ const HouseholdWindow = ({ window, setWindow, selectedHouseholdId }) => {
                 );
 
             default:
-                return null;
+                return "idk";
         }
     };
 

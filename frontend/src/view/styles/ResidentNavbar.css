@@ -1,11 +1,11 @@
-.navbar-container {
+.navbar-container-resident {
     display: flex;
     align-items: flex-start;
     width: 100%;
     height: 100%;
 }
 
-.decisions-tab, .info-tab-household {
+.info-tab-resident {
     background-color: #f7e7cf;
     width: 150px;
     text-align: left;
@@ -16,6 +16,6 @@
     border-right: 1px solid black
 }
 
-.decisions-tab.selected, .info-tab.selected {
+.info-tab-resident.selected {
     background-color: #e6caa3;
 }
