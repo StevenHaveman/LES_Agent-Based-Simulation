@@ -3,12 +3,14 @@ from flask_cors import CORS
 from main import run_simulation, graphics_data, households_data
 import config
 import utilities
+
 # Initialize the Flask application
 app = Flask(__name__)
 chosen_config = utilities.choose_config()
 
+chosen_config = utilities.choose_config()
 # Configure CORS to allow connections from the frontend
-CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 
 @app.route('/config', methods=['POST'])
 def start_simulation():

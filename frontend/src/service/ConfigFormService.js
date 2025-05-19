@@ -10,7 +10,7 @@ class ConfigFormService {
      * @returns {Promise<Object>} - The result of the simulation.
      * @throws {Error} - Throws an error if the API call fails.
      */
-    async startSimulation(config) {
+    async start_Simulation(config) {
         const response = await fetch(`${API_URL}/config`, {
             method: "POST",
             headers: {
@@ -22,21 +22,6 @@ class ConfigFormService {
         if (!response.ok) {
             throw new Error("Starting simulation failed");
         }
-        return await response.json();
-    }
-
-    /**
-     * Fetches the graphical results of the simulation.
-     * @returns {Promise<Object>} - The graphical data of the simulation.
-     * @throws {Error} - Throws an error if the API call fails.
-     */
-    async getSimulationGraphicResults() {
-        const response = await fetch(`${API_URL}/overview`);
-
-        if (!response.ok) {
-            throw new Error("Fetching simulation graphic results failed");
-        }
-
         return await response.json();
     }
 }

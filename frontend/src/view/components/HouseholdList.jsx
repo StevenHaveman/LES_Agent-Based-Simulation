@@ -1,30 +1,21 @@
-/**
- * Component to display a list of households.
- *
- * Props:
- * @param {Function} onSelectResidents - Callback function to handle the selection of residents from a household.
- *
- * State:
- * @property {Array} households - An array of household objects fetched from the backend.
- * Each household object should have the following properties:
- * - {number} id - The unique identifier of the household.
- * - {string} name - The name of the household.
- * - {string} address - The address of the household.
- * - {Array} residents - An array of resident objects belonging to the household.
- *
- * Returns:
- * A React component that displays a list of households and allows viewing their residents.
- */
-
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import "../styles/HouseholdList.css";
 import "../styles/SharedListStyles.css";
 import detailController from "../../controller/DetailController.js";
 
-const HouseholdList = ({onSelectResidents}) => {
-    const [households, setHouseholds] = useState([]);
-    const [selectedHouseholdId, setSelectedHouseholdId] = useState(null);
+/**
+ * Component that displays a list of households.
+ * Allows the user to select a household and view its residents.
+ *
+ * Props:
+ * - onSelectResidents: function to pass selected residents to the parent component
+ * - onSelectHousehold: function to pass the selected household to the parent component
+ * - selectedHouseholdId: ID of the currently selected household (used for visual highlighting)
+ */
+const HouseholdList = ({ onSelectResidents, onSelectHousehold, selectedHouseholdId }) => {
+    const [households, setHouseholds] = useState([]); // Stores the list of households
 
+    // Fetch households from the backend when the component mounts
     useEffect(() => {
         const fetchHouseholds = async () => {
             try {
@@ -34,13 +25,13 @@ const HouseholdList = ({onSelectResidents}) => {
                 console.error('Error fetching households:', error);
             }
         };
-
         fetchHouseholds();
     }, []);
 
+    // Handle the selection of a household (user clicks on a list item)
     const handleViewResidents = (household) => {
-        setSelectedHouseholdId(household.id);
         onSelectResidents(household.residents);
+        onSelectHousehold(household);
     };
 
     return (
@@ -54,6 +45,7 @@ const HouseholdList = ({onSelectResidents}) => {
                             onClick={() => handleViewResidents(household)}
                         >
                             <div className="entry">
+                                {/* Display household icon and name */}
                                 <img src="/INNO/Household_icon.png" alt="House icon" className="icon"/>
                                 <h2>{household.name}</h2>
                             </div>

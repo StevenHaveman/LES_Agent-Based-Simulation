@@ -16,13 +16,11 @@
 import "../styles/ResidentsList.css";
 import "../styles/SharedListStyles.css";
 import React, { useState } from 'react';
-const ResidentsList = ({ residents }) => {
-    const [selectedResidentIndex, setSelectedResidentIndex] = useState(null);
-
+const ResidentsList = ({ residents, selectedResidentIndex, onSelectResident }) => {
     const handleResidentClick = (resident, index) => {
-        console.log(`Resident clicked: ${resident.name}`);
-        setSelectedResidentIndex(index); // update the selected resident
+        onSelectResident(index);
     };
+
 
     return (
         <div className="container">

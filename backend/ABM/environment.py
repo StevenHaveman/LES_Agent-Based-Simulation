@@ -64,7 +64,9 @@ class SolarAdoptionModel(Model):
             remaining -= value
 
         if remaining > 0:
-            for i in range(pointer, self.config['nr_households']):
+            for i in range(pointer, len(self.households)):
+                print(i)
+                print(len(self.households))
                 chosen_list = random.randint(0, len(self.streets) - 1)
                 self.streets[chosen_list].append(self.households[i])
 
