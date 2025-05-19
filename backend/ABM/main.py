@@ -1,4 +1,4 @@
-from environment import SolarAdoptionModel
+from environment import Environment
 import utilities
 
 # TODO DENK DAT DIT IN EEN DATA CLASSE MOET GAAN GEBEUREN ZODDAT DE DATA IN DE GUI KAN WORDEN GETOONT EN HET OP EEN PLEK IS.
@@ -11,7 +11,7 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30):
     
     graphics_data.clear()
 
-    model = SolarAdoptionModel(nr_households=nr_households, nr_residents=nr_residents)
+    model = Environment(nr_households=nr_households, nr_residents=nr_residents)
 
     for year in range(simulation_years):
         print(f"=== Year {year + 1} ===")

@@ -1,7 +1,7 @@
 import pytest
 from backend.ABM.agents.resident_agent import Resident
 from backend.ABM.agents.household_agent import Household
-from backend.ABM.environment import SolarAdoptionModel
+from backend.ABM.environment import Environment
 
 def test_resident_initialization():
     resident = Resident(1, 0.2, 1.0, 1.1, 0.9)

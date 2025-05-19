@@ -2,7 +2,7 @@ from mesa import Agent
 import numpy as np
 import random
 import utilities
-import config
+from solar_panel import SolarPanel
 
 class Resident(Agent):
     """
@@ -39,6 +39,7 @@ class Resident(Agent):
 
         self.household = household
         self.environment = model
+        self.solar_panel = self.environment.solar_panel
 
         salary = self.calc_salary()
         self.income = max(round(salary, -2), 0)
@@ -88,7 +89,7 @@ class Resident(Agent):
             bool | None: True if the decision is positive, None otherwise.
         """
 
-        behavioral_inf = self.calculate_behavioral_influence(self.environment.solarpanel_price * self.household.solarpanel_amount)
+        behavioral_inf = self.solar_panel.calculate_behavioral_influence(self.income, self.household)
         decision_stat = (self.attitude * self.attitude_mod
                           + self.subj_norm * self.subj_norm_mod
                             + behavioral_inf * self.behavioral_mod) / 6 # Divide by 6 to normalize stat to 0-1
@@ -101,41 +102,4 @@ class Resident(Agent):
     def step(self):
         if not self.solar_decision:
             self.calc_decision()
-
         self.income = int(round(self.income * random.choice(self.config['raise_income']), -1))
-
-    def calc_roi(self):
-        """
-        Calculates the simple payback period (Return on Investment time) in years.
-
-        Formula based on: Total Investment / Annual Savings
-        https://pure-energie.nl/kennisbank/zonnepanelen-terugverdienen/
-
-        Returns:
-            float: The calculated ROI time in years. Returns infinity if savings are zero or negative.
-        """
-        savings = self.household.energy_generation * self.household.solarpanel_amount * self.environment.energy_price
-        cost = self.environment.solarpanel_price * self.household.solarpanel_amount
-        return cost / savings if savings > 0 else float("inf")
-    
-    
-
-    def calculate_behavioral_influence(self, solarpanel_price):
-        """
-        Calculates the behavioral influence component for the decision-making process.
-        This considers the affordability (income vs. total panel cost) and the
-        Return on Investment (ROI).
-
-        Args:
-            solarpanel_price (float): The total cost of the solar panels for the household.
-
-        Returns:
-            float: The calculated behavioral influence, clipped between 0 and 1.
-        """
-        max_diff = 1000
-        min_diff = -1000
-        difference = self.income - solarpanel_price
-        normalized_diff = (difference - min_diff) / (max_diff - min_diff)
-        roi = self.calc_roi()
-        influence_roi = max(0, 0.25 - 0.025 * roi)  # Maps ROI [0,10] → Influence [*_
-        return np.clip(normalized_diff + influence_roi, 0, 1)

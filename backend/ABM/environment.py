@@ -1,15 +1,16 @@
 import random
 from mesa import Model
+import numpy as np
 from agents.household_agent import Household
 import utilities
+from solar_panel import SolarPanel
 
-
-class SolarAdoptionModel(Model):
+class Environment(Model):
     def __init__(self, nr_households, nr_residents):
         super().__init__()
         self.config_id, self.config = utilities.choose_config()
 
-        self.solarpanel_price = self.config['solar_panel_price']
+        self.solar_panel = SolarPanel(self)
         self.energy_price = self.config['energy_price'] 
         self.decided_residents = 0
 
@@ -130,7 +131,7 @@ class SolarAdoptionModel(Model):
             hh.calc_avg_decision()
 
         self.update_subjective_norm()
-        self.solarpanel_price += round(random.randint(*self.config['solarpanel_price_increase']))
+        self.solar_panel.step()
 
     def collect_start_of_year_data(self, year):
         all_residents = [resident for household in self.residents for resident in household]
@@ -140,7 +141,7 @@ class SolarAdoptionModel(Model):
         start_state = {
             "residents_for_panels": residents_with_panels,
             "households_with_panels": households_with_panels,
-            "solar_panel_price": self.solarpanel_price
+            "solar_panel_price": self.solar_panel.price
         }
 
         data = {
@@ -160,7 +161,7 @@ class SolarAdoptionModel(Model):
         end_state = {
             "residents_for_panels": residents_with_panels,
             "households_with_panels": households_with_panels,
-            "solar_panel_price": self.solarpanel_price,
+            "solar_panel_price": self.solar_panel.price,
             "decisions_this_year": self.decided_residents
         }
 
@@ -199,6 +200,6 @@ class SolarAdoptionModel(Model):
             1 for h in self.households if h.solar_panels or any(r.solar_decision for r in h.residents))
         return (f"    Total Residents who would like Panels: {residents_with_panels} / {total_residents}\n"
                 f"    Households: {households_with_panels} / {total_households} with panels\n"
-                f"    Current Solar Panel Price: {self.solarpanel_price}\n")  # Use the price variable directly
+                f"    Current Solar Panel Price: {self.solar_panel.price}\n")  # Use the price variable directly
         
         

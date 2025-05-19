@@ -2,6 +2,7 @@ from mesa import Agent
 import random
 from agents.resident_agent import Resident
 import utilities
+from solar_panel import SolarPanel
 
 class Household(Agent):
     """
