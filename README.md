@@ -60,7 +60,6 @@ De `root.jsx` bevat alle routes naar de verschillende pagina's en vormt daarmee 
 2. Voeg de volgende code toe in deze file
 
 ```jsx
-// src/routes/newpage.jsx
 import { createRoute } from "@tanstack/react-router";
 import { rootRoute } from "./root";
 import Navbar from "../components/Navbar.jsx";
