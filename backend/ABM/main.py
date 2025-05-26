@@ -23,7 +23,8 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30):
         model.step()
 
         print(f"\nEnd of Year {year + 1}:")
-        print(f"  Decisions this year: {model.decided_residents}")
+        print(f"  Decisions this year for Solar Panels: {model.decided_residents_sp}")
+        print(f"  Decisions this year for Heatpumps: {model.decided_residents_hp}\n")
         print("  Current Environment State (end):")
         print(model)
         print("-" * 40)

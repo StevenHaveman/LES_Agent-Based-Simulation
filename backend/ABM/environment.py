@@ -3,7 +3,8 @@ from mesa import Model
 import numpy as np
 from agents.household_agent import Household
 import utilities
-from solar_panel import SolarPanel
+from sustainability_packages.solar_panel import SolarPanel
+from sustainability_packages.heat_pump import HeatPump
 
 class Environment(Model):
     def __init__(self, nr_households, nr_residents):
@@ -11,8 +12,12 @@ class Environment(Model):
         self.config_id, self.config = utilities.choose_config()
 
         self.solar_panel = SolarPanel(self)
+        self.heat_pump = HeatPump(self)
         self.energy_price = self.config['energy_price'] 
-        self.decided_residents = 0
+        self.decided_residents_sp = 0
+        self.decided_residents_hp = 0
+
+        self.sustainability_packages = [self.solar_panel, self.heat_pump]
 
         self.households = []  # gewone Python-lijst voor filteren/gemak
         self.residents = []  # gewone Python-lijst voor filteren/gemak
@@ -34,6 +39,7 @@ class Environment(Model):
         for i in range(nr_households):
             hh = Household(self)
             hh.solar_panels = random.random() < self.config['initial_solarpanel_chance']
+            hh.heatpump = random.random() < self.config['initial_heatpump_chance']
 
             self.households.append(hh)
             # self.add_agent(hh)  # voeg toe aan het model (dus aan self.agents)
@@ -66,8 +72,6 @@ class Environment(Model):
 
         if remaining > 0:
             for i in range(pointer, len(self.households)):
-                print(i)
-                print(len(self.households))
                 chosen_list = random.randint(0, len(self.streets) - 1)
                 self.streets[chosen_list].append(self.households[i])
 
@@ -128,10 +132,11 @@ class Environment(Model):
         self._agents_by_type[Household].shuffle_do("step")
 
         for hh in self._agents_by_type[Household]:
-            hh.calc_avg_decision()
+            hh.step()
 
         self.update_subjective_norm()
         self.solar_panel.step()
+        self.heat_pump.step()
 
     def collect_start_of_year_data(self, year):
         all_residents = [resident for household in self.residents for resident in household]
@@ -146,7 +151,7 @@ class Environment(Model):
 
         data = {
             "year": year,
-            "decisions_this_year": self.decided_residents,
+            "decisions_this_year": self.decided_residents_sp + self.decided_residents_hp,
             "start_state": start_state,
         }
 
@@ -162,7 +167,7 @@ class Environment(Model):
             "residents_for_panels": residents_with_panels,
             "households_with_panels": households_with_panels,
             "solar_panel_price": self.solar_panel.price,
-            "decisions_this_year": self.decided_residents
+            "decisions_this_year": self.decided_residents_sp + self.decided_residents_hp
         }
 
         data["end_state"] = end_state
@@ -196,10 +201,16 @@ class Environment(Model):
         total_households = len(self.households)
         total_residents = sum(len(h.residents) for h in self.households)
         residents_with_panels = sum(sum(1 for r in h.residents if r.solar_decision) for h in self.households)
+        residents_with_heatpump = sum(sum(1 for r in h.residents if r.heatpump_decision) for h in self.households)
         households_with_panels = sum(
             1 for h in self.households if h.solar_panels or any(r.solar_decision for r in h.residents))
+        households_with_heatpump = sum(
+            1 for h in self.households if h.heatpump or any(r.heatpump_decision for r in h.residents))
         return (f"    Total Residents who would like Panels: {residents_with_panels} / {total_residents}\n"
-                f"    Households: {households_with_panels} / {total_households} with panels\n"
-                f"    Current Solar Panel Price: {self.solar_panel.price}\n")  # Use the price variable directly
+                f"    Households with panels: {households_with_panels} / {total_households}\n\n"
+                f"    Total Residents who would like Heatpumps: {residents_with_heatpump} / {total_residents}\n"
+                f"    Households with heatpump: {households_with_heatpump} / {total_households}\n\n"
+                f"    Current Solar Panel Price: {self.solar_panel.price}\n"  # Use the price variable directly
+                f"    Current Solar Panel Price: {self.heat_pump.price}\n")  # Use the price variable directly
         
         

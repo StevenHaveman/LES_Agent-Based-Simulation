@@ -2,7 +2,7 @@ from mesa import Agent
 import numpy as np
 import random
 import utilities
-from solar_panel import SolarPanel
+from sustainability_packages.solar_panel import SolarPanel
 
 class Resident(Agent):
     """
@@ -39,7 +39,6 @@ class Resident(Agent):
 
         self.household = household
         self.environment = model
-        self.solar_panel = self.environment.solar_panel
 
         salary = self.calc_salary()
         self.income = max(round(salary, -2), 0)
@@ -56,8 +55,16 @@ class Resident(Agent):
             self.subj_norm_mod = self.config['subj_norm_mod']
             self.behavioral_mod = self.config['behavioral_mod']
 
-        self.solar_decision = False
-        self.decision_threshold = self.config['decision_threshold'] 
+        self.package_decisions = {} # Stores True/False for each package.name
+        self.package_subjective_norms = {}
+
+        for package in self.environment.sustainability_packages:
+            self.package_decisions[package.name] = False
+            self.package_subjective_norms[package.name] = self.config.get('subjective_norm', 0.0)
+
+        self.decision_threshold = self.config['decision_threshold']
+
+
 
     def calc_salary(self):
         """
@@ -88,18 +95,26 @@ class Resident(Agent):
         Returns:
             bool | None: True if the decision is positive, None otherwise.
         """
+        for package in self.environment.sustainability_packages:
+            # Skip if already decided for this package
+            if self.package_decisions.get(package.name, False):
+                continue
 
-        behavioral_inf = self.solar_panel.calculate_behavioral_influence(self.income, self.household)
-        decision_stat = (self.attitude * self.attitude_mod
-                          + self.subj_norm * self.subj_norm_mod
-                            + behavioral_inf * self.behavioral_mod) / 6 # Divide by 6 to normalize stat to 0-1
+            behavioral_inf = package.calculate_behavioral_influence(self.income, self.household)
+            
+            current_subj_norm_for_package = self.package_subjective_norms.get(package.name, 0.0)
+            
+            decision_stat = (self.attitude * self.attitude_mod +
+                             current_subj_norm_for_package * package.subj_norm_mod * self.subj_norm_mod +
+                             behavioral_inf * self.behavioral_mod) / 6 # Normalize (sum of max mods if all are 2)
 
-        if decision_stat > self.decision_threshold:
-            self.solar_decision = True
-            self.environment.decided_residents += 1
+            if decision_stat > self.decision_threshold:
+                self.package_decisions[package.name] = True
+                self.environment.decided_residents_this_step_per_package[package.name] = \
+                    self.environment.decided_residents_this_step_per_package.get(package.name, 0) + 1
 
 
     def step(self):
-        if not self.solar_decision:
+        if not all(self.package_decisions.get(p.name, False) for p in self.environment.sustainability_packages):
             self.calc_decision()
         self.income = int(round(self.income * random.choice(self.config['raise_income']), -1))
