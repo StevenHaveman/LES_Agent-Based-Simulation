@@ -1,16 +1,19 @@
 import random
 import numpy as np
-import utilities
+from sustainability_packages.packages_base import SustainabilityPackage
 
 
-class SolarPanel():
+class HeatPump(SustainabilityPackage):
     def __init__(self, environment):
-        self.config_id, self.config = utilities.choose_config()
-        self.price = self.config['solar_panel_price']
-        self.environment = environment
+        super().__init__(
+            name="Heat Pump",
+            environment=environment,
+            price_config_key='heat_pump_price',
+            price_increase_config_key='heatpump_price_increase'
+        )
 
     def step(self):
-        self.price += round(random.randint(*self.config['solarpanel_price_increase']))
+        self.price += round(random.randint(*self.config['heatpump_price_increase']))
 
     def calculate_behavioral_influence(self, income, household):
         """
@@ -27,7 +30,7 @@ class SolarPanel():
         max_diff = 1000
         min_diff = -1000
 
-        difference = income - self.price * household.solarpanel_amount
+        difference = income - self.price
         normalized_diff = (difference - min_diff) / (max_diff - min_diff)
 
         roi = self.calc_roi(household)
@@ -40,11 +43,16 @@ class SolarPanel():
         Calculates the simple payback period (Return on Investment time) in years.
 
         Formula based on: Total Investment / Annual Savings
-        https://pure-energie.nl/kennisbank/zonnepanelen-terugverdienen/
+        https://www.essent.nl/kennisbank/verwarming/wat-zijn-de-voordelen-van-een-verwarmingsinstallatie/terugverdientijd-warmtepomp
+
+        And based on the most commonly used heatpump in The Netherlands, the hybrid heatpump
+        https://www.anwb.nl/energie/welke-warmtepomp-kies-ik 
 
         Returns:
             float: The calculated ROI time in years. Returns infinity if savings are zero or negative.
         """
-        savings = household.energy_generation * household.solarpanel_amount * self.environment.energy_price
-        cost = self.price * household.solarpanel_amount
-        return cost / savings if savings > 0 else float("inf")
+        gas_costs = household.gas_usage * self.config['gas_price']
+        heat_pump_costs = household.heatpump_usage * self.config['energy_price']
+        savings = gas_costs - heat_pump_costs
+
+        return self.price / savings
