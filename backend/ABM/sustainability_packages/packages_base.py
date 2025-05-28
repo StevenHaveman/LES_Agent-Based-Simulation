@@ -45,7 +45,7 @@ class SustainabilityPackage:
                 num_total = len(all_households_in_scope)
                 subj_norm_value = (num_installed / (num_total - 1)) if num_total > 0 else 0.0 # total households - 1, since own household doesn't count for calc
             
-            subj_norm_value = min(subj_norm_value, 1.0)
+            subj_norm_value = min(max(0.0, subj_norm_value), 1.0)
             for hh in all_households_in_scope:
                 for res in hh.residents:
                     res.package_subjective_norms[package_name] = subj_norm_value
@@ -60,7 +60,7 @@ class SustainabilityPackage:
                     num_total_in_street = len(street_list)
                     subj_norm_value_street = (num_installed_in_street / (num_total_in_street - 1)) if num_total_in_street > 0 else 0.0 # total houses in street - 1, because own household doesnt count in calc
 
-                subj_norm_value_street = min(subj_norm_value_street, 1.0)
+                subj_norm_value_street = min(max(0.0, subj_norm_value_street), 1.0)
                 for hh_in_street in street_list:
                     for res_in_street in hh_in_street.residents:
                         res_in_street.package_subjective_norms[package_name] = subj_norm_value_street
