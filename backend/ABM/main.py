@@ -1,3 +1,6 @@
+import random
+
+import numpy as np
 from environment import Environment
 import utilities
 
@@ -5,9 +8,15 @@ import utilities
 graphics_data = []
 households_data = []
 
-def run_simulation(nr_households=10, nr_residents=10, simulation_years=30):
+def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=None): 
     global graphics_data
     global households_data
+
+    if seed is None:
+        seed = random.randint(0, 2**32 - 1)
+
+    random.seed(seed)
+    np.random.seed(seed)
     
     graphics_data.clear()
 

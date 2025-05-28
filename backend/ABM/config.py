@@ -7,7 +7,7 @@ configs = {
         # Main simulation startup parameters
         "nr_households": 840, # https://www.cbs.nl/nl-nl/visualisaties/dashboard-bevolking/woonsituatie/huishoudens-nu#:~:text=Begin%202024%20waren%20er%208,gemiddelde%20huishoudensgrootte%20nog%203%2C49.
         "nr_residents": 1772,
-        "simulation_years": 2,
+        "simulation_years": 30,
 
         # Environment parameters
         "subjective_norm": 0.0, # Initial environmental influence (0-1)
@@ -45,9 +45,9 @@ configs = {
         # TESTING CONFIG
 
         # Main simulation startup parameters
-        "nr_households": 10, # https://www.cbs.nl/nl-nl/visualisaties/dashboard-bevolking/woonsituatie/huishoudens-nu#:~:text=Begin%202024%20waren%20er%208,gemiddelde%20huishoudensgrootte%20nog%203%2C49.
-        "nr_residents": 10,
-        "simulation_years": 30,
+        "nr_households": 500, # https://www.cbs.nl/nl-nl/visualisaties/dashboard-bevolking/woonsituatie/huishoudens-nu#:~:text=Begin%202024%20waren%20er%208,gemiddelde%20huishoudensgrootte%20nog%203%2C49.
+        "nr_residents": 870,
+        "simulation_years": 2,
 
         # Environment parameters
         "subjective_norm": 0.0, # Initial environmental influence (0-1)
