@@ -21,15 +21,14 @@ class Household(Agent):
         self.config_id, self.config = utilities.choose_config()
         self.residents = []
         self.environment = model
+        self.package_installations = {}
 
-        self.skip_prev = False
-        self.skip_next = False
+        # Flags for "Direct" subjective norm, per package
+        self.skip_prev_flags = {} # {package_name: False/True}
+        self.skip_next_flags = {} # {package_name: False/True}
 
-        self.solar_panels = False
         self.solarpanel_amount = random.choice(self.config['solar_panel_amount_options'])
         self.energy_generation = random.randint(*self.config['energy_generation_range'])
-
-        self.heatpump = False
         self.gas_usage = random.randint(*self.config['yearly_gas_usage'])
         self.heatpump_usage = random.randint(*self.config['yearly_heatpump_usage'])
 
@@ -48,8 +47,9 @@ class Household(Agent):
                 self.model,
                 self  # link naar household
             )
-            if self.solar_panels:
-                resident.solar_decision = True
+            for package_name, is_installed in self.package_installations.items():
+                if is_installed:
+                    resident.package_decisions[package_name] = True
             self.residents.append(resident)
 
     def calc_avg_decision(self, package):
@@ -61,17 +61,16 @@ class Household(Agent):
         if not self.residents:
             return
 
-        if package.name == "Solar Panel":
-            total_score = sum(int(resident.solar_decision) for resident in self.residents)
-            avg_score = total_score / len(self.residents)
-            if avg_score > self.config['household_decision_threshold']:
-                self.solar_panels = True
+        if self.package_installations.get(package.name, False):
+            return
 
-        elif package.name == "Heat Pump":
-            total_score = sum(int(resident.heatpump_decision) for resident in self.residents)
-            avg_score = total_score / len(self.residents)
-            if avg_score > self.config['household_decision_threshold']:
-                self.heatpump = True
+        num_positive_decisions = sum(
+            1 for res in self.residents if res.package_decisions.get(package.name, False)
+        )
+        avg_score = num_positive_decisions / len(self.residents)
+
+        if avg_score > self.config['household_decision_threshold']:
+            self.package_installations[package.name] = True
 
     def step(self):
         """
@@ -89,13 +88,10 @@ class Household(Agent):
         the number of residents, their decisions, and whether solar panels are installed.
             """ 
         resident_count = len(self.residents)
-        residents_with_panels = sum(1 for res in self.residents if res.solar_decision)
-        residents_with_heatpump = sum(1 for res in self.residents if res.heatpump_decision)
-
-        details = (f"Household {self.unique_id}: \n"
-                   f"  Solar Panels Installed: {self.solar_panels}\n"
-                   f"  Solar Panels Installed: {self.heatpump}\n"
-                   f"  Number of Residents: {resident_count}\n"
-                   f"  Residents who decided for panels: {residents_with_panels}\n"
-                   f"  Residents who decided for heatpump: {residents_with_heatpump}")
+        details = f"Household {self.unique_id}:\n"
+        for package_name, installed in self.package_installations.items():
+            details += f"  {package_name} Installed: {installed}\n"
+            decided_residents = sum(1 for res in self.residents if res.package_decisions.get(package_name, False))
+            details += f"  Residents who decided for {package_name}: {decided_residents}/{resident_count}\n"
+        details += f"  Number of Residents: {resident_count}\n"
         return details

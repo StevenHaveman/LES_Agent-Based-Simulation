@@ -45,12 +45,14 @@ configs = {
         # TESTING CONFIG
 
         # Main simulation startup parameters
-        "nr_households": 840, # https://www.cbs.nl/nl-nl/visualisaties/dashboard-bevolking/woonsituatie/huishoudens-nu#:~:text=Begin%202024%20waren%20er%208,gemiddelde%20huishoudensgrootte%20nog%203%2C49.
-        "nr_residents": 1772,
+        "nr_households": 10, # https://www.cbs.nl/nl-nl/visualisaties/dashboard-bevolking/woonsituatie/huishoudens-nu#:~:text=Begin%202024%20waren%20er%208,gemiddelde%20huishoudensgrootte%20nog%203%2C49.
+        "nr_residents": 10,
         "simulation_years": 30,
 
         # Environment parameters
         "subjective_norm": 0.0, # Initial environmental influence (0-1)
+        "solar_panel_subj_norm_mod": 1.0, 
+        "heat_pump_subj_norm_mod": 0.75,
         "solar_panel_price": 410, # Initial price of solar panels (in euros), based on Dutch market data
         "heat_pump_price": 6000, # https://warmtepompenadvies.nl/warmtepomp-kosten/
         "energy_price": 0.32, # https://www.overstappen.nl/energie/stroomprijs/#:~:text=Momenteel%20betreft%20de%20stroomprijs%20gemiddeld,variabel%20energiecontract%20van%2020%20energieleveranciers.

@@ -96,7 +96,6 @@ class Resident(Agent):
             bool | None: True if the decision is positive, None otherwise.
         """
         for package in self.environment.sustainability_packages:
-            # Skip if already decided for this package
             if self.package_decisions.get(package.name, False):
                 continue
 

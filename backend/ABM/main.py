@@ -23,14 +23,14 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30):
         model.step()
 
         print(f"\nEnd of Year {year + 1}:")
-        print(f"  Decisions this year for Solar Panels: {model.decided_residents_sp}")
-        print(f"  Decisions this year for Heatpumps: {model.decided_residents_hp}\n")
+        for package_name, count in model.decided_residents_this_step_per_package.items():
+            print(f"  Decisions this year for {package_name}: {count}")
+
         print("  Current Environment State (end):")
         print(model)
         print("-" * 40)
 
         model.collect_end_of_year_data(data)
-
         graphics_data.append(data)
 
     households_data.clear()
@@ -39,6 +39,7 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30):
 
 if __name__ == "__main__":
     config_id, config = utilities.choose_config()
-    nr_streets = run_simulation(config['nr_households'], config['nr_residents'], config['simulation_years'])
+    simulation_result = run_simulation(config['nr_households'], config['nr_residents'], config['simulation_years'])
+    print(simulation_result["message"])
 
         
