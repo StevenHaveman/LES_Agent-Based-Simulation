@@ -69,7 +69,7 @@ class Household(Agent):
         )
         avg_score = num_positive_decisions / len(self.residents)
 
-        if avg_score > self.config['household_decision_threshold']:
+        if avg_score >= self.config['household_decision_threshold']:
             self.package_installations[package.name] = True
 
     def step(self):
