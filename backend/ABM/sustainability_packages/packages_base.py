@@ -37,13 +37,13 @@ class SustainabilityPackage:
 
         # --- District Level ---
         if subj_norm_level == "District":
-            all_households_in_scope = environment.households # All households in the simulation
+            all_households_in_scope = environment.households
             if not all_households_in_scope:
                 subj_norm_value = 0.0
             else:
                 num_installed = sum(1 for hh in all_households_in_scope if hh.package_installations.get(package_name, False))
                 num_total = len(all_households_in_scope)
-                subj_norm_value = (num_installed / num_total) if num_total > 0 else 0.0
+                subj_norm_value = (num_installed / (num_total - 1)) if num_total > 0 else 0.0 # total households - 1, since own household doesn't count for calc
             
             subj_norm_value = min(subj_norm_value, 1.0)
             for hh in all_households_in_scope:
@@ -58,7 +58,7 @@ class SustainabilityPackage:
                 else:
                     num_installed_in_street = sum(1 for hh_in_street in street_list if hh_in_street.package_installations.get(package_name, False))
                     num_total_in_street = len(street_list)
-                    subj_norm_value_street = (num_installed_in_street / num_total_in_street) if num_total_in_street > 0 else 0.0
+                    subj_norm_value_street = (num_installed_in_street / (num_total_in_street - 1)) if num_total_in_street > 0 else 0.0 # total houses in street - 1, because own household doesnt count in calc
 
                 subj_norm_value_street = min(subj_norm_value_street, 1.0)
                 for hh_in_street in street_list:

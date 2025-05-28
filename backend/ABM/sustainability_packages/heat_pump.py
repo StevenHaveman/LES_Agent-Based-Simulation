@@ -34,7 +34,7 @@ class HeatPump(SustainabilityPackage):
         normalized_diff = (difference - min_diff) / (max_diff - min_diff)
 
         roi = self.calc_roi(household)
-        influence_roi = max(0, 0.25 - 0.025 * roi)  # Maps ROI [0,10] → Influence [*_
+        influence_roi = max(0, min(0.25, 0.25 * (1 - roi / 30)))  # Maps ROI [0,30]
 
         return np.clip(normalized_diff + influence_roi, 0, 1)
     
