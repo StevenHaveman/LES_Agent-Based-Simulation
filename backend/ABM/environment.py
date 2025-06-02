@@ -1,145 +1,203 @@
 import random
-from backend.ABM.agents.household_agent import Household
+from mesa import Model
+from agents.household_agent import Household
+import utilities
 
-class Environment:
-    """
-    Manages the simulation environment, containing households and global parameters.
 
-    Attributes:
-        households (list[Household]): A list of Household agents in the environment.
-        environmental_inf (float): A value representing the social/environmental pressure
-                                   or influence to adopt solar panels, typically derived
-                                   from the proportion of existing adopters. Normalized to [0, 1].
-        solarpanel_price (float): The average price per solar panel.
-        energy_price (float): The price of electricity per kWh.
-    """
-    def __init__(self, environmental_inf: float = 0.0):
-        """
-        Initializes the Environment.
+class SolarAdoptionModel(Model):
+    def __init__(self, nr_households, nr_residents):
+        super().__init__()
+        self.config_id, self.config = utilities.choose_config()
 
-        Args:
-            environmental_inf (float, optional): Initial environmental influence. Defaults to 0.0.
-        """
-        self.households = []
-        self.environmental_inf = environmental_inf
-        self.solarpanel_price = 410 # https://www.milieucentraal.nl/energie-besparen/zonnepanelen/kosten-en-opbrengst-zonnepanelen/#:~:text=Bij%20een%20set%20van%206,bij%2010%20ongeveer%20%E2%82%AC%20390.
-        self.energy_price = 0.32 #https://www.overstappen.nl/energie/stroomprijs/#:~:text=Momenteel%20betreft%20de%20stroomprijs%20gemiddeld,variabel%20energiecontract%20van%2020%20energieleveranciers.
-    
-    def change_influence(self, households: list):
-        """
-        Updates the environmental influence based on the current adoption rate
-        of solar panels among households. Also slightly increases solar panel price.
+        self.solarpanel_price = self.config['solar_panel_price']
+        self.energy_price = self.config['energy_price']
+        self.decided_residents = 0
 
-        Args:
-            households (list[Household]): The list of households in the simulation.
-        """
-        nr_solarpanels = 0
-        for household in households:
-            if household.solar_panels:
-                nr_solarpanels += 1
+        self.households = []  # gewone Python-lijst voor filteren/gemak
+        self.residents = []  # gewone Python-lijst voor filteren/gemak
+        self.streets = []
+        self.yearly_stats = []
 
-        self.environmental_inf = min(nr_solarpanels / (len(households) - 1), 1)
-        self.solarpanel_price += round(random.randint(0, 20))
-    
-    def create_households(self, nr_households: int = 1):
-        """
-        Creates a specified number of Household agents and adds them to the environment.
+        self.create_agents(nr_households, nr_residents)
+        self.generate_streets()
+        self.update_subjective_norm()
 
-        Args:
-            nr_households (int, optional): The number of households to create. Defaults to 1.
+    def create_agents(self, nr_households: int, nr_residents: int):
         """
+        Creates a specified number of Household agents and distributes residents among them.
+        Also initializes the environmental influence and solar panel price.
+        """
+        base = nr_residents // nr_households
+        remainder = nr_residents % nr_households
+
         for i in range(nr_households):
-            self.households.append(Household(False, i))
+            hh = Household(self)
+            hh.solar_panels = random.random() < self.config['initial_solarpanel_chance']
 
-    def distribute_residents(self, nr_residents, nr_households):
+            self.households.append(hh)
+            # self.add_agent(hh)  # voeg toe aan het model (dus aan self.agents)
+
+            nr_res = base + (1 if i < remainder else 0)
+            hh.create_residents(nr_res)
+            self.residents.append(hh.residents)
+
+    def generate_streets(self,):
         """
-        Distributes a total number of residents among the specified number of households.
-        Attempts to distribute them as evenly as possible, assigning remainders randomly.
-
-        Args:
-            nr_residents (int): The total number of residents to create and distribute.
-            nr_households_to_distribute_among (int): The number of households to distribute residents into.
-                                                    Should be <= total households in environment.
+        Generate a list of (street_name, household_count) where the total households sum up to total_households.
+        The number of streets is not fixed, and household counts are randomly assigned with occasional large streets.
         """
-        counter = 0
-        n_households = len(self.households)
-        base_residents = nr_residents // n_households
-        remainder = nr_residents % n_households
+        pointer = 0
+        remaining = self.config['nr_households']
+        min_households = min(self.config['min_nr_houses'], self.config['nr_households'])
+        max_households = self.config['max_nr_houses']
 
-        for household in self.households:
-            household.create_residents(self, counter, base_residents)
-            counter += 1
-        for _ in range(remainder):
-            random.choice(nr_households).create_residents(self, counter, 1)
-            counter += 1
+        while remaining >= min_households:
+            # 20% chance to pick a large household count (closer to max)
+            if random.random() < 0.2:
+                value = random.randint(int(max_households * 0.7), max_households)
+            else:
+                value = random.randint(min_households, int(max_households * 0.6))
 
-    def create_environment(self, nr_residents: int = 1, nr_households: int = 1):
+            value = min(value, remaining)
+            self.streets.append(self.households[pointer: pointer + value])
+            pointer += value
+            remaining -= value
+
+        if remaining > 0:
+            for i in range(pointer, len(self.households)):
+                print(i)
+                print(len(self.households))
+                chosen_list = random.randint(0, len(self.streets) - 1)
+                self.streets[chosen_list].append(self.households[i])
+
+    def update_subjective_norm(self):
+        subj_norm_level = self.config['subj_norm_level']
+
+        if subj_norm_level == "District":
+            nr_solarpanels = 0
+            for i in range(len(self.streets)):
+                for house in self.streets[i]:
+                    if house.solar_panels:
+                        nr_solarpanels += 1
+            subj_norm = min(nr_solarpanels / (len(self.households) - 1), 1)
+
+            for street in self.streets:
+                for house in street:
+                    for resident in house.residents:
+                        resident.subj_norm = subj_norm
+
+        if subj_norm_level == "Street":
+            for i in range(len(self.streets)):
+                nr_solarpanels = 0
+                for house in self.streets[i]:
+                    if house.solar_panels:
+                        nr_solarpanels += 1
+                    subj_norm = min(nr_solarpanels / (len(self.streets[i]) - 1), 1)
+
+                for house in self.streets[i]:
+                    for resident in house.residents:
+                        resident.subj_norm = subj_norm
+
+        if subj_norm_level == "Direct":
+            for i in range(len(self.streets)):
+                for j in range(len(self.streets[i])):
+                    skip = any(res.subj_norm >= 1.0 for res in self.streets[i][j].residents)
+
+                    if skip:
+                        continue
+
+                    if j > 0 and self.streets[i][j - 1].solar_panels and not self.streets[i][j].skip_prev:
+                        for resident in self.streets[i][j].residents:
+                            resident.subj_norm += 0.5
+                        self.streets[i][j].skip_prev = True
+
+                    # Check next house
+                    if j < len(self.streets[i]) - 1 and self.streets[i][j + 1].solar_panels and not self.streets[i][j].skip_next:
+                        for resident in self.streets[i][j].residents:
+                            resident.subj_norm += 0.5
+                        self.streets[i][j].skip_next = True
+
+    def step(self):
         """
-        Sets up the environment by creating households and distributing residents among them.
-
-        Args:
-            nr_residents (int, optional): Total number of residents to create. Defaults to 1.
-            nr_households (int, optional): Total number of households to create. Defaults to 1.
+        Executes a step for each household and resident in the model.
+        This includes updating the environmental influence and the solar panel price.
         """
-        self.create_households(nr_households)
-        self.distribute_residents(nr_residents, nr_households)
+        self.decided_residents = 0
 
-    def simulate(self, nr_years: int = 1, info_dump: bool = True):
+        self._agents_by_type[Household].shuffle_do("step")
+
+        for hh in self._agents_by_type[Household]:
+            hh.calc_avg_decision()
+
+        self.update_subjective_norm()
+        self.solarpanel_price += round(random.randint(*self.config['solarpanel_price_increase']))
+
+    def collect_start_of_year_data(self, year):
+        all_residents = [resident for household in self.residents for resident in household]
+        residents_with_panels = sum(res.solar_decision for res in all_residents)
+        households_with_panels = sum(hh.solar_panels for hh in self.households)
+
+        start_state = {
+            "residents_for_panels": residents_with_panels,
+            "households_with_panels": households_with_panels,
+            "solar_panel_price": self.solarpanel_price
+        }
+
+        data = {
+            "year": year,
+            "decisions_this_year": self.decided_residents,
+            "start_state": start_state,
+        }
+
+        self.yearly_stats.append(data)
+        return data
+
+    def collect_end_of_year_data(self, data):
+        all_residents = [resident for household in self.residents for resident in household]
+        residents_with_panels = sum(res.solar_decision for res in all_residents)
+        households_with_panels = sum(hh.solar_panels for hh in self.households)
+
+        end_state = {
+            "residents_for_panels": residents_with_panels,
+            "households_with_panels": households_with_panels,
+            "solar_panel_price": self.solarpanel_price,
+            "decisions_this_year": self.decided_residents
+        }
+
+        data["end_state"] = end_state
+
+
+    def collect_household_information(self):
         """
-        Runs the simulation for a specified number of years.
-
-        In each year:
-        1. Each resident (who hasn't decided yet) potentially decides on solar panels.
-        2. Each household updates its solar panel status based on resident decisions.
-        3. Environmental influence and solar panel prices are updated.
-
-        Args:
-            nr_years (int, optional): The number of years to simulate. Defaults to 1.
-            info_dump (bool, optional): If True, prints detailed logs for each step. Defaults to True.
-        """
-        print(f"--- Starting Simulation ({nr_years} years) ---")
-        print(f"Initial State: \n {self}")
-
-        for i in range(nr_years):
-            print(f"Year: {i + 1}")
-            print(f"Influences: Env={self.environmental_inf:.3f}, Price={self.solarpanel_price}")
-
-            decided_residents = 0
-            for household in self.households:
-                for resident in household.residents:
-                    if not resident.solar_decision: # Only residents without panels reconsider
-                        resident.calc_decision(2, info_dump)
-                        if resident.solar_decision:
-                            decided_residents += 1
-                            if info_dump:
-                                print(f"Resident {resident.id} wants to get solar panels!")
-
-                household.calc_avg_decision()
-                if household.solar_panels and info_dump:
-                    print(f"Household {household.id} got solar panels!")
-
-            print(f"\nEnd of Year {i + 1}:")
-            print(f"  Decisions this year: {decided_residents}")
-            print(f"  Current Environment State: \n {self}") # Show state after year using __str__
-            print("-" * 40)
-
-            self.change_influence(self.households)
-
-        print("\n\n" + "-" * 20 + "Simulation Finished" + "-" * 20)
-    
-    def __str__(self):
-        """
-        Provides a string representation of the Environment's current state.
+        Verzamelt informatie over alle huishoudens in het model en retourneert deze in JSON-formaat.
 
         Returns:
-            str: A summary string of the environment status.
+            list: Een lijst van huishoudens met hun details en bewoners.
         """
+        households_data = []
+        for household in self.households:
+            household_data = {
+                "id": household.unique_id,
+                "name": f"Household {household.unique_id}",
+                "address": f"Straat {household.unique_id}, Stad",
+                "residents": [{"name": f"Resident {i}", "income": resident.income, "Solar_decision": resident.solar_decision} for i, resident in enumerate(household.residents, start=1)]
+            }
+            households_data.append(household_data)
+        return households_data
+
+    def __str__(self):
+        """
+   Provides a string representation of the Environment's current state.
+
+   Returns:
+       str: A summary string of the environment status.
+   """
         total_households = len(self.households)
         total_residents = sum(len(h.residents) for h in self.households)
         residents_with_panels = sum(sum(1 for r in h.residents if r.solar_decision) for h in self.households)
-        households_with_panels = sum(1 for h in self.households if h.solar_panels or any(r.solar_decision for r in h.residents))
-        return (f"  Environment State:\n"
-                f"    Total Residents who would like Panels: {residents_with_panels} / {total_residents}\n"
+        households_with_panels = sum(
+            1 for h in self.households if h.solar_panels or any(r.solar_decision for r in h.residents))
+        return (f"    Total Residents who would like Panels: {residents_with_panels} / {total_residents}\n"
                 f"    Households: {households_with_panels} / {total_households} with panels\n"
-                f"    Environmental Influence: {self.environmental_inf:.3f}\n"
-                f"    Current Solar Panel Price: {self.solarpanel_price}\n") # Use the price variable directly
+                f"    Current Solar Panel Price: {self.solarpanel_price}\n")  # Use the price variable directly
+
