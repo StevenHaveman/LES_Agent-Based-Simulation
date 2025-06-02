@@ -20,7 +20,6 @@ body {
 .map-container{
     grid-column: 1 / 11;
     grid-row: 1 / 6;
-    border: 1px solid black;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -40,21 +39,15 @@ body {
 .household-container{
     grid-column: 1 / 6;
     grid-row: 6 / 11;
-    border: 1px solid black;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    grid-template:  repeat(20, 1fr) / repeat(10, 1fr);
 }
 
 .resident-container{
     grid-column: 6 / 11;
     grid-row: 6 / 11;
-    border: 1px solid black;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    grid-template:  repeat(20, 1fr) / repeat(10, 1fr);
 }
 
 .parameters-container{
@@ -76,5 +69,35 @@ body {
     align-items: center;
     justify-content: center;
 }
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    width: 100vw;
+}
+
+.parent-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    height: 100vh;
+    width: 100vw;
+}
+
+.parent-container > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.list-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: stretch;
+
+}
+
 
 
