@@ -2,8 +2,8 @@ import React from "react";
 import {createRoute} from "@tanstack/react-router";
 import {rootRoute} from "./root";
 import Navbar from "../components/Navbar.jsx";
-import "../styles/configpage.css"
 import ConfigForm from "../components/ConfigForm.jsx";
+import "../styles/globalPageStyles.css";
 
 
 export const configRoute = createRoute({
