@@ -12,7 +12,7 @@ def gen_random_value(range_min: float, range_max: float):
     Returns:
         float: A random float between range_min and range_max.
     """
-    return random.uniform(range_min, range_max)
+    return random.uniform(range_min, range_max) 
 
 def choose_config():
     chosen_config = config.CHOSEN_CONFIG

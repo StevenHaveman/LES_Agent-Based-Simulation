@@ -43,7 +43,7 @@ class Resident(Agent):
         salary = self.calc_salary()
         self.income = max(round(salary, -2), 0)
         self.subj_norm = self.config['subjective_norm']
-
+        
         if self.config_id == 0 or self.config_id == 1:
             self.attitude = utilities.gen_random_value(0, 1)
             self.attitude_mod = utilities.gen_random_value(0, 2)
@@ -56,7 +56,7 @@ class Resident(Agent):
             self.behavioral_mod = self.config['behavioral_mod']
 
         self.solar_decision = False
-        self.decision_threshold = self.config['decision_threshold']
+        self.decision_threshold = self.config['decision_threshold'] 
 
     def calc_salary(self):
         """
@@ -71,7 +71,7 @@ class Resident(Agent):
         mu = np.log(median)
         sigma_lognormaal = np.sqrt(np.log(1 + (sigma_normal / median) ** 2))
         return np.random.lognormal(mu, sigma_lognormaal)
-
+    
     def calc_decision(self):
         """
         Calculates whether the resident decides to adopt solar panels based on
@@ -90,8 +90,8 @@ class Resident(Agent):
 
         behavioral_inf = self.calculate_behavioral_influence(self.environment.solarpanel_price * self.household.solarpanel_amount)
         decision_stat = (self.attitude * self.attitude_mod
-                         + self.subj_norm * self.subj_norm_mod
-                         + behavioral_inf * self.behavioral_mod) / 6 # Divide by 6 to normalize stat to 0-1
+                          + self.subj_norm * self.subj_norm_mod
+                            + behavioral_inf * self.behavioral_mod) / 6 # Divide by 6 to normalize stat to 0-1
 
         if decision_stat > self.decision_threshold:
             self.solar_decision = True
@@ -117,8 +117,8 @@ class Resident(Agent):
         savings = self.household.energy_generation * self.household.solarpanel_amount * self.environment.energy_price
         cost = self.environment.solarpanel_price * self.household.solarpanel_amount
         return cost / savings if savings > 0 else float("inf")
-
-
+    
+    
 
     def calculate_behavioral_influence(self, solarpanel_price):
         """

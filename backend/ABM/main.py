@@ -8,7 +8,7 @@ households_data = []
 def run_simulation(nr_households=10, nr_residents=10, simulation_years=30):
     global graphics_data
     global households_data
-
+    
     graphics_data.clear()
 
     model = SolarAdoptionModel(nr_households=nr_households, nr_residents=nr_residents)
@@ -40,3 +40,4 @@ if __name__ == "__main__":
     config_id, config = utilities.choose_config()
     nr_streets = run_simulation(config['nr_households'], config['nr_residents'], config['simulation_years'])
 
+        

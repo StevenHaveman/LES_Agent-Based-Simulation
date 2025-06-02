@@ -1,0 +1,19 @@
+.info-container {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.info{
+    display: flex;
+    flex-direction: column;
+
+}
+
+.select-resident-hint{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

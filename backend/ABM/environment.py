@@ -10,7 +10,7 @@ class SolarAdoptionModel(Model):
         self.config_id, self.config = utilities.choose_config()
 
         self.solarpanel_price = self.config['solar_panel_price']
-        self.energy_price = self.config['energy_price']
+        self.energy_price = self.config['energy_price'] 
         self.decided_residents = 0
 
         self.households = []  # gewone Python-lijst voor filteren/gemak
@@ -70,7 +70,7 @@ class SolarAdoptionModel(Model):
                 chosen_list = random.randint(0, len(self.streets) - 1)
                 self.streets[chosen_list].append(self.households[i])
 
-    def update_subjective_norm(self):
+    def update_subjective_norm(self):           
         subj_norm_level = self.config['subj_norm_level']
 
         if subj_norm_level == "District":
@@ -97,7 +97,7 @@ class SolarAdoptionModel(Model):
                 for house in self.streets[i]:
                     for resident in house.residents:
                         resident.subj_norm = subj_norm
-
+        
         if subj_norm_level == "Direct":
             for i in range(len(self.streets)):
                 for j in range(len(self.streets[i])):
@@ -166,7 +166,7 @@ class SolarAdoptionModel(Model):
 
         data["end_state"] = end_state
 
-
+        
     def collect_household_information(self):
         """
         Verzamelt informatie over alle huishoudens in het model en retourneert deze in JSON-formaat.
@@ -200,4 +200,5 @@ class SolarAdoptionModel(Model):
         return (f"    Total Residents who would like Panels: {residents_with_panels} / {total_residents}\n"
                 f"    Households: {households_with_panels} / {total_households} with panels\n"
                 f"    Current Solar Panel Price: {self.solarpanel_price}\n")  # Use the price variable directly
-
+        
+        
