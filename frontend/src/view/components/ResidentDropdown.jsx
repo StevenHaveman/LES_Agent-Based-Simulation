@@ -14,7 +14,7 @@ const ResidentDropdown = ({ residents, selectedResidentIndex, onSelectResident }
         <div className="dropdown-container">
             <div className="dropdown">
                 <button className="dropdown-toggle" onClick={() => setIsOpen(!isOpen)}>
-                    {residents[selectedResidentIndex]?.name || "Selecteer Resident..."} ▼
+                    {residents[selectedResidentIndex]?.name || "Select Resident..."} ▼
                 </button>
                 {isOpen && (
                     <ul className="dropdown-menu">

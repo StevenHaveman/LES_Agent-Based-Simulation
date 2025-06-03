@@ -19,7 +19,7 @@ const ResidentWindow = ({ residentWindow, residents, selectedResidentIndex }) =>
             default:
                 return (
                     <div className="select-household-hint">
-                        <h3>Click on a resident </h3>
+                        <h3> Select a Resident </h3>
                     </div>
                 );
         }
