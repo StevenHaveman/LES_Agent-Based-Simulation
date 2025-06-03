@@ -7,6 +7,11 @@ import "../styles/globalPageStyles.css";
 
 import GraphicsView from "../components/GraphicsView.jsx";
 import HouseholdMap from "../components/HouseholdMap.jsx";
+import HouseholdWindow from "../components/HouseholdWindow.jsx";
+import HouseholdNavbar from "../components/HouseholdNavbar.jsx";
+import ResidentNavbar from "../components/ResidentNavbar.jsx";
+import ResidentWindow from "../components/ResidentWindow.jsx";
+import ResidentDropdown from "../components/ResidentDropdown.jsx";
 
 
 export const overviewRoute = createRoute({
@@ -25,7 +30,6 @@ export const overviewRoute = createRoute({
         };
 
 
-
         return (
             <>
                 <Navbar title={"MVP Overview"}></Navbar>
@@ -41,11 +45,27 @@ export const overviewRoute = createRoute({
                         <h1> Graphics</h1>
                     </div>
                     <div className="household-container">
-                        <h1> Household</h1>
-
+                        <HouseholdNavbar
+                            householdWindow={householdWindow}
+                            setHouseholdWindow={setHouseholdWindow}
+                        />
+                        <HouseholdWindow
+                            householdWindow={householdWindow}
+                            setHouseholdWindow={setHouseholdWindow}
+                            selectedHouseholdId={selectedHouseholdId}
+                        />
                     </div>
                     <div className="resident-container">
-                        <h1> Residents</h1>
+                        <ResidentNavbar residentWindow={residentWindow} setResidentWindow={setResidentWindow}/>
+                        <ResidentDropdown residents={selectedResidents}
+                                          selectedResidentIndex={selectedResidentIndex}
+                                          onSelectResident={setSelectedResidentIndex}> </ResidentDropdown>
+                        <ResidentWindow
+                            residentWindow={residentWindow}
+                            setWindow={setResidentWindow}
+                            residents={selectedResidents}
+                            selectedResidentIndex={selectedResidentIndex}
+                        />
                     </div>
                     <div className="parameters-container">
                         <h1> Parameters</h1>

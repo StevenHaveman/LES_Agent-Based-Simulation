@@ -29,7 +29,7 @@ const HouseholdDecisions = ({ selectedHouseholdId, visible }) => {
         : false;
 
     return (
-        <div className="decisions-container">
+        <div className="household-decisions-container">
             <div className="solar-panels">
                 <img src="/INNO/solar_panel.png" alt="Solar Panel" className="solar_panel_icon"/>
                 <h2 className={hasSolarDecision ? "text-green" : "text-red"}>
