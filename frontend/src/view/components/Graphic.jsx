@@ -19,7 +19,7 @@
  * A React component that renders a line chart with the simulation data.
  */
 
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import {
     LineChart,
     Line,
@@ -43,7 +43,7 @@ const validKeys = [
     "solar_panel_price"
 ];
 
-const Graphic = ({ title = "Simulation Graph", yAxisKey = "solar_panel_price" }) => {
+const Graphic = ({title = "Simulation Graph", yAxisKey = "solar_panel_price"}) => {
     const [simulationData, setSimulationData] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -76,10 +76,16 @@ const Graphic = ({ title = "Simulation Graph", yAxisKey = "solar_panel_price" })
      * Flatten the simulation data into a format usable by Recharts.
      * For each year, create two entries: one for the start state and one for the end state.
      */
-    const flattenedData = simulationData.flatMap(d => [
-        { year: d.year, state: "Start", value: d.start_state[yKey] },
-        { year: d.year, state: "End", value: d.end_state[yKey] }
-    ]);
+    const flattenedData = simulationData.flatMap(d => {
+        const entries = [];
+        if (d.start_state && d.start_state[yKey] !== undefined) {
+            entries.push({year: d.year, state: "Start", value: d.start_state[yKey]});
+        }
+        if (d.end_state && d.end_state[yKey] !== undefined) {
+            entries.push({year: d.year, state: "End", value: d.end_state[yKey]});
+        }
+        return entries;
+    });
 
     // Calculate min and max Y values from the flattened dataset
     const yValues = flattenedData.map(d => d.value);
@@ -96,77 +102,64 @@ const Graphic = ({ title = "Simulation Graph", yAxisKey = "solar_panel_price" })
         : Math.ceil(yMaxRaw);
 
     return (
-        <div className="map-preview-container">
-            {/* Chart title */}
-            <h2 className={"graphic-title"}>{title}</h2>
-
-            {/* Responsive container ensures the chart adapts to screen size */}
-            <ResponsiveContainer width="100%" height={400}>
-                <LineChart
-                    data={flattenedData}
-                    margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
-                >
-                    {/* Background grid for better readability */}
-                    <CartesianGrid strokeDasharray="3 3" />
-
-                    {/* X-axis setup: based on year, with tick count matching data length */}
-                    <XAxis
-                        dataKey="year"
-                        type="number"
-                        domain={['dataMin', 'dataMax']}
-                        tickCount={simulationData.length}
-                    />
-
-                    {/* Y-axis setup: custom formatter and decimal support if needed */}
-                    <YAxis
-                        domain={[yMin, yMax]}
-                        tickFormatter={value => (
-                            yKey === "environmental_influence"
-                                ? value.toFixed(2)
-                                : Math.round(value)
-                        )}
-                        allowDecimals={yKey === "environmental_influence"}
-                    />
-
-                    {/* Tooltip shows formatted value based on data type */}
-                    <Tooltip
-                        formatter={value =>
-                            yKey === "environmental_influence"
-                                ? value.toFixed(2)
-                                : value
-                        }
-                    />
-
-                    {/* Automatically generates legend for lines */}
-                    <Legend />
-
-                    {/* Line for start-of-year values */}
-                    <Line
-                        type="monotone"
-                        dataKey="value"
-                        data={flattenedData.filter(d => d.state === "Start")}
-                        name="Start of the year"
-                        stroke="#8884d8"
-                        strokeWidth={2}
-                        dot={{ r: 4 }}
-                        activeDot={{ r: 6 }}
-                    />
-
-                    {/* Line for end-of-year values */}
-                    <Line
-                        type="monotone"
-                        dataKey="value"
-                        data={flattenedData.filter(d => d.state === "End")}
-                        name="End of the year"
-                        stroke="#82ca9d"
-                        strokeWidth={2}
-                        dot={{ r: 4 }}
-                        activeDot={{ r: 6 }}
-                    />
-                </LineChart>
-            </ResponsiveContainer>
+        <div className="graphic-container">
+            <h3 className="graphic-title">{title}</h3>
+            <div className="graphic-square-wrapper">
+                <ResponsiveContainer width="100%" height="100%">
+                    <LineChart
+                        data={flattenedData}
+                        margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+                    >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis
+                            dataKey="year"
+                            type="number"
+                            domain={['dataMin', 'dataMax']}
+                            tickCount={simulationData.length}
+                        />
+                        <YAxis
+                            domain={[yMin, yMax]}
+                            tickFormatter={value =>
+                                yKey === "environmental_influence"
+                                    ? value.toFixed(2)
+                                    : Math.round(value)
+                            }
+                            allowDecimals={yKey === "environmental_influence"}
+                        />
+                        <Tooltip
+                            formatter={value =>
+                                yKey === "environmental_influence"
+                                    ? value.toFixed(2)
+                                    : value
+                            }
+                        />
+                        <Legend />
+                        <Line
+                            type="monotone"
+                            dataKey="value"
+                            data={flattenedData.filter(d => d.state === "Start")}
+                            name="Start of the year"
+                            stroke="#8884d8"
+                            strokeWidth={2}
+                            dot={{ r: 4 }}
+                            activeDot={{ r: 6 }}
+                        />
+                        <Line
+                            type="monotone"
+                            dataKey="value"
+                            data={flattenedData.filter(d => d.state === "End")}
+                            name="End of the year"
+                            stroke="#82ca9d"
+                            strokeWidth={2}
+                            dot={{ r: 4 }}
+                            activeDot={{ r: 6 }}
+                        />
+                    </LineChart>
+                </ResponsiveContainer>
+            </div>
         </div>
     );
+
 };
 
 export default Graphic;
