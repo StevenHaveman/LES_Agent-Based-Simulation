@@ -23,8 +23,6 @@ import { useNavigate } from "@tanstack/react-router";
 
 const ConfigForm = () => {
     const [formData, setFormData] = useState({
-        email: "",
-        password: "",
         nr_households: 10,
         nr_residents: 10,
         simulation_years: 30

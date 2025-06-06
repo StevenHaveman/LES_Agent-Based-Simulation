@@ -42,7 +42,7 @@ export const overviewRoute = createRoute({
                         />
                     </div>
                     <div className="graphics-container">
-                        <h1> Graphics</h1>
+                        <GraphicsView> </GraphicsView>
                     </div>
                     <div className="household-container">
                         <HouseholdNavbar
