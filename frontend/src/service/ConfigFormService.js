@@ -26,6 +26,6 @@ class ConfigFormService {
     }
 }
 
-// Exporting an instance of ConfigFormService.
+
 const configFormService = new ConfigFormService();
 export default configFormService;

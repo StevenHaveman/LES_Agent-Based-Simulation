@@ -34,6 +34,7 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
     // Load household icon image once, then trigger initial draw
     useEffect(() => {
         const icon = new Image();
+        // icon.src = "/INNO/Household_img.webp";
         icon.src = "/INNO/Household_icon.png";
         icon.onload = () => {
             iconRef.current = icon;

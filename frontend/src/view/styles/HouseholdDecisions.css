@@ -1,7 +1,7 @@
-.decisions-container {
+.household-decisions-container {
+    grid-row: 3 / 21;
+    grid-column: 1 / 11;
     display: flex;
-    height: 100%;
-    width: 100%;
     justify-content: center;
     align-items: center;
 }

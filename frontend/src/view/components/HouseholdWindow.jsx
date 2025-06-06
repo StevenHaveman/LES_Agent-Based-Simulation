@@ -8,7 +8,7 @@ const HouseholdWindow = ({ householdWindow, selectedHouseholdId }) => {
     if (!selectedHouseholdId) {
         return (
             <div className="select-household-hint">
-                <h3> Click on a household</h3>
+                <h3> Select a household</h3>
             </div>
         );
     }

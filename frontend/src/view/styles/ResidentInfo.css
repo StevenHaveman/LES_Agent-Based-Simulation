@@ -1,8 +1,8 @@
-.info-container {
+.resident_info-container {
+    grid-row: 3 / 21;
+    grid-column: 1 / 11;
     display: flex;
-    height: 100%;
-    width: 100%;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
 }
 
@@ -13,6 +13,8 @@
 }
 
 .select-resident-hint{
+    grid-row: 3 / 21;
+    grid-column: 1 / 11;
     display: flex;
     justify-content: center;
     align-items: center;

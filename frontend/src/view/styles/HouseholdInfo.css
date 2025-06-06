@@ -1,8 +1,9 @@
-.info-container {
+.household_info-container {
+    grid-row: 3 / 21;
+    grid-column: 1 / 11;
     display: flex;
-    height: 100%;
-    width: 100%;
-    justify-content: flex-start;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
 }
 
