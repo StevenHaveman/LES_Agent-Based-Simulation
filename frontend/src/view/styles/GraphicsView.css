@@ -1,13 +1,13 @@
 .graphics-view-container {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 kolommen */
-    grid-template-rows: repeat(2, 50%);    /* 2 rijen van elk 50% hoogte */
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 50%);
     gap: 1rem;
     width: 100%;
-    height: 100vh; /* Vul hele schermhoogte */
+    height: 100vh;
     padding: 1rem;
     box-sizing: border-box;
-    overflow: auto; /* Voorkom afsnijden, laat scrollen toe indien nodig */
+    overflow: auto;
 }
 
 .graphic-wrapper {
