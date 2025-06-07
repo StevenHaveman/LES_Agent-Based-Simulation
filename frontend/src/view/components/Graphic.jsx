@@ -2,23 +2,13 @@
  * Component to display a simulation graph based on the provided data.
  *
  * Props:
- * @param {string} title - The title of the graph. Defaults to "Simulation Graph".
+ * @param {string} title - The title of the graph.
  * @param {string} yAxisKey - The key for the Y-axis data.
- * Valid keys include:
- * - "decisions_this_year_total"
- * - "solar_panel_households"
- * - "heat_pump_households"
+ * Valid keys:
  * - "solar_panel_price"
  * - "heat_pump_price"
+ * - "solar_panel_households"
  * - "solar_panel_positive_decisions"
- * - "heat_pump_positive_decisions"
- *
- * State:
- * @property {Array} simulationData - The data fetched for the simulation graph.
- * @property {boolean} loading - Indicates whether the data is still being loaded.
- *
- * Returns:
- * A React component that renders a line chart with the simulation data.
  */
 
 import React, { useState, useEffect } from "react";
@@ -36,18 +26,14 @@ import {
 import "../styles/Graphic.css";
 import overviewController from "../../controller/OverviewController.js";
 
-// Valid keys for graphing
 const validKeys = [
-    "decisions_this_year_total",
-    "solar_panel_households",
-    "heat_pump_households",
     "solar_panel_price",
     "heat_pump_price",
-    "solar_panel_positive_decisions",
-    "heat_pump_positive_decisions"
+    "solar_panel_households",
+    "solar_panel_positive_decisions"
 ];
 
-const Graphic = ({ title = "Simulation Graph", yAxisKey = "decisions_this_year_total" }) => {
+const Graphic = ({ title = "", yAxisKey = "" }) => {
     const [simulationData, setSimulationData] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -76,31 +62,20 @@ const Graphic = ({ title = "Simulation Graph", yAxisKey = "decisions_this_year_t
         const { year, start_state_per_package, end_state_per_package } = d;
 
         const extract = (key, stateObj, stateLabel) => {
-            let value;
+            let value = null;
             switch (key) {
-                case "decisions_this_year_total":
-                    value = stateLabel === "Start" ? d.decisions_this_year_total : d.decisions_this_year_total_end;
-                    break;
-                case "solar_panel_households":
-                    value = stateObj?.["Solar Panel"]?.households_with_package;
-                    break;
-                case "heat_pump_households":
-                    value = stateObj?.["Heat Pump"]?.households_with_package;
-                    break;
                 case "solar_panel_price":
                     value = stateObj?.["Solar Panel"]?.price;
                     break;
                 case "heat_pump_price":
                     value = stateObj?.["Heat Pump"]?.price;
                     break;
+                case "solar_panel_households":
+                    value = stateObj?.["Solar Panel"]?.households_with_package;
+                    break;
                 case "solar_panel_positive_decisions":
                     value = stateObj?.["Solar Panel"]?.residents_positive_decision;
                     break;
-                case "heat_pump_positive_decisions":
-                    value = stateObj?.["Heat Pump"]?.residents_positive_decision;
-                    break;
-                default:
-                    value = null;
             }
 
             if (value !== undefined && value !== null) {
@@ -145,7 +120,7 @@ const Graphic = ({ title = "Simulation Graph", yAxisKey = "decisions_this_year_t
                             type="monotone"
                             dataKey="value"
                             data={flattenedData.filter(d => d.state === "Start")}
-                            name="Start van het jaar"
+                            name="Start of the year"
                             stroke="#8884d8"
                             strokeWidth={2}
                             dot={{ r: 4 }}
@@ -155,7 +130,7 @@ const Graphic = ({ title = "Simulation Graph", yAxisKey = "decisions_this_year_t
                             type="monotone"
                             dataKey="value"
                             data={flattenedData.filter(d => d.state === "End")}
-                            name="Einde van het jaar"
+                            name="End of the year"
                             stroke="#82ca9d"
                             strokeWidth={2}
                             dot={{ r: 4 }}
