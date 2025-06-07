@@ -6,16 +6,28 @@ const GraphicsView = () => {
     return (
         <div className="graphics-view-container">
             <div className="graphic-wrapper">
-                <Graphic title="Graphic 1" />
+                <Graphic
+                    title="Solar Panel Prijs (Start vs Einde)"
+                    yAxisKey="solar_panel_price"
+                />
             </div>
             <div className="graphic-wrapper">
-                <Graphic title="Graphic 2" />
+                <Graphic
+                    title="Heat Pump Prijs (Start vs Einde)"
+                    yAxisKey="heat_pump_price"
+                />
             </div>
             <div className="graphic-wrapper">
-                <Graphic title="Graphic 3" />
+                <Graphic
+                    title="Huishoudens met Pakket (Start vs Einde)"
+                    yAxisKey="solar_panel_households"
+                />
             </div>
             <div className="graphic-wrapper">
-                <Graphic title="Graphic 4" />
+                <Graphic
+                    title="Positieve Beslissingen (Start vs Einde)"
+                    yAxisKey="solar_panel_positive_decisions"
+                />
             </div>
         </div>
     );
