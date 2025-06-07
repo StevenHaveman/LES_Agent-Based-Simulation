@@ -38,7 +38,13 @@ import overviewController from "../../controller/OverviewController.js";
 
 // Valid keys for graphing
 const validKeys = [
-
+    "decisions_this_year_total",
+    "solar_panel_households",
+    "heat_pump_households",
+    "solar_panel_price",
+    "heat_pump_price",
+    "solar_panel_positive_decisions",
+    "heat_pump_positive_decisions"
 ];
 
 const Graphic = ({ title = "Simulation Graph", yAxisKey = "decisions_this_year_total" }) => {
