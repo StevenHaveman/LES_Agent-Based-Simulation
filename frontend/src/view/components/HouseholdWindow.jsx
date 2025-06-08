@@ -32,7 +32,7 @@ const HouseholdWindow = ({ householdWindow, selectedHouseholdId }) => {
             default:
                 return (
                     <div className="select-household-hint">
-                        <h3>Click on a household </h3>
+                        <h3>Click on a window </h3>
                     </div>
                 );
 

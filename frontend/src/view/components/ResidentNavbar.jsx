@@ -1,24 +1,29 @@
-import React, { useState } from "react";
+import React from "react";
 import "../styles/ResidentNavbar.css";
 
-const ResidentNavbar = ({ residentWindow, setResidentWindow }) => {
-    const [selectedTab, setSelectedTab] = useState(null);
-
+const ResidentNavbar = ({
+                            residentWindow,
+                            setResidentWindow,
+                            selectedTab,
+                            setSelectedTab,
+                            chatWindow,
+                            setChatWindow,
+                        }) => {
     const toggleInfoTab = () => {
         if (residentWindow === "info-resident") {
             setResidentWindow(null);
         } else {
             setResidentWindow("info-resident");
-            setSelectedTab(null); // deselect AI tab
         }
     };
 
     const toggleAiTab = () => {
-        if (selectedTab === "ai") {
+        if (chatWindow === "ai") {
+            setChatWindow("");
             setSelectedTab(null);
         } else {
+            setChatWindow("ai");
             setSelectedTab("ai");
-            setResidentWindow(null); // deselect info tab
         }
     };
 
@@ -31,7 +36,7 @@ const ResidentNavbar = ({ residentWindow, setResidentWindow }) => {
                 <h4>Info</h4>
             </div>
             <div
-                className={`AI-chat-resident${selectedTab === "ai" ? " selected" : ""}`}
+                className={`AI-chat-resident${chatWindow === "ai" ? " selected" : ""}`}
                 onClick={toggleAiTab}
             >
                 <h4>AI-Chat</h4>
