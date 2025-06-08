@@ -16,9 +16,10 @@ class Household(Agent):
         solarpanel_amount (int): The number of solar panels the household would install (e.g., 6, 8, 10).
         energy_generation (int): Estimated energy generation per panel per year (kWh).
     """
-    def __init__(self, model):
+    def __init__(self, id, model):
         super().__init__(model)
         self.config_id, self.config = utilities.choose_config()
+        self.unique_id = id
         self.residents = []
         self.environment = model
         self.package_installations = {}
@@ -42,8 +43,9 @@ class Household(Agent):
         Returns:
             int: The next available resident ID.
         """
-        for _ in range(nr_residents):
+        for id in range(nr_residents):
             resident = Resident(
+                id,
                 self.model,
                 self  # link naar household
             )

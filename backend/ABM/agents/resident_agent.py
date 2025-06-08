@@ -20,7 +20,7 @@ class Resident(Agent):
         solar_decision (bool): Whether the resident has decided in favor of solar panels. Initially False.
     """
 
-    def __init__(self, model, household):
+    def __init__(self, id, model, household):
         """
         Initializes a Resident agent.
 
@@ -36,7 +36,7 @@ class Resident(Agent):
         super().__init__(model)
         self.config_id, self.config = utilities.choose_config()
 
-
+        self.unique_id = id
         self.household = household
         self.environment = model
 
@@ -111,6 +111,22 @@ class Resident(Agent):
                 self.package_decisions[package.name] = True
                 self.environment.decided_residents_this_step_per_package[package.name] = \
                     self.environment.decided_residents_this_step_per_package.get(package.name, 0) + 1
+                
+    def collect_resident_data(self):
+        agent_data = {
+            "id": self.unique_id,
+            "household_id": self.household.unique_id,
+            "income": self.income,
+            "attitude": self.attitude,
+            "attitude_mod": self.attitude_mod,
+            "subj_norm": self.subj_norm,
+            "subj_norm_mod": self.subj_norm_mod,
+            "behavioral_mod": self.behavioral_mod,
+            "solar_panels": self.package_decisions.get("Solar Panels", False),
+            "heat_pump": self.package_decisions.get("Heat Pump", False),
+        }
+
+        return agent_data
 
 
     def step(self):
