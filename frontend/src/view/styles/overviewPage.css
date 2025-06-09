@@ -25,6 +25,7 @@ body {
     align-items: center;
     justify-content: center;
     border-right: 1px solid black;
+    background-color: #f8f7f2;
 }
 
 .graphics-container{
@@ -42,6 +43,8 @@ body {
     grid-row: 7 / 11;
     display: grid;
     grid-template:  repeat(20, 1fr) / repeat(10, 1fr);
+    background-color: #f8f7f2
+
 }
 
 .resident-container{
@@ -49,6 +52,8 @@ body {
     grid-row: 7 / 11;
     display: grid;
     grid-template:  repeat(20, 1fr) / repeat(10, 1fr);
+    background-color: #f8f7f2
+
 }
 
 .parameters-container{

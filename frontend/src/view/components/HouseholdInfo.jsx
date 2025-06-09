@@ -5,6 +5,7 @@ import detailController from "../../controller/DetailController.js";
 const HouseholdInfo = ({ selectedHouseholdId, visible }) => {
     const [households, setHouseholds] = useState([]);
 
+
     useEffect(() => {
         const fetchHouseholds = async () => {
             try {

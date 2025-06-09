@@ -4,14 +4,86 @@
     display: grid;
     grid-template:  repeat(20, 1fr) / repeat(1, 1fr);
 }
+
+
 .conversation-container {
     grid-row: 1 / 18;
     grid-column: 1 / 2;
-    border: 1px  solid blue;
+    background-color: #f8f7f2;
 
+}
+
+.prompt-container {
+    grid-row: 18 / 21;
+    grid-column: 1 / 2;
+    padding: 12px;
+    background-color: #f9f9f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.input-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    max-width: 800px;
+    box-sizing: border-box;
 }
 .prompt-container {
     grid-row: 18 / 21;
     grid-column: 1 / 2;
-    border: 1px  solid red;
+    background-color: #f8f7f2;
+    padding: 12px 16px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.input-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    gap: 12px;
+}
+
+.prompt-input {
+    flex-grow: 1;
+    height: 45px;
+    resize: none;
+    padding: 10px 16px;
+    font-size: 16px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 22px;
+    outline: none;
+    color: #333;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
+}
+
+.new-chat-btn,
+.send-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    border: none;
+    background-color: #b6a567; /* goud/beige accentkleur */
+    color: white;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.new-chat-btn:hover,
+.send-btn:hover {
+    background-color: #9e8e4c;
 }
