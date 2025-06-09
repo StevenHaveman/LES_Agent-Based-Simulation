@@ -87,3 +87,34 @@
 .send-btn:hover {
     background-color: #9e8e4c;
 }
+
+.chat-bubble {
+    max-width: 70%;
+    padding: 10px 14px;
+    margin: 6px 12px;
+    border-radius: 18px;
+    font-size: 16x;
+    line-height: 1.4;
+    word-break: break-word;
+    display: inline-block;
+    clear: both;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.chat-bubble.user {
+    background-color: #b6a567; /* of probeer #e5dfc8 voor subtieler */
+    color: white; /* of #333 als je een lichte achtergrond kiest */
+    align-self: flex-end;
+    margin-left: auto;
+    border-radius: 18px;
+    border-top-right-radius: 4px;
+}
+
+.conversation-container {
+    grid-row: 1 / 18;
+    grid-column: 1 / 2;
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+}
