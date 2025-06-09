@@ -9,7 +9,7 @@
 
 }
 
-.info-tab-resident {
+.info-tab-resident, .AI-chat-resident {
     background-color: #f7e7cf;
     width: 150px;
     text-align: left;
@@ -21,6 +21,7 @@
 
 }
 
-.info-tab-resident.selected {
+.info-tab-resident.selected,
+.AI-chat-resident.selected {
     background-color: #e6caa3;
 }
