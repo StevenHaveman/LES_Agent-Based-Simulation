@@ -5,7 +5,6 @@
     grid-template:  repeat(20, 1fr) / repeat(1, 1fr);
 }
 
-
 .conversation-container {
     grid-row: 1 / 18;
     grid-column: 1 / 2;
@@ -73,7 +72,7 @@
     height: 40px;
     font-size: 20px;
     border: none;
-    background-color: #b6a567; /* goud/beige accentkleur */
+    background-color: #b6a567;
     color: white;
     border-radius: 50%;
     cursor: pointer;
@@ -93,7 +92,7 @@
     padding: 10px 14px;
     margin: 6px 12px;
     border-radius: 18px;
-    font-size: 16x;
+    font-size: 16px;
     line-height: 1.4;
     word-break: break-word;
     display: inline-block;
@@ -102,12 +101,11 @@
 }
 
 .chat-bubble.user {
-    background-color: #b6a567; /* of probeer #e5dfc8 voor subtieler */
-    color: white; /* of #333 als je een lichte achtergrond kiest */
+    background-color: #b6a567;
+    color: white; /
     align-self: flex-end;
     margin-left: auto;
-    border-radius: 18px;
-    border-top-right-radius: 4px;
+    border-radius: 18px 4px 18px 18px;
 }
 
 .conversation-container {
@@ -117,4 +115,12 @@
     padding: 12px;
     display: flex;
     flex-direction: column;
+}
+
+.chat-bubble.ai {
+    background-color: #e6dec0;
+    color: #333;
+    align-self: flex-start;
+    margin-right: auto;
+    border-radius: 4px 18px 18px 18px;
 }

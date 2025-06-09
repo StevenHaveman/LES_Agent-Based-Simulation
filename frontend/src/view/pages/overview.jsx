@@ -38,10 +38,19 @@ export const overviewRoute = createRoute({
                 <Navbar title={"MVP Overview"}></Navbar>
                 <div className="overview-container">
                     <div className="map-container">
-                        <AIChatWindow
-                            chatWindow={chatWindow}
-                            residents={selectedResidents}></AIChatWindow>
-
+                        {chatWindow === "ai" ? (
+                            <AIChatWindow
+                                chatWindow={chatWindow}
+                                residents={selectedResidents}
+                                selectedResidentIndex={selectedResidentIndex}
+                            />
+                        ) : (
+                            <HouseholdMap
+                                onSelectResidents={setSelectedResidents}
+                                onSelectHousehold={handleHouseholdSelect}
+                                selectedHouseholdId={selectedHouseholdId}
+                            />
+                        )}
                     </div>
                     <div className="graphics-container">
                         <GraphicsView> </GraphicsView>
