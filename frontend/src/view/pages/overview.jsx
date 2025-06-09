@@ -12,6 +12,7 @@ import HouseholdNavbar from "../components/HouseholdNavbar.jsx";
 import ResidentNavbar from "../components/ResidentNavbar.jsx";
 import ResidentWindow from "../components/ResidentWindow.jsx";
 import ResidentDropdown from "../components/ResidentDropdown.jsx";
+import AIChatWindow from "../components/AIChatWindow.jsx";
 
 
 export const overviewRoute = createRoute({
@@ -23,6 +24,8 @@ export const overviewRoute = createRoute({
         const [selectedResidentIndex, setSelectedResidentIndex] = useState(null);
         const [householdWindow, setHouseholdWindow] = useState("");
         const [residentWindow, setResidentWindow] = useState("");
+        const [selectedTab, setSelectedTab] = useState(null);
+        const [chatWindow, setChatWindow] = useState("");
 
         const handleHouseholdSelect = (household) => {
             setSelectedHouseholdId(household.id);
@@ -35,14 +38,22 @@ export const overviewRoute = createRoute({
                 <Navbar title={"MVP Overview"}></Navbar>
                 <div className="overview-container">
                     <div className="map-container">
-                        <HouseholdMap
-                            onSelectResidents={setSelectedResidents}
-                            onSelectHousehold={handleHouseholdSelect}
-                            selectedHouseholdId={selectedHouseholdId}
-                        />
+                        {chatWindow === "ai" ? (
+                            <AIChatWindow
+                                chatWindow={chatWindow}
+                                residents={selectedResidents}
+                                selectedResidentIndex={selectedResidentIndex}
+                            />
+                        ) : (
+                            <HouseholdMap
+                                onSelectResidents={setSelectedResidents}
+                                onSelectHousehold={handleHouseholdSelect}
+                                selectedHouseholdId={selectedHouseholdId}
+                            />
+                        )}
                     </div>
                     <div className="graphics-container">
-                        <h1> Graphics</h1>
+                        <GraphicsView> </GraphicsView>
                     </div>
                     <div className="household-container">
                         <HouseholdNavbar
@@ -56,7 +67,14 @@ export const overviewRoute = createRoute({
                         />
                     </div>
                     <div className="resident-container">
-                        <ResidentNavbar residentWindow={residentWindow} setResidentWindow={setResidentWindow}/>
+                        <ResidentNavbar
+                            residentWindow={residentWindow}
+                            setResidentWindow={setResidentWindow}
+                            chatWindow={chatWindow}
+                            setChatWindow={setChatWindow}
+                            selectedTab={selectedTab}
+                            setSelectedTab={setSelectedTab}
+                        />
                         <ResidentDropdown residents={selectedResidents}
                                           selectedResidentIndex={selectedResidentIndex}
                                           onSelectResident={setSelectedResidentIndex}> </ResidentDropdown>

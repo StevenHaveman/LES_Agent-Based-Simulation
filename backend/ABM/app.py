@@ -76,6 +76,17 @@ def fetch_households():
         return jsonify({"error": "No household data available"}), 400
     return jsonify(households_data)
 
+@app.route('/AI_test_response', methods=['POST'])
+def ai_test_response():
+    data = request.get_json()
+    prompt = data.get("prompt", "")
+
+    if not prompt.strip():
+        return jsonify({"error": "Prompt is leeg."}), 400
+
+    response = f"(AI-test response) Je zei: '{prompt}'"
+
+    return jsonify({"response": response})
 
 if __name__ == '__main__':
     app.run(debug=True)

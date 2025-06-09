@@ -19,11 +19,13 @@ body {
 
 .map-container{
     grid-column: 1 / 11;
-    grid-row: 1 / 6;
+    grid-row: 1 / 7;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    border-right: 1px solid black;
+    background-color: #f8f7f2;
 }
 
 .graphics-container{
@@ -38,16 +40,20 @@ body {
 
 .household-container{
     grid-column: 1 / 6;
-    grid-row: 6 / 11;
+    grid-row: 7 / 11;
     display: grid;
     grid-template:  repeat(20, 1fr) / repeat(10, 1fr);
+    background-color: #f8f7f2
+
 }
 
 .resident-container{
     grid-column: 6 / 11;
-    grid-row: 6 / 11;
+    grid-row: 7 / 11;
     display: grid;
     grid-template:  repeat(20, 1fr) / repeat(10, 1fr);
+    background-color: #f8f7f2
+
 }
 
 .parameters-container{
