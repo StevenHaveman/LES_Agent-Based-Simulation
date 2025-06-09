@@ -4,7 +4,6 @@ import "../styles/ResidentNavbar.css";
 const ResidentNavbar = ({
                             residentWindow,
                             setResidentWindow,
-                            selectedTab,
                             setSelectedTab,
                             chatWindow,
                             setChatWindow,
