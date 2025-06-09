@@ -16,9 +16,8 @@ const AIChatWindow = ({chatWindow, residents, selectedResidentIndex }) => {
                 );
             default:
                 return (
-                    <div className="select-household-hint">
-                        <h3> Click on a Resident</h3>
-                    </div>
+                    <AIChat  resident={residents && selectedResidentIndex !== null ? residents[selectedResidentIndex] : null}
+                             visible={true}> </AIChat>
                 );
         }
     };
