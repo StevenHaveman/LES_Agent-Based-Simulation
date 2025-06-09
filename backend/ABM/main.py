@@ -1,14 +1,40 @@
+"""
+Main script for running the agent-based model simulation.
+
+This script initializes the simulation environment and runs it for a specified
+number of years. It collects data for visualization and detailed household
+information at the end of the simulation.
+"""
 import random
 
 import numpy as np
 from environment import Environment
 import utilities
 
-# TODO DENK DAT DIT IN EEN DATA CLASSE MOET GAAN GEBEUREN ZODDAT DE DATA IN DE GUI KAN WORDEN GETOONT EN HET OP EEN PLEK IS.
-graphics_data = []
-households_data = []
+# Global lists to store data from the simulation for potential use by an API or UI.
+graphics_data = [] # Stores yearly aggregated data for charts/graphs.
+households_data = [] # Stores detailed household information at the end of the simulation.
 
 def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=None): 
+    """
+    Runs the agent-based model simulation.
+
+    Initializes the model with the given parameters, runs it for the specified
+    number of simulation years, and collects data.
+
+    Args:
+        nr_households (int, optional): The number of households in the simulation.
+                                       Defaults to 10.
+        nr_residents (int, optional): The total number of residents, distributed
+                                      among households. Defaults to 10.
+        simulation_years (int, optional): The number of years the simulation
+                                          will run. Defaults to 30.
+        seed (int, optional): Seed for random number generators for reproducibility.
+                              If None, a random seed is used. Defaults to None.
+
+    Returns:
+        dict: A dictionary containing a message indicating simulation completion.
+    """
     global graphics_data
     global households_data
 

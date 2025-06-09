@@ -1,3 +1,11 @@
+"""
+Flask application for serving the agent-based model simulation API.
+
+This application provides endpoints to:
+- Start a new simulation with specified parameters.
+- Retrieve aggregated data for graphical representation.
+- Fetch detailed data about individual households from the last simulation.
+"""
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from main import run_simulation, graphics_data, households_data
@@ -14,13 +22,14 @@ def start_simulation():
     """
     Start a new simulation with the provided configuration.
 
-    Expects a JSON payload with the following fields:
-    - nr_households: Number of households (default: 10)
-    - nr_residents: Number of residents per household (default: 10)
-    - simulation_years: Number of simulation years (default: 30)
+    Expects a JSON payload with the following optional fields:
+    - nr_households: Number of households (default from chosen_config)
+    - nr_residents: Number of residents (default from chosen_config, total distributed among households)
+    - simulation_years: Number of simulation years (default from chosen_config)
 
     Returns:
-        JSON response with the status and simulation result.
+        JSON response with the status and simulation result message.
+        Returns a 400 error if input parameters are invalid.
     """
     data = request.get_json()
 
@@ -40,10 +49,13 @@ def start_simulation():
 @app.route("/overview", methods=["GET"])
 def get_graphics_data():
     """
-    Retrieve the graphical data from the simulation.
+    Retrieve the graphical data from the most recently run simulation.
+
+    This data is typically aggregated per year and suitable for plotting.
 
     Returns:
-        JSON response with the graphical data or an error message if no data is available.
+        JSON response with the graphical data.
+        Returns a 400 error if no simulation data is available.
     """
     if not graphics_data:
         return jsonify({"error": "No simulation data available"}), 400
@@ -52,10 +64,13 @@ def get_graphics_data():
 @app.route('/fetch_households', methods=['GET'])
 def fetch_households():
     """
-    Retrieve the household data from the simulation.
+    Retrieve detailed household data from the most recently run simulation.
+
+    This includes information about each household and its residents.
 
     Returns:
-        JSON response with the household data or an error message if no data is available.
+        JSON response with the household data.
+        Returns a 400 error if no household data is available.
     """
     if not households_data:
         return jsonify({"error": "No household data available"}), 400

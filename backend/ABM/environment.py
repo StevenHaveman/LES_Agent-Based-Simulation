@@ -7,7 +7,36 @@ from sustainability_packages.solar_panel import SolarPanel
 from sustainability_packages.heat_pump import HeatPump
 
 class Environment(Model):
+    """
+    The main model class for the simulation environment.
+
+    It initializes and manages households, residents, sustainability packages,
+    and the overall simulation flow. It also collects data at each step.
+
+    Attributes:
+        config_id (int): Identifier for the chosen configuration.
+        config (dict): The configuration dictionary.
+        solar_panel (SolarPanel): Instance of the SolarPanel package.
+        heat_pump (HeatPump): Instance of the HeatPump package.
+        sustainability_packages (list): List of all available sustainability packages.
+        decided_residents_this_step_per_package (dict): Tracks the number of residents
+            who made a positive decision for each package in the current step.
+        energy_price (float): Current price of energy (e.g., electricity).
+        households (list[Household]): List of all household agents in the model.
+        residents (list[list[Resident]]): List of lists, where each inner list contains
+            residents of a particular household.
+        streets (list[list[Household]]): Households grouped into streets.
+        yearly_stats (list[dict]): List to store aggregated data collected each year.
+    """
     def __init__(self, nr_households, nr_residents):
+        """
+        Initializes the simulation environment.
+
+        Args:
+            nr_households (int): The total number of households to create.
+            nr_residents (int): The total number of residents to create and
+                                distribute among households.
+        """
         super().__init__()
         self.config_id, self.config = utilities.choose_config()
 
@@ -32,7 +61,14 @@ class Environment(Model):
     def create_agents(self, nr_households: int, nr_residents: int):
         """
         Creates a specified number of Household agents and distributes residents among them.
-        Also initializes the environmental influence and solar panel price.
+
+        Initializes households with a chance to have pre-installed sustainability packages
+        based on configuration. Residents are then created within these households.
+
+        Args:
+            nr_households (int): The number of household agents to create.
+            nr_residents (int): The total number of resident agents to create and
+                                distribute among the households.
         """
         base = nr_residents // nr_households
         remainder = nr_residents % nr_households
@@ -62,8 +98,11 @@ class Environment(Model):
 
     def generate_streets(self,):
         """
-        Generate a list of (street_name, household_count) where the total households sum up to total_households.
-        The number of streets is not fixed, and household counts are randomly assigned with occasional large streets.
+        Generate a list of streets, where each street is a list of households.
+
+        The total number of households is distributed among streets. The number of
+        streets is not fixed, and household counts per street are randomly assigned
+        within configured limits, with occasional larger streets.
         """
         pointer = 0
         remaining = self.config['nr_households']
@@ -87,7 +126,13 @@ class Environment(Model):
                 chosen_list = random.randint(0, len(self.streets) - 1)
                 self.streets[chosen_list].append(self.households[i])
 
-    def update_subjective_norm(self):           
+    def update_subjective_norm(self):
+        """
+        Updates the subjective norm for all residents regarding each sustainability package.
+
+        This involves resetting flags for "Direct" norm calculation (if applicable)
+        and then invoking the package-specific subjective norm update logic.
+        """
         for hh in self.households:
             for package in self.sustainability_packages:
                 hh.skip_prev_flags[package.name] = False
@@ -98,8 +143,13 @@ class Environment(Model):
 
     def step(self):
         """
-        Executes a step for each household and resident in the model.
-        This includes updating the environmental influence and the solar panel price.
+        Executes one step (typically representing a year) of the simulation.
+
+        This involves:
+        1. Resetting the count of residents who decided for packages in this step.
+        2. Executing the step method for each household.
+        3. Updating the subjective norm across the environment.
+        4. Executing the step method for each sustainability package (e.g., price updates).
         """
         for pkg_name in self.decided_residents_this_step_per_package:
             self.decided_residents_this_step_per_package[pkg_name] = 0
@@ -113,6 +163,19 @@ class Environment(Model):
             package.step()
 
     def collect_start_of_year_data(self, year):
+        """
+        Collects and stores data at the beginning of a simulation year.
+
+        This includes counts of residents with positive decisions, households with
+        installed packages, and package prices, for each sustainability package.
+        Also records total decisions made in the *previous* year (which is now "this step").
+
+        Args:
+            year (int): The current simulation year.
+
+        Returns:
+            dict: A dictionary containing the collected data for the start of the year.
+        """
         data_per_package = {}
         for package in self.sustainability_packages:
             residents_positive_decision = sum(
@@ -131,7 +194,7 @@ class Environment(Model):
 
         data = {
             "year": year,
-            "decisions_this_year_total": total_decisions_this_year,
+            "decisions_this_year_total": total_decisions_this_year, # This is actually decisions from end of previous year / during this step
             "decisions_this_year_per_package": dict(self.decided_residents_this_step_per_package),
             "start_state_per_package": data_per_package,
         }
@@ -139,6 +202,18 @@ class Environment(Model):
         return data
 
     def collect_end_of_year_data(self, data_from_start_of_year):
+        """
+        Collects and appends data at the end of a simulation year to the
+        data collected at the start of the year.
+
+        This includes updated counts of residents with positive decisions,
+        households with installed packages, package prices, and the number
+        of decisions made during the current year's step.
+
+        Args:
+            data_from_start_of_year (dict): The data dictionary collected at the
+                                            start of the current year.
+        """
         end_data_per_package = {}
         for package in self.sustainability_packages:
             residents_positive_decision = sum(
@@ -160,6 +235,17 @@ class Environment(Model):
         data_from_start_of_year["decisions_this_year_per_package_end"] = dict(self.decided_residents_this_step_per_package)
 
     def collect_household_information(self):
+        """
+        Collects detailed information about each household and its residents.
+
+        This data is typically used for providing a detailed view of the
+        simulation state at the end, often for UI display.
+
+        Returns:
+            list[dict]: A list of dictionaries, where each dictionary contains
+                        detailed information for a household, including its residents'
+                        attributes and decisions.
+        """
         households_data = []
         for household in self.households:
             resident_details = []
@@ -180,6 +266,16 @@ class Environment(Model):
         return households_data
 
     def __str__(self):
+        """
+        Returns a string representation of the current state of the environment.
+
+        Includes total number of households and residents, and for each
+        sustainability package: the number of residents who decided for it,
+        the number of households that installed it, and its current price.
+
+        Returns:
+            str: A summary string of the environment's state.
+        """
         total_households = len(self.households)
         total_residents = sum(len(h.residents) for h in self.households)
         output = f"Environment State:\n"

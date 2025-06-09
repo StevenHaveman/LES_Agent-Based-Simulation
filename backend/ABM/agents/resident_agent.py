@@ -8,29 +8,36 @@ class Resident(Agent):
     """
     Represents an individual resident within a household.
 
-    Attributes:
-        unique_id (int): Unique identifier for the resident.
-        model (Model): Reference to the Mesa model (serves as the simulation environment).
-        household (Household): Reference to the household the resident belongs to.
-        income (float): The resident's calculated annual income, rounded to the nearest 100.
-        attitude (float): Base attitude towards solar panels (e.g., environmental concern).
-        attitude_mod (float): Modifier for the attitude component in decision making.
-        subj_norm_mod (float): Modifier for the environmental influence component.
-        behavioral_mod (float): Modifier for the behavioral influence component.
-        solar_decision (bool): Whether the resident has decided in favor of solar panels. Initially False.
-    """
+    Residents make individual decisions about adopting sustainability packages,
+    influenced by their income, attitude, subjective norms, and perceived
+    behavioral control.
 
+    Attributes:
+        unique_id (int): Unique identifier for the resident, inherited from Mesa Agent.
+        model (Model): Reference to the Mesa model (simulation environment).
+        household (Household): Reference to the household the resident belongs to.
+        config_id (int): Identifier for the chosen configuration.
+        config (dict): The configuration dictionary.
+        environment (Model): Reference to the simulation model (same as model).
+        income (float): The resident's calculated annual income, rounded to the nearest 100.
+        subj_norm (float): Base subjective norm value from configuration.
+        attitude (float): Base attitude towards sustainability packages (e.g., environmental concern).
+        attitude_mod (float): Modifier for the attitude component in decision making.
+        subj_norm_mod (float): Modifier for the subjective norm component in decision making.
+        behavioral_mod (float): Modifier for the behavioral influence component in decision making.
+        package_decisions (dict): Stores decision status (True/False) for each
+                                  sustainability package (e.g., {package_name: bool}).
+        package_subjective_norms (dict): Stores the current subjective norm value
+                                         for each package (e.g., {package_name: float}).
+        decision_threshold (float): The threshold a decision statistic must exceed
+                                    for a positive decision towards a package.
+    """
     def __init__(self, model, household):
         """
         Initializes a Resident agent.
 
         Args:
-            unique_id (int): Unique identifier for the resident.
-            attitude (float): Base attitude towards solar panels.
-            attitude_mod (float): Modifier for the attitude component.
-            subj_norm_mod (float): Modifier for the environmental influence component.
-            behavioral_mod (float): Modifier for the behavioral influence component.
-            model (Model): The simulation model object (used instead of 'environment').
+            model (Model): The simulation model object this agent belongs to.
             household (Household): The household object this resident belongs to.
         """
         super().__init__(model)
@@ -64,12 +71,10 @@ class Resident(Agent):
 
         self.decision_threshold = self.config['decision_threshold']
 
-
-
     def calc_salary(self):
         """
         Calculates a resident's salary based on a log-normal distribution
-        approximating Dutch income distribution.
+        approximating Dutch income distribution from the configuration.
 
         Returns:
             float: A randomly generated salary value.
@@ -82,18 +87,13 @@ class Resident(Agent):
     
     def calc_decision(self):
         """
-        Calculates whether the resident decides to adopt solar panels based on
-        attitude, environmental influence, and behavioral factors, compared against a threshold.
+        Calculates whether the resident decides to adopt available sustainability
+        packages based on attitude, subjective norm, and behavioral factors,
+        compared against a decision threshold.
 
-        If the decision score exceeds the threshold, the resident's `solar_decision`
-        attribute is set to True. Otherwise, the resident's income might slightly increase.
-
-        Args:
-            threshold (float): The value the decision statistic must exceed for a positive decision.
-            info_dump (bool, optional): If True, prints debug information. Defaults to False.
-
-        Returns:
-            bool | None: True if the decision is positive, None otherwise.
+        If the decision score for a package exceeds the threshold, the resident's
+        decision for that package is set to True. This method iterates through
+        all sustainability packages not yet adopted by the resident.
         """
         for package in self.environment.sustainability_packages:
             if self.package_decisions.get(package.name, False):
@@ -112,8 +112,14 @@ class Resident(Agent):
                 self.environment.decided_residents_this_step_per_package[package.name] = \
                     self.environment.decided_residents_this_step_per_package.get(package.name, 0) + 1
 
-
     def step(self):
+        """
+        Step function for the resident.
+
+        The resident first attempts to make decisions on any sustainability packages
+        they haven't already decided on. After decision-making, their income is
+        updated with a random raise.
+        """
         if not all(self.package_decisions.get(p.name, False) for p in self.environment.sustainability_packages):
             self.calc_decision()
         self.income = int(round(self.income * random.choice(self.config['raise_income']), -1))

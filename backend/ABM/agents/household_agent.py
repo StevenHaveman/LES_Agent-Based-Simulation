@@ -8,15 +8,38 @@ class Household(Agent):
     """
     A Mesa-compatible Household agent that contains Resident agents.
 
+    This agent represents a household unit in the simulation, capable of making
+    collective decisions on adopting sustainability packages based on the
+    preferences of its resident members.
+
     Attributes:
         unique_id (int): Unique identifier from the Mesa Agent class.
         model (Model): The model in which this agent is embedded.
+        config_id (int): Identifier for the chosen configuration.
+        config (dict): The configuration dictionary.
         residents (list[Resident]): A list of Resident agents belonging to this household.
-        solar_panels (bool): Whether the household has decided to install solar panels.
-        solarpanel_amount (int): The number of solar panels the household would install (e.g., 6, 8, 10).
-        energy_generation (int): Estimated energy generation per panel per year (kWh).
+        environment (Model): Reference to the simulation model (same as model).
+        package_installations (dict): A dictionary tracking installed sustainability
+                                      packages (e.g., {"Solar Panel": True, "Heat Pump": False}).
+        skip_prev_flags (dict): Flags for "Direct" subjective norm calculation,
+                                indicating if influence from the previous house for a
+                                package has been accounted for. {package_name: bool}.
+        skip_next_flags (dict): Flags for "Direct" subjective norm calculation,
+                                indicating if influence from the next house for a
+                                package has been accounted for. {package_name: bool}.
+        solarpanel_amount (int): The number of solar panels the household would install
+                                 if they decide to adopt solar panels (e.g., 6, 8, 10).
+        energy_generation (int): Estimated energy generation per solar panel per year (kWh).
+        gas_usage (int): Annual gas usage of the household (kWh).
+        heatpump_usage (int): Annual electricity usage by a heat pump if installed (kWh).
     """
     def __init__(self, model):
+        """
+        Initializes a Household agent.
+
+        Args:
+            model (Model): The model in which this agent is embedded.
+        """
         super().__init__(model)
         self.config_id, self.config = utilities.choose_config()
         self.residents = []
@@ -34,13 +57,13 @@ class Household(Agent):
 
     def create_residents(self, nr_residents: int):
         """
-        Create and add Resident agents to the household, and add them to the model schedule.
+        Create and add Resident agents to the household.
+
+        Newly created residents inherit the household's current package installation
+        status as their initial decision state for those packages.
 
         Args:
-            start_resident_id (int): The starting ID for the new residents.
-            nr_residents (int): Number of residents to create.
-        Returns:
-            int: The next available resident ID.
+            nr_residents (int): Number of residents to create for this household.
         """
         for _ in range(nr_residents):
             resident = Resident(
@@ -54,9 +77,16 @@ class Household(Agent):
 
     def calc_avg_decision(self, package):
         """
-        Determines if the household installs solar panels based on the average
-        decision of its residents. If the average score is greater than 0.5,
-        the household installs panels.
+        Determines if the household installs a given sustainability package based
+        on the average decision of its residents.
+
+        If the proportion of residents who have decided in favor of the package
+        meets or exceeds the household's decision threshold, the household
+        installs the package. This check is skipped if the package is already
+        installed or if the household has no residents.
+
+        Args:
+            package (SustainabilityPackage): The sustainability package being considered.
         """
         if not self.residents:
             return
@@ -74,7 +104,11 @@ class Household(Agent):
 
     def step(self):
         """
-        Step function for the household. Executes a step for each resident.
+        Step function for the household.
+
+        This method first executes a step for each resident in the household.
+        Then, for each sustainability package available in the environment,
+        it re-evaluates the household's decision to install that package.
         """
         for resident in self.residents:
             resident.step()
@@ -84,9 +118,15 @@ class Household(Agent):
 
     def __str__(self):
         """
-        Returns a string representation of the household's state, including 
-        the number of residents, their decisions, and whether solar panels are installed.
-            """ 
+        Returns a string representation of the household's state.
+
+        Includes the household's ID, the installation status of each sustainability
+        package, the number of residents who decided for each package, and the
+        total number of residents.
+
+        Returns:
+            str: A string detailing the household's current status.
+        """ 
         resident_count = len(self.residents)
         details = f"Household {self.unique_id}:\n"
         for package_name, installed in self.package_installations.items():
