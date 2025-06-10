@@ -55,6 +55,8 @@ class Household(Agent):
         self.gas_usage = random.randint(*self.config['yearly_gas_usage'])
         self.heatpump_usage = random.randint(*self.config['yearly_heatpump_usage'])
 
+        self.co2_saved_yearly = 0.0
+
     def create_residents(self, nr_residents: int):
         """
         Create and add Resident agents to the household.
@@ -101,6 +103,8 @@ class Household(Agent):
 
         if avg_score >= self.config['household_decision_threshold']:
             self.package_installations[package.name] = True
+
+            self.co2_saved_yearly += package.calc_co2_savings(self)
 
     def step(self):
         """

@@ -89,3 +89,10 @@ class SolarPanel(SustainabilityPackage):
         if savings <= 0:
             return float("inf")
         return cost / savings
+    
+    def calc_co2_savings(self, household):
+        """
+        Calculates annual CO2 savings by displacing grid electricity.
+        """
+        annual_energy_generation = household.energy_generation * household.solarpanel_amount
+        return annual_energy_generation * self.config['CO2_electricity']

@@ -80,6 +80,10 @@ class Environment(Model):
                 initial_chance = self.config.get(chance_key, 0.0) # Default to 0% if not in config
                 
                 hh.package_installations[package.name] = (random.random() < initial_chance)
+
+                if hh.package_installations.get(package.name, False):
+                    initial_savings = package.calc_co2_savings(hh)
+                    hh.co2_saved_yearly += initial_savings
                 
                 hh.skip_prev_flags[package.name] = False
                 hh.skip_next_flags[package.name] = False
@@ -191,13 +195,16 @@ class Environment(Model):
             }
         
         total_decisions_this_year = sum(self.decided_residents_this_step_per_package.values())
+        total_yearly_co2_saved = sum(hh.co2_saved_yearly for hh in self.households)
 
         data = {
             "year": year,
             "decisions_this_year_total": total_decisions_this_year, # This is actually decisions from end of previous year / during this step
             "decisions_this_year_per_package": dict(self.decided_residents_this_step_per_package),
             "start_state_per_package": data_per_package,
+            "total_co2_saved_yearly": total_yearly_co2_saved,
         }
+
         self.yearly_stats.append(data)
         return data
 
@@ -284,11 +291,14 @@ class Environment(Model):
             pkg_name = package.name
             residents_decided = sum(1 for hh in self.households for r in hh.residents if r.package_decisions.get(pkg_name, False))
             households_installed = sum(1 for hh in self.households if hh.package_installations.get(pkg_name, False))
+            total_yearly_co2_saved = sum(hh.co2_saved_yearly for hh in self.households)
             
             output += f"  --- {pkg_name} ---\n"
             output += f"    Residents decided for {pkg_name}: {residents_decided} / {total_residents}\n"
             output += f"    Households with {pkg_name}: {households_installed} / {total_households}\n"
             output += f"    Current {pkg_name} Price: {package.price}\n"
+        output += f"  --- MISC INFO ---\n"
+        output += f"    Total CO2 saved so far: {total_yearly_co2_saved:.1f} kg\n"
         return output
         
         
