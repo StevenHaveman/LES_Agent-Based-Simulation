@@ -51,8 +51,8 @@ class SolarPanel(SustainabilityPackage):
         Returns:
             float: The calculated behavioral influence, clipped between 0 and 1.
         """
-        max_diff = 1000
-        min_diff = -1000
+        max_diff = self.price / 3 
+        min_diff = -(self.price / 3)
 
         total_panel_cost = self.price * household.solarpanel_amount
         difference = income - total_panel_cost

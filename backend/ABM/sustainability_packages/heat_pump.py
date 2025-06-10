@@ -47,10 +47,10 @@ class HeatPump(SustainabilityPackage):
         Returns:
             float: The calculated behavioral influence, clipped between 0 and 1.
         """
-        max_diff = 1000
-        min_diff = -1000
+        max_diff = self.price / 3 
+        min_diff = -(self.price / 3)
 
-        difference = income - self.price # Assumes one heat pump unit
+        difference = income - self.price / 1.829 # Division to make price of heatpump equal to avg price of solarpanels
         normalized_diff = (difference - min_diff) / (max_diff - min_diff)
 
         roi = self.calc_roi(household)
