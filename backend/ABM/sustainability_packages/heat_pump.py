@@ -78,8 +78,25 @@ class HeatPump(SustainabilityPackage):
         """
         gas_costs = household.gas_usage * self.config['gas_price']
         heat_pump_costs = household.heatpump_usage * self.config['energy_price']
+
+        for package_name, is_installed in household.package_installations.items():
+            if package_name == "Solar Panel" and is_installed:
+                heat_pump_costs = min(household.heatpump_usage - (household.energy_generation * household.solarpanel_amount), 0) * self.config['energy_price']
         savings = gas_costs - heat_pump_costs
 
         if savings <= 0:
             return float("inf")
         return self.price / savings
+    
+    def calc_co2_savings(self, household):
+        """
+        Calculates net annual CO2 savings by replacing gas heating with electric heating.
+        """
+        co2_saved = household.gas_usage * self.config['CO2_gas']
+        co2_used = household.heatpump_usage * self.config['CO2_electricity']
+
+        for package_name, is_installed in household.package_installations.items():
+            if package_name == "Solar Panel" and is_installed:
+                co2_used = min(household.heatpump_usage - (household.energy_generation * household.solarpanel_amount), 0) * self.config['CO2_electricity']
+
+        return co2_saved - co2_used
