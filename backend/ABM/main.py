@@ -10,6 +10,7 @@ import random
 import numpy as np
 from environment import Environment
 import utilities
+import config
 
 # Global lists to store data from the simulation for potential use by an API or UI.
 graphics_data = [] # Stores yearly aggregated data for charts/graphs.
@@ -74,7 +75,7 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
 
 if __name__ == "__main__":
     config_id, config = utilities.choose_config()
-    simulation_result = run_simulation(config['nr_households'], config['nr_residents'], config['simulation_years'])
+    simulation_result = run_simulation(config['nr_households'], config['nr_residents'], config['simulation_years'], config['seed'])
     print(simulation_result["message"])
 
         
