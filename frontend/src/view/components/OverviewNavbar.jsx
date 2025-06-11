@@ -32,7 +32,7 @@ const OverviewNavbar = ({ title }) => {
 
     return (
         <>
-            <div className="navbar">
+            <div className="overview-navbar">
                 <img className="logo" src="LES_logo.png" alt="Logo links"/>
                 <div><h1>{title}</h1></div>
                 <img className="logo" src="LES_logo2.png" alt="Logo rechts"/>

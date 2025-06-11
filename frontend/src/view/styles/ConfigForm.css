@@ -56,18 +56,23 @@
 .form-group {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: 5px;
+    width: 100%;
+    max-width: 300px;  /* Limiteert de breedte */
+    margin: 0 auto;     /* Centreert binnen de form */
 }
 
 .form-label {
     font-size: 14px;
     color: #333;
     font-weight: 500;
+    text-align: left;
 }
+
 
 .form-input-wrapper {
     position: relative;
-
 
 }
 
@@ -75,7 +80,9 @@
     padding: 10px;
     border: 1px solid #ddd;
     font-size: 14px;
-
+    border-radius: 10px;
+    width: 100%; /* past binnen max-width van .form-group */
+    box-sizing: border-box;
 }
 
 .form-input:focus {
