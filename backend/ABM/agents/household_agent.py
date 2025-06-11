@@ -53,6 +53,7 @@ class Household(Agent):
         self.solarpanel_amount = random.choice(self.config['solar_panel_amount_options'])
         self.energy_generation = random.randint(*self.config['energy_generation_range'])
         self.gas_usage = random.randint(*self.config['yearly_gas_usage'])
+        self.energy_usage = random.randint(*self.config['yearly_energy_usage'])
         self.heatpump_usage = random.randint(*self.config['yearly_heatpump_usage'])
 
         self.co2_saved_yearly = 0.0
@@ -104,7 +105,13 @@ class Household(Agent):
         if avg_score >= self.config['household_decision_threshold']:
             self.package_installations[package.name] = True
 
-            self.co2_saved_yearly += package.calc_co2_savings(self)
+            self.environment.current_co2 -= package.calc_co2_savings(self)
+
+    def calc_co2_emissions(self,):
+        co2_electricity = self.energy_usage * self.config['CO2_electricity']
+        co2_gas = self.gas_usage * self.config['CO2_gas']
+
+        return co2_electricity + co2_gas
 
     def step(self):
         """
@@ -113,12 +120,15 @@ class Household(Agent):
         This method first executes a step for each resident in the household.
         Then, for each sustainability package available in the environment,
         it re-evaluates the household's decision to install that package.
+        Also calculates the total amount of CO2 saved by each package.
         """
         for resident in self.residents:
             resident.step()
         
         for package in self.environment.sustainability_packages:
             self.calc_avg_decision(package)
+            self.co2_saved_yearly += package.calc_co2_savings(self)
+
 
     def __str__(self):
         """

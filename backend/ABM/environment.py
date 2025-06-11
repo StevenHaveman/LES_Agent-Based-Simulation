@@ -53,6 +53,8 @@ class Environment(Model):
         self.residents = []  # gewone Python-lijst voor filteren/gemak
         self.streets = []
         self.yearly_stats = []
+        self.total_co2 = 0
+        self.current_co2 = 0
 
         self.create_agents(nr_households, nr_residents)
         self.generate_streets()
@@ -75,6 +77,10 @@ class Environment(Model):
 
         for i in range(nr_households):
             hh = Household(self)
+            hh_emissions = hh.calc_co2_emissions()
+            self.total_co2 += hh_emissions
+            self.current_co2 += hh_emissions
+
             for package in self.sustainability_packages:
                 chance_key = f"initial_{package.name.lower().replace(' ', '')}_chance"
                 initial_chance = self.config.get(chance_key, 0.0) # Default to 0% if not in config
@@ -84,6 +90,7 @@ class Environment(Model):
                 if hh.package_installations.get(package.name, False):
                     initial_savings = package.calc_co2_savings(hh)
                     hh.co2_saved_yearly += initial_savings
+                    self.current_co2 -= initial_savings
                 
                 hh.skip_prev_flags[package.name] = False
                 hh.skip_next_flags[package.name] = False
@@ -298,7 +305,8 @@ class Environment(Model):
             output += f"    Households with {pkg_name}: {households_installed} / {total_households}\n"
             output += f"    Current {pkg_name} Price: {package.price}\n"
         output += f"  --- MISC INFO ---\n"
-        output += f"    Total CO2 saved so far: {total_yearly_co2_saved:.1f} kg\n"
+        output += f"    Total CO2 saved so far: {total_yearly_co2_saved / 1000:.1f} tons\n"
+        output += f"    % of CO2 emission relative to district total: {self.current_co2 / self.total_co2 * 100:.1f}"
         return output
         
         

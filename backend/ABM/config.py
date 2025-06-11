@@ -61,7 +61,8 @@ configs = {
         "heat_pump_price": 6000, # https://warmtepompenadvies.nl/warmtepomp-kosten/
         "energy_price": 0.32, # https://www.overstappen.nl/energie/stroomprijs/#:~:text=Momenteel%20betreft%20de%20stroomprijs%20gemiddeld,variabel%20energiecontract%20van%2020%20energieleveranciers.
         "gas_price": 1.29, # https://www.gaslicht.com/energienota/gasprijs?utm_source=google&utm_medium=cpc&utm_campaign=1433018089&t_gclid=Cj0KCQjwucDBBhDxARIsANqFdr1-3we-bScEEFLESdSZ_r258D4bGeum-2_xOB-_wuw-533vRRGK4jQaAkNCEALw_wcB&gad_source=1&gad_campaignid=1433018089&gbraid=0AAAAAD_HXpYz9o63iTImp0E2Lu5B8tM3s&gclid=Cj0KCQjwucDBBhDxARIsANqFdr1-3we-bScEEFLESdSZ_r258D4bGeum-2_xOB-_wuw-533vRRGK4jQaAkNCEALw_wcB
-        "yearly_gas_usage": (850, 1800), # https://www.essent.nl/kennisbank/energie-besparen/inzicht-in-verbruik/gemiddelde-gasverbruik#:~:text=Het%20gasverbruik%20gemiddeld%20in%20Nederland,1.000%20kubieke%20meter%20per%20jaar. 
+        "yearly_energy_usage": (1600, 5000), # https://www.overstappen.nl/energie/gemiddeld-energieverbruik/ 
+        "yearly_gas_usage": (900, 1900), # https://www.overstappen.nl/energie/gemiddeld-energieverbruik/ 
         "CO2_electricity": 0.27, # https://www.nn.nl/Inspiratie/CO2-uitstoot.htm
         "CO2_gas": 1.78, # https://www.nn.nl/Inspiratie/CO2-uitstoot.htm 
         "yearly_heatpump_usage": (2000, 2500), # https://www.zonneplan.nl/energie/besparen/hoeveel-stroom-verbruikt-een-warmtepomp
