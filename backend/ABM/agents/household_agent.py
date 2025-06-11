@@ -33,7 +33,7 @@ class Household(Agent):
         self.gas_usage = random.randint(*self.config['yearly_gas_usage'])
         self.heatpump_usage = random.randint(*self.config['yearly_heatpump_usage'])
 
-    def create_residents(self, nr_residents: int):
+    def create_residents(self, nr_residents: int, id_counter: int) -> int:
         """
         Create and add Resident agents to the household, and add them to the model schedule.
 
@@ -43,16 +43,20 @@ class Household(Agent):
         Returns:
             int: The next available resident ID.
         """
-        for id in range(nr_residents):
+        for _ in range(nr_residents):
             resident = Resident(
-                id,
+                id_counter,
                 self.model,
                 self  # link naar household
             )
+            id_counter += 1
+
             for package_name, is_installed in self.package_installations.items():
                 if is_installed:
                     resident.package_decisions[package_name] = True
             self.residents.append(resident)
+
+        return id_counter
 
     def calc_avg_decision(self, package):
         """

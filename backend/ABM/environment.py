@@ -39,6 +39,9 @@ class Environment(Model):
         base = nr_residents // nr_households
         remainder = nr_residents % nr_households
 
+        # Initialize the agent ID counter
+        id_counter = 0
+
         for i in range(nr_households):
             hh = Household(i, self)
             for package in self.sustainability_packages:
@@ -53,7 +56,7 @@ class Environment(Model):
             self.households.append(hh)
 
             nr_res_for_hh = base + (1 if i < remainder else 0)
-            hh.create_residents(nr_res_for_hh)
+            id_counter = hh.create_residents(nr_res_for_hh, id_counter)
             self.residents.extend(hh.residents) # Veranderd: self.residents was eerst een lijst van lijsten.
         
         for hh_obj in self.households:
@@ -117,10 +120,12 @@ class Environment(Model):
     def collect_environment_data(self):
         environment_data = {
             "energy_price": self.energy_price,
-            "nr_agents_with_solar_panel": "nog doen",
+            "nr_agents_with_solar_panel": "nog doen", # TODO: ...
+            "nr_agents_with_heat_pump": "nog doen", # TODO: ...
             "average_income": np.mean([resident.income for resident in self.residents]),
             "average_attitude": np.mean([resident.attitude for resident in self.residents]),
             "average_subjective_norm": np.mean([resident.subj_norm for resident in self.residents]),
+            # TODO: Average behavioral modification
         }
 
         return environment_data
@@ -136,9 +141,12 @@ class Environment(Model):
             },
             "simulation_years": {
                 f"year {year}": {
-                    "residents_data": {resident.unique_id: {} for resident in self.residents},
-                    "environment_data": []
+                    "residents_data": {},
+                    "environment_data": {}
                 } for year in range(1, self.config['simulation_years'] + 1)
+            },
+            "conversation_history": {
+                "residents": {resident.unique_id: {} for resident in self.residents},
             }
         }
 
@@ -161,7 +169,7 @@ class Environment(Model):
             data['simulation_years'][year_key]['residents_data'][resident.unique_id] = resident_data
 
         environment_data = self.collect_environment_data()
-        data['simulation_years'][year_key]['environment_data'].append(environment_data)
+        data['simulation_years'][year_key]['environment_data'] = environment_data
 
         # Save to file
         with open(file_name, 'w') as file:

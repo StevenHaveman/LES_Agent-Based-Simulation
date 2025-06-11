@@ -43,6 +43,7 @@ class Resident(Agent):
         salary = self.calc_salary()
         self.income = max(round(salary, -2), 0)
         self.subj_norm = self.config['subjective_norm']
+        self.behavioral_control = {package.name: None for package in self.environment.sustainability_packages}
         
         if self.config_id == 0 or self.config_id == 1:
             self.attitude = utilities.gen_random_value(0, 1)
@@ -63,6 +64,7 @@ class Resident(Agent):
             self.package_subjective_norms[package.name] = self.config.get('subjective_norm', 0.0)
 
         self.decision_threshold = self.config['decision_threshold']
+        self.calc_behavioral_control()
 
 
 
@@ -80,6 +82,13 @@ class Resident(Agent):
         sigma_lognormaal = np.sqrt(np.log(1 + (sigma_normal / median) ** 2))
         return np.random.lognormal(mu, sigma_lognormaal)
     
+    def calc_behavioral_control(self):
+        for package in self.environment.sustainability_packages:
+            if self.package_decisions.get(package.name, False):
+                continue
+
+            self.behavioral_control[package.name] = package.calculate_behavioral_influence(self.income, self.household)
+
     def calc_decision(self):
         """
         Calculates whether the resident decides to adopt solar panels based on
@@ -98,14 +107,12 @@ class Resident(Agent):
         for package in self.environment.sustainability_packages:
             if self.package_decisions.get(package.name, False):
                 continue
-
-            behavioral_inf = package.calculate_behavioral_influence(self.income, self.household)
             
             current_subj_norm_for_package = self.package_subjective_norms.get(package.name, 0.0)
             
             decision_stat = (self.attitude * self.attitude_mod +
                              current_subj_norm_for_package * package.subj_norm_mod * self.subj_norm_mod +
-                             behavioral_inf * self.behavioral_mod) / 6 # Normalize (sum of max mods if all are 2)
+                             self.behavioral_control[package.name] * self.behavioral_mod) / 6 # Normalize (sum of max mods if all are 2)
 
             if decision_stat > self.decision_threshold:
                 self.package_decisions[package.name] = True
@@ -121,6 +128,10 @@ class Resident(Agent):
             "attitude_mod": self.attitude_mod,
             "subj_norm": self.subj_norm,
             "subj_norm_mod": self.subj_norm_mod,
+            "behavioral_control": {
+                package.name: self.behavioral_control[package.name] 
+                for package in self.environment.sustainability_packages
+            },
             "behavioral_mod": self.behavioral_mod,
             "solar_panels": self.package_decisions.get("Solar Panels", False),
             "heat_pump": self.package_decisions.get("Heat Pump", False),

@@ -11,6 +11,21 @@ import glob
 graphics_data = []
 households_data = []
 
+def initialize_data_collection(model: Environment):
+    save_folder = config['data_save_folder']
+    os.makedirs(save_folder, exist_ok=True)
+
+    # Find existing files matching the pattern
+    existing_files = glob.glob(os.path.join(save_folder, "simulation_data_*.json"))
+    run_number = len(existing_files) + 1
+    file_name = os.path.join(save_folder, f"simulation_data_{run_number:03d}.json")
+
+    # Write the data structure to a Json file
+    model.setup_data_structure(file_name)
+
+    return file_name
+    
+
 def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=None): 
     global graphics_data
     global households_data
@@ -25,17 +40,9 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
 
     model = Environment(nr_households=nr_households, nr_residents=nr_residents)
 
-    save_folder = config['data_save_folder']
-    os.makedirs(save_folder, exist_ok=True)
-
-    # Find existing files matching the pattern
-    existing_files = glob.glob(os.path.join(save_folder, "simulation_data_*.json"))
-    run_number = len(existing_files) + 1
-    file_name = os.path.join(save_folder, f"simulation_data_{run_number:03d}.json")
-
-    # Write the data structure to a Json file
+    # Setup data collection structure to a dedicated json file
     if config['collect_data']:
-        model.setup_data_structure(file_name)
+        file_name = initialize_data_collection(model)
 
     for year in range(simulation_years):
         print(f"=== Year {year + 1} ===")
@@ -57,7 +64,9 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
         model.collect_end_of_year_data(data)
         graphics_data.append(data)
 
-        model.export_data(file_name, year + 1)
+        # Export data to JSON file if configured
+        if config['collect_data']:
+            model.export_data(file_name, year + 1)
 
     households_data.clear()
     households_data.extend(model.collect_household_information())
