@@ -1,0 +1,37 @@
+.navbar {
+    display: flex;
+
+    justify-content: space-around;
+    align-items: center;
+    height: 50px;
+    background-color: #A49C52;
+    padding: 0 20px;
+    /* Relative position is needed for the absolutely positioned center element */
+    position: relative;
+}
+
+.navbar .logo {
+    height: 50px;
+    width: auto;
+}
+
+
+.navbar h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #fff;
+}
+
+.pause-button {
+    border-radius: 5px;
+
+    border: 1px solid black;
+    position: absolute;
+    left: 93%;
+    bottom: 938px;
+    background-color: #A49C52;
+}
+
+.pause-button:hover {
+    background-color: #8c7b3a;
+}

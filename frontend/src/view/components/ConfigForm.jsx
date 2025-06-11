@@ -44,13 +44,12 @@ const ConfigForm = () => {
      */
     const handleSubmit = async (e) => {
         e.preventDefault();
+        await navigate({to: "/overview"});
+
         try {
             await configFormController.startSimulation(formData);
-            console.log("Simulation successfully started");
-            await navigate({ to: "/overview" });
         } catch (error) {
-            alert("Something went wrong");
-            console.error("Simulation failed", error);
+            console.error("Simulation start failed", error);
         }
     };
 
