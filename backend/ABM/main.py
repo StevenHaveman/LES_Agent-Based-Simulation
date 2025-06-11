@@ -11,7 +11,7 @@ import numpy as np
 from environment import Environment
 import utilities
 import config
-
+import time
 # Global lists to store data from the simulation for potential use by an API or UI.
 graphics_data = [] # Stores yearly aggregated data for charts/graphs.
 households_data = [] # Stores detailed household information at the end of the simulation.
@@ -49,6 +49,7 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
 
     model = Environment(nr_households=nr_households, nr_residents=nr_residents)
 
+
     for year in range(simulation_years):
         print(f"=== Year {year + 1} ===")
         print("Current Environment State (begin):")
@@ -68,6 +69,9 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
 
         model.collect_end_of_year_data(data)
         graphics_data.append(data)
+
+        time.sleep(5)
+
 
     households_data.clear()
     households_data.extend(model.collect_household_information())
