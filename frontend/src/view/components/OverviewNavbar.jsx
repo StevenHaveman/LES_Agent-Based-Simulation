@@ -33,9 +33,9 @@ const OverviewNavbar = ({ title }) => {
     return (
         <>
             <div className="overview-navbar">
-                <img className="logo" src="LES_logo.png" alt="Logo links"/>
+                <img className="overview-logo" src="LES_logo.png" alt="Logo links"/>
                 <div><h1>{title}</h1></div>
-                <img className="logo" src="LES_logo2.png" alt="Logo rechts"/>
+                <img className="overview-logo" src="LES_logo2.png" alt="Logo rechts"/>
             </div>
             <button className="pause-button" onClick={togglePause}>
                 {paused ? "Hervat Simulatie" : "Pauzeer Simulatie"}
