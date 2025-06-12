@@ -69,12 +69,85 @@ class AgentLLMHandler:
             )
         }
 
+
+    def _get_system_prompt_second_version(self, max_years=5):
+
+        print("Test je moeder")
+        if not os.path.exists(self.file_name):
+            raise FileNotFoundError(f"Data file {self.file_name} not found.")
+
+        with open(self.file_name, 'r') as file:
+            data = json.load(file)
+
+        print(data["simulation_years"].keys())
+
+
+        year_data_list = []
+
+        # Verzamel alle jaren met data voor deze agent
+        for year_key in data["simulation_years"].keys():
+            year_number = int(year_key.split()[-1])
+            year_data = data["simulation_years"][year_key]["residents_data"][f"{self.current_agent_id}"]
+
+            # print(year_data)
+            if not year_data:
+                continue
+
+            attitude = year_data.get("attitude")
+            subj_norm = year_data.get("subj_norm", {})
+            behavioral_control = year_data.get("behavioral_control", {})
+
+            year_data_list.append((year_number, attitude, subj_norm, behavioral_control))
+
+        # Pak de laatste 'max_years' jaren, oudste eerst
+        year_data_list = sorted(year_data_list, key=lambda x: x[0], reverse=True)[:max_years]
+        year_data_list = sorted(year_data_list, key=lambda x: x[0])  # opnieuw sorteren, oudste eerst
+
+        if not year_data_list:
+            return self._get_system_prompt()
+
+        # Bouw string per jaar op
+        year_lines = []
+        for year, att, sn_dict, bc_dict in year_data_list:
+            sn_str = ", ".join(f"{k}: {v:.2f}" for k, v in sn_dict.items())
+            bc_str = ", ".join(f"{k}: {v:.2f}" for k, v in bc_dict.items())
+
+            year_lines.append(
+                f"(Year {year})\n"
+                f"  Attitude: {att:.2f}\n"
+                f"  Subjective Norms: {sn_str}\n"
+                f"  Perceived Behavioral Control: {bc_str}"
+            )
+
+        score_block = "\n".join(year_lines)
+
+        print(score_block)
+
+        return {
+            'role': 'system',
+            'content': (
+                "You are a resident in a neighborhood and will be asked about your opinion on sustainable energy solutions for your home.\n"
+                "This response is based on your internal factors across multiple years, each represented as a score between 0 and 1.\n"
+                "These factors follow the Theory of Planned Behavior (Ajzen, 1991):\n"
+                "- Attitude: how you think about renewable energy\n"
+                "- Subjective Norm: how influenced you are by neighbors\n"
+                "- Perceived Behavioral Control: how money affects your decision\n"
+                "Your scores over the years:\n"
+                f"{score_block}\n"
+                "You may reflect on how your thinking and influences changed over time. Please answer any questions within 150 words."
+            )
+        }
+
+
+
+
     def _init_conversation(self, agent_id):
             self.set_current_agent_id(agent_id)
             self.get_json_file_name()
             self.get_agent_conversation()
             if len(self.current_agent_conversation) == 0: 
-                self.current_agent_conversation = [self._get_system_prompt()]
+                # self.current_agent_conversation = [self._get_system_prompt_second_version()]
+                self.current_agent_conversation = [self._get_system_prompt_second_version()]
 
     def chat(self, agent_id, prompt):
         if not prompt.strip():
