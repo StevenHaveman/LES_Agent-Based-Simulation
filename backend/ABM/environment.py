@@ -57,7 +57,7 @@ class Environment(Model):
 
             nr_res_for_hh = base + (1 if i < remainder else 0)
             id_counter = hh.create_residents(nr_res_for_hh, id_counter)
-            self.residents.extend(hh.residents) # Veranderd: self.residents was eerst een lijst van lijsten.
+            self.residents.extend(hh.residents)
         
         for hh_obj in self.households:
             for res_obj in hh_obj.residents:
@@ -124,8 +124,14 @@ class Environment(Model):
             "nr_agents_with_heat_pump": "nog doen", # TODO: ...
             "average_income": np.mean([resident.income for resident in self.residents]),
             "average_attitude": np.mean([resident.attitude for resident in self.residents]),
-            "average_subjective_norm": np.mean([resident.subj_norm for resident in self.residents]),
-            # TODO: Average behavioral modification
+            "average_subjective_norm": {
+                package.name: np.mean([resident.subj_norm[package.name] for resident in self.residents])
+                for package in self.sustainability_packages
+            },
+            "average_behavioral_control": {
+                package.name: np.mean([resident.behavioral_control[package.name] for resident in self.residents])
+                for package in self.sustainability_packages
+            }
         }
 
         return environment_data
