@@ -25,7 +25,11 @@ const HouseholdDecisions = ({ selectedHouseholdId, visible }) => {
 
 
     const hasSolarDecision = selectedHousehold
-        ? selectedHousehold.residents.some(resident => resident.Solar_decision === true)
+        ? selectedHousehold.residents.some(resident => resident["Solar Panel_decision"] === true)
+        : false;
+
+    const hasHeatPumpDecision = selectedHousehold
+        ? selectedHousehold.residents.some(resident => resident["Heat Pump_decision"] === true)
         : false;
 
     return (
@@ -34,6 +38,12 @@ const HouseholdDecisions = ({ selectedHouseholdId, visible }) => {
                 <img src="/INNO/solar_panel.png" alt="Solar Panel" className="solar_panel_icon"/>
                 <h2 className={hasSolarDecision ? "text-green" : "text-red"}>
                     {hasSolarDecision ? "Yes" : "No"}
+                </h2>
+            </div>
+            <div className="heat-pumps">
+                <img src="/INNO/heat_pump.png" alt="Heat Pump" className="heat_pump_icon"/>
+                <h2 className={hasHeatPumpDecision ? "text-green" : "text-red"}>
+                    {hasHeatPumpDecision ? "Yes" : "No"}
                 </h2>
             </div>
         </div>
