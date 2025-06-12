@@ -10,10 +10,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from main import run_simulation, graphics_data, households_data
 import utilities
-
-## TODO: Deze lelijke import van ollama en het model ergens anders neer zetten -- Dave.
-import ollama
-conversation_history = []
+from AgentLLMHandler import AgentLLMHandler
+llm_handler = AgentLLMHandler()
 
 # Initialize the Flask application
 app = Flask(__name__)
@@ -86,46 +84,15 @@ def ai_test_response():
     # Messages worden waarscheinlijk uit de json gehaald voor een specfieke agent.
     # TODO: Veranderd dit naar een nette manier  Voor nu gehard code.
 
-    # Berichten tot nu toe, begin met system
-    if not conversation_history:
-        conversation_history.append({
-        'role': 'system',
-        'content': 'You are a resident in a neighborhood and will be asked about your opinion on sustainable energy solutions for your home.'
-            "This response is based on three internal factors, each represented as a score between 0 and 1, and weighted accordingly (the weights sum up to 1)."
-            "The internal factors are base on the Theory of Planned Behavior (Ajzen, 1991):"
-            "Attitude: 0.8 (weight: 0.4) how you think about your view on renewable energy"
-            "Subjective Norm: 0.5 (weight: 0.3) is about your neighbors"
-            "Perceived Behavioral Control: 0.3 (weight: 0.3) is about money"
-            "Feel free to mention your motivations, doubts, or social influences."
-            "please awnser the questions within 150 words."
-    })
-
-    
     data = request.get_json()
+    # agent_id = data.get("agent_id", "default")
     prompt = data.get("prompt", "")
 
-    new_prompt_message ={
-        'role': 'user',
-        'content': prompt
-    
-    }
-
-    if not prompt.strip():
-        return jsonify({"error": "Prompt is leeg."}), 400
-    # print(f"Test wat is de prompt {prompt}")
-
-    conversation_history.append(new_prompt_message)
-
-    response = ollama.chat(model='llama3:8b', messages=conversation_history)
-    model_reply = response.message.content
-
-    # Voeg modelantwoord toe aan de conversatiegeschiedenis
-    conversation_history.append({'role': 'assistant', 'content': model_reply})
-
-    # response = f"(AI-test response) Je zei: '{prompt}'"
-    # response = ollama.chat(model='llama3.1:8b', messages=agent_messages)
-
-    return jsonify({"response": model_reply})
+    try:
+        response = llm_handler.chat(0, prompt)
+        return jsonify({"response": response})
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
