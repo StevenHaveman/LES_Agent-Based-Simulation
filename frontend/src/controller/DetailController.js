@@ -1,8 +1,8 @@
 import DetailService from '../service/DetailService.js';
 
 class DetailController {
-
     constructor(service) {
+        /** @type {DetailService} */
         this.service = service;
     }
 
@@ -15,15 +15,15 @@ class DetailController {
             console.error("Fetching households failed", error);
             throw error;
         }
+    }
 
-
+    async fetchSimulationConfig() {
+        return await this.service.fetchSimulationConfig();
     }
 
     async getDelay() {
         return await DetailService.getDelay();
     }
-
-
 }
 
 // Exporting an instance of DetailController with the service injected.

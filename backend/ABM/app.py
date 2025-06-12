@@ -123,6 +123,10 @@ def set_delay_route():
 def get_delay_route():
     return jsonify({"delay": get_delay()})
 
+@app.route('/config', methods=["GET"])
+def get_sim_config():
+    return jsonify(chosen_config)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
