@@ -87,13 +87,13 @@ def ai_test_response():
     data = request.get_json()
 
     prompt = data.get("prompt", "")
-    resident_id = data.get("resident_id")
-    print(resident_id['name'])
+    resident_info = data.get("resident_id")
+    # print(resident_id)
 
-    print(f"Prompt: {prompt}, Resident ID: {resident_id['name']}")
+    print(f"Prompt: {prompt}, Resident ID: {resident_info['unique_id']}")
 
     try:
-        response = llm_handler.chat(resident_id['name'], prompt)
+        response = llm_handler.chat(resident_info['unique_id'], prompt)
         return jsonify({"response": response})
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
