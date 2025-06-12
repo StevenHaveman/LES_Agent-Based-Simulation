@@ -40,6 +40,8 @@ const Graphic = ({ title = "", yAxisKey = "" }) => {
     const yKey = validKeys.includes(yAxisKey) ? yAxisKey : validKeys[0];
 
     useEffect(() => {
+        let intervalId;
+
         const fetchData = async () => {
             try {
                 const result = await overviewController.getOverview();
@@ -50,7 +52,21 @@ const Graphic = ({ title = "", yAxisKey = "" }) => {
                 setLoading(false);
             }
         };
-        fetchData();
+
+        const fetchInterval = async () => {
+            const res = await overviewController.getDelay(); // ← haal de delay op via controller
+            const delay = parseInt(res.delay || 3) * 1000; // omzetten naar milliseconden
+
+            await fetchData(); // initieel ophalen
+
+            intervalId = setInterval(fetchData, delay);
+        };
+
+        fetchInterval();
+
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
     }, []);
 
     if (loading) {
