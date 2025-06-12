@@ -67,7 +67,7 @@ body {
     justify-content: center;
 }
 
-.KPI-container{
+.KPI-container {
     grid-column: 16 / 21;
     grid-row: 6 / 11;
     border: 1px solid black;
@@ -76,6 +76,7 @@ body {
     align-items: center;
     justify-content: center;
 }
+
 body {
     margin: 0;
     padding: 0;
