@@ -1,18 +1,23 @@
+*{
+    box-sizing: border-box;
+}
 .overview-navbar {
     display: grid;
-    grid-template:  repeat(10, 1fr) / repeat(1, 1fr);;
+    grid-template:  repeat(10, 1fr) / repeat(10, 1fr);
     background-color: #A49C52;
     height: 50px;
-    padding: 0 20px;
+    width: 100%;
 }
 
-.overview-navbar {
+.overview-navbar-title {
+    grid-row: 1 / 1;
+    grid-column: 1 / 9;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: space-around;
+    padding-left: 350px;
     background-color: #A49C52;
-    height: 60px;
-    padding: 0 20px;
+    height: 50px;
 }
 
 .overview-logo {
@@ -33,9 +38,7 @@
 }
 
 .pause-button {
-    position: absolute;
-    right: 20px;
-    top: 10px;
+
     padding: 8px 12px;
     background-color: #A49C52;
     color: white;
@@ -46,5 +49,30 @@
 }
 
 .pause-button:hover {
+    background-color: #8c7b3a;
+}
+
+.control-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    grid-row: 1 / 1;
+    grid-column: 9 / 11;
+}
+
+.pause-button,
+.delay-select {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: #A49C52;
+    color: white;
+    cursor: pointer;
+    appearance: none; /* voor consistentie */
+}
+
+.pause-button:hover,
+.delay-select:hover {
     background-color: #8c7b3a;
 }
