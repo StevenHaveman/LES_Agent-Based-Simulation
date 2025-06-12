@@ -11,7 +11,7 @@ import numpy as np
 import time
 from environment import Environment
 import utilities
-import config
+from shared_state import get_delay
 
 # Global lists to store data from the simulation for potential use by an API or UI.
 graphics_data = []  # Stores yearly aggregated data for charts/graphs.
@@ -96,7 +96,7 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
         model.collect_end_of_year_data(data)
         graphics_data.append(data)
 
-        time.sleep(3)
+        time.sleep(get_delay())
 
     households_data.clear()
     households_data.extend(model.collect_household_information())

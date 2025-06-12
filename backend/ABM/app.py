@@ -10,8 +10,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from main import run_simulation, graphics_data, households_data
 import utilities
-from main import is_simulation_paused
 from main import toggle_simulation_pause, is_simulation_paused
+from shared_state import set_delay, get_delay
 
 # Initialize the Flask application
 app = Flask(__name__)
@@ -103,6 +103,26 @@ def toggle_pause():
 @app.route('/pause_status', methods=['GET'])
 def get_pause_status():
     return jsonify({"paused": is_simulation_paused()})
+
+@app.route('/set_delay', methods=['POST'])
+def set_delay_route():
+    data = request.get_json()
+    delay = data.get("delay")
+
+    try:
+        delay_int = int(delay)
+        set_delay(delay_int)
+        return jsonify({"status": "ok", "message": f"Delay ingesteld op {delay_int} seconden."})
+    except (ValueError, TypeError):
+        return jsonify({"status": "error", "message": "Ongeldige delay-waarde."}), 400
+
+
+
+
+@app.route('/get_delay', methods=['GET'])
+def get_delay_route():
+    return jsonify({"delay": get_delay()})
+
 
 if __name__ == '__main__':
     app.run(debug=True)

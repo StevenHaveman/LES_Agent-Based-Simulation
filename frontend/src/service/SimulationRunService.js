@@ -17,7 +17,25 @@ class SimulationRunService {
         });
         return response.json();
     }
+
+    async setDelay(seconds) {
+        const response = await fetch(`${API_URL}/set_delay`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ delay: seconds })
+        });
+        return response.json();
+    }
+
+    async getDelay() {
+        const response = await fetch(`${API_URL}/get_delay`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        return response.json();
+    }
 }
+
 
 
 

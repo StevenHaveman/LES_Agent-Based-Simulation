@@ -16,6 +16,14 @@ class SimulationRunController {
     async getPauseStatus() {
         return await this.service.getPauseStatus();
     }
+
+    async setDelay(seconds) {
+        return await this.service.setDelay(seconds);
+    }
+    async getDelay() {
+        return await this.service.getDelay();
+    }
+
 }
 
 const simulationRunController = new SimulationRunController(SimulationRunService);

@@ -4,6 +4,7 @@ import "../styles/OverviewNavbar.css";
 
 const OverviewNavbar = ({title}) => {
     const [paused, setPaused] = useState(false);
+    const [delay, setDelay] = useState(3);
 
     const togglePause = async () => {
         const result = await simulationRunController.togglePause();
@@ -13,10 +14,21 @@ const OverviewNavbar = ({title}) => {
         }
     };
 
+    const updateDelay = async (e) => {
+        const newDelay = parseInt(e.target.value);
+        setDelay(newDelay);
+
+
+        await simulationRunController.setDelay(newDelay);
+    };
+
     useEffect(() => {
-        const fetchPauseStatus = async () => {
+        const fetchInitialData = async () => {
             const status = await simulationRunController.getPauseStatus();
             setPaused(status.paused);
+
+            const delayRes = await simulationRunController.getDelay();
+            setDelay(delayRes.delay);
         };
 
         const handleKeyDown = (e) => {
@@ -25,7 +37,7 @@ const OverviewNavbar = ({title}) => {
             }
         };
 
-        fetchPauseStatus();
+        fetchInitialData();
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, []);
@@ -43,11 +55,11 @@ const OverviewNavbar = ({title}) => {
                     <button className="pause-button" onClick={togglePause}>
                         {paused ? "Hervat Simulatie" : "Pauzeer Simulatie"}
                     </button>
-                    <select className="delay-select">
+                    <select className="delay-select" value={delay} onChange={updateDelay}>
                         <option value="3">3 sec</option>
                         <option value="5">5 sec</option>
                         <option value="10">10 sec</option>
-                        <option value="0">0</option>
+                        <option value="0">0 </option>
 
                     </select>
                 </div>
