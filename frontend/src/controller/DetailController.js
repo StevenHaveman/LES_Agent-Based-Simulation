@@ -1,6 +1,6 @@
 import DetailService from '../service/DetailService.js';
 
-class DetailController{
+class DetailController {
 
     constructor(service) {
         this.service = service;
@@ -16,6 +16,11 @@ class DetailController{
             throw error;
         }
 
+
+    }
+
+    async getDelay() {
+        return await DetailService.getDelay();
     }
 
 

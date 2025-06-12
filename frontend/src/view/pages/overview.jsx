@@ -13,6 +13,7 @@ import ResidentNavbar from "../components/ResidentNavbar.jsx";
 import ResidentWindow from "../components/ResidentWindow.jsx";
 import ResidentDropdown from "../components/ResidentDropdown.jsx";
 import AIChatWindow from "../components/AIChatWindow.jsx";
+import OverviewNavbar from "../components/OverviewNavbar.jsx";
 
 
 export const overviewRoute = createRoute({
@@ -35,7 +36,7 @@ export const overviewRoute = createRoute({
 
         return (
             <>
-                <Navbar title={"MVP Overview"}></Navbar>
+                <OverviewNavbar title="Overview"> </OverviewNavbar>
                 <div className="overview-container">
                     <div className="map-container">
                         {chatWindow === "ai" ? (
