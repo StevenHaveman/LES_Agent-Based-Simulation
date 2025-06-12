@@ -55,6 +55,7 @@ const OverviewNavbar = ({title}) => {
                     <button className="pause-button" onClick={togglePause}>
                         {paused ? "Hervat Simulatie" : "Pauzeer Simulatie"}
                     </button>
+                    <h5> Delay: </h5>
                     <select className="delay-select" value={delay} onChange={updateDelay}>
                         <option value="3">3 sec</option>
                         <option value="5">5 sec</option>
