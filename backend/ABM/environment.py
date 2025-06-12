@@ -5,6 +5,8 @@ from agents.household_agent import Household
 import utilities
 from sustainability_packages.solar_panel import SolarPanel
 from sustainability_packages.heat_pump import HeatPump
+import json
+import os
 
 class Environment(Model):
     """
@@ -75,12 +77,15 @@ class Environment(Model):
         base = nr_residents // nr_households
         remainder = nr_residents % nr_households
 
+        # Initialize the agent ID counter
+        id_counter = 0
+
         for i in range(nr_households):
-            hh = Household(self)
+        
+            hh = Household(i, self)
             hh_emissions = hh.calc_co2_emissions()
             self.total_co2 += hh_emissions
             self.current_co2 += hh_emissions
-
             for package in self.sustainability_packages:
                 chance_key = f"initial_{package.name.lower().replace(' ', '')}_chance"
                 initial_chance = self.config.get(chance_key, 0.0) # Default to 0% if not in config
@@ -98,8 +103,8 @@ class Environment(Model):
             self.households.append(hh)
 
             nr_res_for_hh = base + (1 if i < remainder else 0)
-            hh.create_residents(nr_res_for_hh)
-            self.residents.append(hh.residents)
+            id_counter = hh.create_residents(nr_res_for_hh, id_counter)
+            self.residents.extend(hh.residents)
         
         for hh_obj in self.households:
             for res_obj in hh_obj.residents:
@@ -172,6 +177,71 @@ class Environment(Model):
 
         for package in self.sustainability_packages:
             package.step()
+
+    def collect_environment_data(self):
+        environment_data = {
+            "energy_price": self.energy_price,
+            "nr_agents_with_solar_panel": "nog doen", # TODO: ...
+            "nr_agents_with_heat_pump": "nog doen", # TODO: ...
+            "average_income": np.mean([resident.income for resident in self.residents]),
+            "average_attitude": np.mean([resident.attitude for resident in self.residents]),
+            "average_subjective_norm": {
+                package.name: np.mean([resident.subj_norm[package.name] for resident in self.residents])
+                for package in self.sustainability_packages
+            },
+            "average_behavioral_control": {
+                package.name: np.mean([resident.behavioral_control[package.name] for resident in self.residents])
+                for package in self.sustainability_packages
+            }
+        }
+
+        return environment_data
+    
+    def setup_data_structure(self, file_name) -> None:       
+        data = {
+            "metadata":{
+                "config_id": self.config_id,
+                "nr_households": self.config['nr_households'],
+                "nr_residents": self.config['nr_residents'],
+                "simulation_years": self.config['simulation_years'],
+                "subjective_norm": self.config['subjective_norm'],
+            },
+            "simulation_years": {
+                f"year {year}": {
+                    "residents_data": {},
+                    "environment_data": {}
+                } for year in range(1, self.config['simulation_years'] + 1)
+            },
+            "conversation_history": {
+                "residents": {resident.unique_id: {} for resident in self.residents},
+            }
+        }
+
+        # Dump to the json file
+        with open(file_name, 'w+') as file:
+            json.dump(data, file, indent=4)
+
+    def export_data(self, file_name, year: int) -> None:
+        if not os.path.exists(file_name):
+            raise FileNotFoundError(f"Data file {file_name} not found.")
+
+        # Load current JSON data
+        with open(file_name, 'r') as file:
+            data = json.load(file)
+
+        year_key = f"year {year}"
+
+        for resident in self.residents:
+            resident_data = resident.collect_resident_data()
+            data['simulation_years'][year_key]['residents_data'][resident.unique_id] = resident_data
+
+        environment_data = self.collect_environment_data()
+        data['simulation_years'][year_key]['environment_data'] = environment_data
+
+        # Save to file
+        with open(file_name, 'w') as file:
+            json.dump(data, file, indent=4)
+        
 
     def collect_start_of_year_data(self, year):
         """

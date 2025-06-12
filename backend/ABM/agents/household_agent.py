@@ -33,15 +33,10 @@ class Household(Agent):
         gas_usage (int): Annual gas usage of the household (kWh).
         heatpump_usage (int): Annual electricity usage by a heat pump if installed (kWh).
     """
-    def __init__(self, model):
-        """
-        Initializes a Household agent.
-
-        Args:
-            model (Model): The model in which this agent is embedded.
-        """
+    def __init__(self, id, model):
         super().__init__(model)
         self.config_id, self.config = utilities.choose_config()
+        self.unique_id = id
         self.residents = []
         self.environment = model
         self.package_installations = {}
@@ -55,10 +50,9 @@ class Household(Agent):
         self.gas_usage = random.randint(*self.config['yearly_gas_usage'])
         self.energy_usage = random.randint(*self.config['yearly_energy_usage'])
         self.heatpump_usage = random.randint(*self.config['yearly_heatpump_usage'])
+        self.co2_saved_yearly = 0
 
-        self.co2_saved_yearly = 0.0
-
-    def create_residents(self, nr_residents: int):
+    def create_residents(self, nr_residents: int, id_counter: int) -> int:
         """
         Create and add Resident agents to the household.
 
@@ -70,13 +64,18 @@ class Household(Agent):
         """
         for _ in range(nr_residents):
             resident = Resident(
+                id_counter,
                 self.model,
                 self  # link naar household
             )
+            id_counter += 1
+
             for package_name, is_installed in self.package_installations.items():
                 if is_installed:
                     resident.package_decisions[package_name] = True
             self.residents.append(resident)
+
+        return id_counter
 
     def calc_avg_decision(self, package):
         """

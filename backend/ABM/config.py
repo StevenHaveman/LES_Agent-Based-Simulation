@@ -43,7 +43,11 @@ configs = {
         'attitude': None,
         'attitude_mod': None,
         'subj_norm_mod': None,
-        'behavioral_mod': None
+        'behavioral_mod': None,
+
+        # Data collection parameters
+        'collect_data': True, # Whether to collect data for analysis
+        'data_save_folder': 'data/' # Folder to save collected data
     },
 
     1: {
@@ -87,7 +91,11 @@ configs = {
         'attitude': None,
         'attitude_mod': None,
         'subj_norm_mod': None,
-        'behavioral_mod': None
+        'behavioral_mod': None,
+
+        # Data collection parameters
+        'collect_data': True, # Whether to collect data for analysis
+        'data_save_folder': 'data/' # Folder to save collected data
     },
 
     2: {
@@ -119,6 +127,10 @@ configs = {
         'attitude': None,
         'attitude_mod': None,
         'subj_norm_mod': None,
-        'behavioral_mod': None
+        'behavioral_mod': None,
+
+        # Data collection parameters
+        'collect_data': True, # Whether to collect data for analysis
+        'data_save_folder': 'data/' # Folder to save collected data
     }
 }
