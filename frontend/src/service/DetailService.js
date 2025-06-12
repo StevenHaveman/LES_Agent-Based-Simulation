@@ -10,6 +10,8 @@ class DetailService{
         return await response.json();
     }
 
+
+
 }
 // Exporting an instance of DetailService.
 const detailService = new DetailService();

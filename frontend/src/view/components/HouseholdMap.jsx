@@ -19,16 +19,36 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
     const iconRef = useRef(null);
 
 
+
     useEffect(() => {
-        const fetchHouseholds = async () => {
+        let intervalId;
+
+        const fetchAndUpdateHouseholds = async () => {
             try {
-                const data = await detailController.fetch_households(); // Backend call
+                const data = await detailController.fetch_households();
                 setHouseholds(data);
             } catch (error) {
                 console.error('Error fetching households:', error);
             }
         };
-        fetchHouseholds();
+
+        const startPolling = async () => {
+            await fetchAndUpdateHouseholds();
+
+            try {
+                const delayRes = await detailController.getDelay(); // ← Je moet deze functie toevoegen aan controller
+                const delay = parseInt(delayRes.delay || 3) * 1000;
+                intervalId = setInterval(fetchAndUpdateHouseholds, delay);
+            } catch (error) {
+                console.error("Failed to fetch delay for polling:", error);
+            }
+        };
+
+        startPolling();
+
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
     }, []);
 
     // Load household icon image once, then trigger initial draw

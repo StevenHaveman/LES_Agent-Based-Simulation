@@ -20,6 +20,7 @@ households_data = []  # Stores detailed household information at the end of the 
 # Global pause flag
 simulation_paused = False
 
+
 def toggle_simulation_pause():
     """
     Toggle the global pause state of the simulation.
@@ -31,6 +32,7 @@ def toggle_simulation_pause():
     simulation_paused = not simulation_paused
     return simulation_paused
 
+
 def is_simulation_paused():
     """
     Check if the simulation is currently paused.
@@ -39,6 +41,7 @@ def is_simulation_paused():
         bool: True if paused, False otherwise.
     """
     return simulation_paused
+
 
 def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=None):
     """
@@ -64,7 +67,7 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
     global households_data
 
     if seed is None:
-        seed = random.randint(0, 2**32 - 1)
+        seed = random.randint(0, 2 ** 32 - 1)
 
     random.seed(seed)
     np.random.seed(seed)
@@ -82,7 +85,6 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
         print(model)
 
         data = model.collect_start_of_year_data(year + 1)
-
         model.step()
 
         print(f"\nEnd of Year {year + 1}:")
@@ -96,13 +98,15 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
         model.collect_end_of_year_data(data)
         graphics_data.append(data)
 
+
+        households_data.clear()
+        households_data.extend(model.collect_household_information())
+
         time.sleep(get_delay())
 
-    households_data.clear()
-    households_data.extend(model.collect_household_information())
-    return {"message": "Simulation completed"}
 
 if __name__ == "__main__":
     config_id, config = utilities.choose_config()
-    simulation_result = run_simulation(config['nr_households'], config['nr_residents'], config['simulation_years'], config['seed'])
+    simulation_result = run_simulation(config['nr_households'], config['nr_residents'], config['simulation_years'],
+                                       config['seed'])
     print(simulation_result["message"])
