@@ -11,11 +11,12 @@ from flask_cors import CORS
 from main import run_simulation, graphics_data, households_data
 import utilities
 from AgentLLMHandler import AgentLLMHandler
-llm_handler = AgentLLMHandler()
+
 
 # Initialize the Flask application
 app = Flask(__name__)
 config_id, chosen_config = utilities.choose_config()
+llm_handler = AgentLLMHandler("llama3:8b",chosen_config)
 # Configure CORS to allow connections from the frontend
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 

@@ -213,7 +213,7 @@ class Environment(Model):
                 } for year in range(1, self.config['simulation_years'] + 1)
             },
             "conversation_history": {
-                "residents": {resident.unique_id: {} for resident in self.residents},
+                "residents": {resident.unique_id: [] for resident in self.residents},
             }
         }
 
