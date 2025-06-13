@@ -137,5 +137,55 @@ def get_config():
         "config": filtered_config
     })
 
+@app.route('/update_parameter', methods=['POST'])
+def update_single_parameter():
+
+    data = request.get_json()
+    key = data.get("parameter")
+    value = data.get("value")
+
+    if not key:
+        return jsonify({"status": "error", "message": "Geen parameternaam opgegeven."}), 400
+
+    conf = config.configs.get(config_id)
+    if not conf:
+        return jsonify({"status": "error", "message": f"Config ID {config_id} niet gevonden."}), 404
+
+    if key not in conf:
+        return jsonify({"status": "error", "message": f"Parameter '{key}' bestaat niet in de config."}), 400
+
+    conf[key] = value
+    return jsonify({
+        "status": "ok",
+        "updated": {key: value},
+        "message": f"Parameter '{key}' succesvol bijgewerkt."
+    })
+
+
+@app.route('/get_full_config_values', methods=['GET'])
+def get_full_config_values():
+    if config_id not in config.configs:
+        return jsonify({"status": "error", "message": f"Config ID {config_id} niet gevonden."}), 404
+
+    full_config = config.configs[config_id]
+
+    return jsonify({
+        "status": "ok",
+        "config_id": config_id,
+        "config": full_config
+    })
+
+
+@app.route('/get_full_config_ids', methods=['GET'])
+def get_full_config_ids():
+    if config_id not in config.configs:
+        return jsonify({"status": "error", "message": f"Config ID {config_id} niet gevonden."}), 404
+
+    return jsonify({
+        "status": "ok",
+        "config_id": config_id,
+        "config": config.configs[config_id]
+    })
+
 if __name__ == '__main__':
     app.run(debug=True)
