@@ -12,6 +12,7 @@ from main import run_simulation, graphics_data, households_data
 import utilities
 from main import toggle_simulation_pause, is_simulation_paused
 from shared_state import set_delay, get_delay
+import config
 
 # Initialize the Flask application
 app = Flask(__name__)
@@ -21,32 +22,26 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_cred
 
 @app.route('/config', methods=['POST'])
 def start_simulation():
-    """
-    Start a new simulation with the provided configuration.
 
-    Expects a JSON payload with the following optional fields:
-    - nr_households: Number of households (default from chosen_config)
-    - nr_residents: Number of residents (default from chosen_config, total distributed among households)
-    - simulation_years: Number of simulation years (default from chosen_config)
-
-    Returns:
-        JSON response with the status and simulation result message.
-        Returns a 400 error if input parameters are invalid.
-    """
     data = request.get_json()
 
     try:
         nr_households = int(data.get("nr_households", chosen_config["nr_households"]))
         nr_residents = int(data.get("nr_residents", chosen_config["nr_residents"]))
         simulation_years = int(data.get("simulation_years", chosen_config["simulation_years"]))
-    except ValueError as e:
-        # Return an error message for invalid input
+        seed = int(data.get("seed", config.configs[config_id].get("seed", None)))
+    except (ValueError, TypeError) as e:
         return jsonify({"status": "error", "message": "Invalid input: " + str(e)}), 400
 
-    # Run the simulation and return the result
-    result = run_simulation(nr_households, nr_residents, simulation_years)
-    return jsonify({"status": "ok", "result": result})
+    config.configs[config_id]["nr_households"] = nr_households
+    config.configs[config_id]["nr_residents"] = nr_residents
+    config.configs[config_id]["simulation_years"] = simulation_years
+    config.configs[config_id]["seed"] = seed
 
+
+    result = run_simulation(nr_households, nr_residents, simulation_years, seed=seed)
+
+    return jsonify({"status": "ok", "result": result})
 
 @app.route("/overview", methods=["GET"])
 def get_graphics_data():
@@ -122,6 +117,25 @@ def set_delay_route():
 def get_delay_route():
     return jsonify({"delay": get_delay()})
 
+
+@app.route('/get_config', methods=['GET'])
+def get_config():
+
+    if config_id not in config.configs:
+        return jsonify({"status": "error", "message": f"Config ID {config_id} niet gevonden."}), 404
+
+    conf = config.configs[config_id]
+    filtered_config = {
+        "nr_households": conf.get("nr_households"),
+        "nr_residents": conf.get("nr_residents"),
+        "simulation_years": conf.get("simulation_years"),
+        "seed": conf.get("seed")
+    }
+    return jsonify({
+        "status": "ok",
+        "config_id": config_id,
+        "config": filtered_config
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)
