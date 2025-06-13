@@ -24,6 +24,8 @@ class DetailController {
     }
 
 
+
+
 }
 
 // Exporting an instance of DetailController with the service injected.

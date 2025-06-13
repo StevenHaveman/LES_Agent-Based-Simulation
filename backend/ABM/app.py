@@ -118,7 +118,6 @@ def set_delay_route():
 
 
 
-
 @app.route('/get_delay', methods=['GET'])
 def get_delay_route():
     return jsonify({"delay": get_delay()})

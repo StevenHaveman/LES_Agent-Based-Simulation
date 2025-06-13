@@ -21,8 +21,6 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
 
 
     useEffect(() => {
-        let intervalId;
-
         const fetchAndUpdateHouseholds = async () => {
             try {
                 const data = await detailController.fetch_households();
@@ -32,26 +30,22 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
             }
         };
 
-        const startPolling = async () => {
-            await fetchAndUpdateHouseholds();
+        const startTimeout = async () => {
+            await fetchAndUpdateHouseholds(); // Initial load
 
             try {
-                const delayRes = await detailController.getDelay(); // ← Je moet deze functie toevoegen aan controller
+                const delayRes = await detailController.getDelay();
                 const delay = parseInt(delayRes.delay || 3) * 1000;
-                intervalId = setInterval(fetchAndUpdateHouseholds, delay);
+                setTimeout(fetchAndUpdateHouseholds, delay); // ✅ Alleen één keer extra ophalen na delay
             } catch (error) {
                 console.error("Failed to fetch delay for polling:", error);
             }
         };
 
-        startPolling();
-
-        return () => {
-            if (intervalId) clearInterval(intervalId);
-        };
+        startTimeout();
     }, []);
 
-    // Load household icon image once, then trigger initial draw
+
     useEffect(() => {
         const icon = new Image();
         // icon.src = "/INNO/Household_img.webp";
