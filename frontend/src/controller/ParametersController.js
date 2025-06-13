@@ -1,4 +1,4 @@
-import ParametersService from "../service/ParametersService.jsx";
+import ParametersService from "../service/ParametersService.js";
 
 class ParametersController {
     constructor(service) {
