@@ -1,0 +1,87 @@
+*{
+    box-sizing: border-box;
+}
+.overview-navbar {
+    display: grid;
+    grid-template:  repeat(10, 1fr) / repeat(10, 1fr);
+    background-color: #A49C52;
+    height: 50px;
+    width: 100%;
+}
+
+.overview-navbar-title {
+    grid-row: 1 / 1;
+    grid-column: 1 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding-left: 350px;
+    background-color: #A49C52;
+    height: 50px;
+}
+
+.overview-logo {
+    height: 40px;
+    width: auto;
+}
+
+.overview-navbar h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: white;
+    text-align: center;
+    flex-grow: 1;
+}
+
+.overview-logo {
+    flex: none;
+}
+
+.pause-button {
+
+    padding: 8px 12px;
+    background-color: #A49C52;
+    color: white;
+    border: 1px solid black;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.pause-button:hover {
+    background-color: #8c7b3a;
+}
+
+.control-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    grid-row: 1 / 1;
+    grid-column: 9 / 11;
+}
+
+.pause-button,
+.delay-select {
+    padding: 3px 3px;
+    font-size: 0.9rem;
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: #A49C52;
+    color: white;
+    cursor: pointer;
+    appearance: none;
+    /* Nieuw toegevoegd: centreren van tekst */
+    text-align: center;          /* Horizontaal centreren voor sommige browsers */
+    text-align-last: center;     /* Specifiek voor <select> */
+    line-height: 1.5;            /* Zorgt voor verticale alignment */
+}
+
+.pause-button:hover,
+.delay-select:hover {
+    background-color: #8c7b3a;
+}
+
+.control-bar h5{
+    color: white;
+    margin-right: -20px;
+}

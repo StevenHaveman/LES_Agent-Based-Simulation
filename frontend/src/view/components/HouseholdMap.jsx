@@ -19,19 +19,33 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
     const iconRef = useRef(null);
 
 
+
     useEffect(() => {
-        const fetchHouseholds = async () => {
+        const fetchAndUpdateHouseholds = async () => {
             try {
-                const data = await detailController.fetch_households(); // Backend call
+                const data = await detailController.fetch_households();
                 setHouseholds(data);
             } catch (error) {
                 console.error('Error fetching households:', error);
             }
         };
-        fetchHouseholds();
+
+        const startTimeout = async () => {
+            await fetchAndUpdateHouseholds(); // Initial load
+
+            try {
+                const delayRes = await detailController.getDelay();
+                const delay = parseInt(delayRes.delay || 3) * 1000;
+                setTimeout(fetchAndUpdateHouseholds, delay); // ✅ Alleen één keer extra ophalen na delay
+            } catch (error) {
+                console.error("Failed to fetch delay for polling:", error);
+            }
+        };
+
+        startTimeout();
     }, []);
 
-    // Load household icon image once, then trigger initial draw
+
     useEffect(() => {
         const icon = new Image();
         // icon.src = "/INNO/Household_img.webp";

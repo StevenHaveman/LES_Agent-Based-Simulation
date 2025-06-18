@@ -10,6 +10,12 @@ class DetailService{
         return await response.json();
     }
 
+    async getDelay() {
+        const res = await fetch(`${API_URL}/get_delay`);
+        if (!res.ok) throw new Error("Failed to fetch delay");
+        return await res.json();
+    }
+
 }
 // Exporting an instance of DetailService.
 const detailService = new DetailService();
