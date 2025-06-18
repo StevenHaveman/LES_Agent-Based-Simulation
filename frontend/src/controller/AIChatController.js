@@ -5,8 +5,8 @@ class AIChatController {
         this.service = service;
     }
 
-    async sendPrompt(prompt) {
-        return await this.service.sendPrompt(prompt);
+    async sendPrompt(prompt, residentId) {
+        return await this.service.sendPrompt(prompt, residentId);
     }
 }
 

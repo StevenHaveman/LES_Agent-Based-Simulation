@@ -14,7 +14,10 @@ import ResidentWindow from "../components/ResidentWindow.jsx";
 import ResidentDropdown from "../components/ResidentDropdown.jsx";
 import AIChatWindow from "../components/AIChatWindow.jsx";
 import OverviewNavbar from "../components/OverviewNavbar.jsx";
+
 import KPIWindow from "../components/KPIWindow.jsx";
+
+import Parameters from "../components/Parameters.jsx";
 
 
 export const overviewRoute = createRoute({
@@ -88,7 +91,7 @@ export const overviewRoute = createRoute({
                         />
                     </div>
                     <div className="parameters-container">
-                        <h1> Parameters</h1>
+                      <Parameters> </Parameters>
                     </div>
                     <div className="KPI-container">
                         <KPIWindow />

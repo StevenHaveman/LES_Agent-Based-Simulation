@@ -25,7 +25,9 @@ const ConfigForm = () => {
     const [formData, setFormData] = useState({
         nr_households: 10,
         nr_residents: 10,
-        simulation_years: 30
+        simulation_years: 30,
+        seed: ""
+
     });
     const navigate = useNavigate();
 
@@ -101,6 +103,19 @@ const ConfigForm = () => {
                                 className="form-input"
                                 min="1"
                                 required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="seed" className="form-label">Random Seed (optional)</label>
+                            <input
+                                type="number"
+                                id="seed"
+                                name="seed"
+                                value={formData.seed}
+                                onChange={handleChange}
+                                className="form-input"
+                                min="0"
+                                placeholder="Leave empty for random"
                             />
                         </div>
 
