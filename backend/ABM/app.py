@@ -17,17 +17,16 @@ from main import toggle_simulation_pause, is_simulation_paused
 from shared_state import set_delay, get_delay
 import config
 
-
 # Initialize the Flask application
 app = Flask(__name__)
 config_id, chosen_config = utilities.choose_config()
-llm_handler = AgentLLMHandler("llama3.1:8b",chosen_config)
+llm_handler = AgentLLMHandler("llama3.1:8b", chosen_config)
 # Configure CORS to allow connections from the frontend
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 
+
 @app.route('/config', methods=['POST'])
 def start_simulation():
-
     data = request.get_json()
 
     try:
@@ -43,10 +42,10 @@ def start_simulation():
     config.configs[config_id]["simulation_years"] = simulation_years
     config.configs[config_id]["seed"] = seed
 
-
     result = run_simulation(nr_households, nr_residents, simulation_years, seed=seed)
 
     return jsonify({"status": "ok", "result": result})
+
 
 @app.route("/overview", methods=["GET"])
 def get_graphics_data():
@@ -63,6 +62,7 @@ def get_graphics_data():
         return jsonify({"error": "No simulation data available"}), 400
     return jsonify(graphics_data)
 
+
 @app.route('/fetch_households', methods=['GET'])
 def fetch_households():
     """
@@ -77,6 +77,7 @@ def fetch_households():
     if not households_data:
         return jsonify({"error": "No household data available"}), 400
     return jsonify(households_data)
+
 
 @app.route('/AI_test_response', methods=['POST'])
 def ai_test_response():
@@ -98,9 +99,9 @@ def ai_test_response():
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
+
 @app.route('/toggle_pause', methods=['POST'])
 def toggle_pause():
-
     new_state = toggle_simulation_pause()
     return jsonify({
         "status": "ok",
@@ -108,9 +109,11 @@ def toggle_pause():
         "message": "Simulatie gepauzeerd" if new_state else "Simulatie hervat"
     })
 
+
 @app.route('/pause_status', methods=['GET'])
 def get_pause_status():
     return jsonify({"paused": is_simulation_paused()})
+
 
 @app.route('/set_delay', methods=['POST'])
 def set_delay_route():
@@ -125,19 +128,13 @@ def set_delay_route():
         return jsonify({"status": "error", "message": "Ongeldige delay-waarde."}), 400
 
 
-
 @app.route('/get_delay', methods=['GET'])
 def get_delay_route():
     return jsonify({"delay": get_delay()})
 
-@app.route('/config', methods=["GET"])
-def get_sim_config():
-    return jsonify(chosen_config)
-
 
 @app.route('/get_config', methods=['GET'])
 def get_config():
-
     if config_id not in config.configs:
         return jsonify({"status": "error", "message": f"Config ID {config_id} niet gevonden."}), 404
 
@@ -154,9 +151,9 @@ def get_config():
         "config": filtered_config
     })
 
+
 @app.route('/update_parameter', methods=['POST'])
 def update_single_parameter():
-
     data = request.get_json()
     key = data.get("parameter")
     value = data.get("value")
@@ -203,6 +200,7 @@ def get_full_config_ids():
         "config_id": config_id,
         "config": config.configs[config_id]
     })
+
 
 if __name__ == '__main__':
     app.run(debug=True)

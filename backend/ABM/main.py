@@ -21,6 +21,7 @@ config_id, config = utilities.choose_config()
 graphics_data = []
 households_data = []
 
+
 def initialize_data_collection(model: Environment):
     save_folder = config['data_save_folder']
     os.makedirs(save_folder, exist_ok=True)
@@ -34,7 +35,7 @@ def initialize_data_collection(model: Environment):
     model.setup_data_structure(file_name)
 
     return file_name
-    
+
 
 # Global lists to store data from the simulation for potential use by an API or UI.
 graphics_data = []  # Stores yearly aggregated data for charts/graphs.
@@ -132,10 +133,10 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
 
     households_data.clear()
     households_data.extend(model.collect_household_information())
-    return {"message": "Simulation completed"}
+
+    time.sleep(get_delay())
+
 
 if __name__ == "__main__":
-    simulation_result = run_simulation(config['nr_households'], config['nr_residents'], config['simulation_years'], config['seed'])
-
-
-       
+    simulation_result = run_simulation(config['nr_households'], config['nr_residents'], config['simulation_years'],
+                                       config['seed'])
