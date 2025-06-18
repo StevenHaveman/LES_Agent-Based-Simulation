@@ -134,8 +134,6 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
     households_data.clear()
     households_data.extend(model.collect_household_information())
 
-    time.sleep(get_delay())
-
 
 if __name__ == "__main__":
     simulation_result = run_simulation(config['nr_households'], config['nr_residents'], config['simulation_years'],

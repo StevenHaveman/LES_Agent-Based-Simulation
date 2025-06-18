@@ -19,7 +19,6 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
     const iconRef = useRef(null);
 
 
-
     useEffect(() => {
         const fetchAndUpdateHouseholds = async () => {
             try {
@@ -30,19 +29,7 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
             }
         };
 
-        const startTimeout = async () => {
-            await fetchAndUpdateHouseholds(); // Initial load
-
-            try {
-                const delayRes = await detailController.getDelay();
-                const delay = parseInt(delayRes.delay || 3) * 1000;
-                setTimeout(fetchAndUpdateHouseholds, delay); // ✅ Alleen één keer extra ophalen na delay
-            } catch (error) {
-                console.error("Failed to fetch delay for polling:", error);
-            }
-        };
-
-        startTimeout();
+        fetchAndUpdateHouseholds(); // Alleen eenmalig ophalen bij laden component
     }, []);
 
 
@@ -64,19 +51,44 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
             const height = canvas.offsetHeight;
 
             const newPositions = {};
+            const maxAttempts = 100;
+
+            const isOverlapping = (x, y, existingPositions) => {
+                const size = 32;
+                for (const pos of Object.values(existingPositions)) {
+                    const dx = pos.x - x;
+                    const dy = pos.y - y;
+                    if (Math.abs(dx) < size && Math.abs(dy) < size) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+
             households.forEach(household => {
-                const x = Math.random() * (width - 40); // Leave margin
-                const y = Math.random() * (height - 40);
-                newPositions[household.id] = { x, y, width: 32, height: 32 }; // Fixed icon size
+                let x, y, attempts = 0;
+                do {
+                    x = Math.random() * (width - 40);
+                    y = Math.random() * (height - 40);
+                    attempts++;
+                } while (isOverlapping(x, y, newPositions) && attempts < maxAttempts);
+
+                newPositions[household.id] = {
+                    x,
+                    y,
+                    width: 32,
+                    height: 32
+                };
             });
 
             householdPositions.current = newPositions;
 
             if (iconRef.current) {
-                drawCanvas(); // Draw with new positions
+                drawCanvas();
             }
         }
     }, [households]);
+
 
     // Redraw canvas when selected household changes (to update highlighting)
     useEffect(() => {
