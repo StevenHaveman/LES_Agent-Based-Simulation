@@ -32,7 +32,7 @@ const AIChat = ({ resident }) => {
             await new Promise((resolve) => setTimeout(resolve, 3000));
 
 
-            const result = await aiChatController.sendPrompt(prompt);
+            const result = await aiChatController.sendPrompt(prompt, resident);
 
             setMessages((prev) => [
                 ...prev.slice(0, -1),

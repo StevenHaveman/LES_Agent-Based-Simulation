@@ -10,12 +10,17 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from main import run_simulation, graphics_data, households_data
 import utilities
+
+from AgentLLMHandler import AgentLLMHandler
+
 from main import toggle_simulation_pause, is_simulation_paused
 from shared_state import set_delay, get_delay
+
 
 # Initialize the Flask application
 app = Flask(__name__)
 config_id, chosen_config = utilities.choose_config()
+llm_handler = AgentLLMHandler("llama3.1:8b",chosen_config)
 # Configure CORS to allow connections from the frontend
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 
@@ -80,15 +85,23 @@ def fetch_households():
 
 @app.route('/AI_test_response', methods=['POST'])
 def ai_test_response():
+    ## Test updates -Dave
+    # Messages worden waarscheinlijk uit de json gehaald voor een specfieke agent.
+    # TODO: Veranderd dit naar een nette manier  Voor nu gehard code.
+
     data = request.get_json()
+
     prompt = data.get("prompt", "")
+    resident_info = data.get("resident_id")
+    # print(resident_id)
 
-    if not prompt.strip():
-        return jsonify({"error": "Prompt is leeg."}), 400
+    print(f"Prompt: {prompt}, Resident ID: {resident_info['unique_id']}")
 
-    response = f"(AI-test response) Je zei: '{prompt}'"
-
-    return jsonify({"response": response})
+    try:
+        response = llm_handler.chat(resident_info['unique_id'], prompt)
+        return jsonify({"response": response})
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
 
 @app.route('/toggle_pause', methods=['POST'])
 def toggle_pause():
