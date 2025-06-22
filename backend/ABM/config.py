@@ -55,7 +55,7 @@ configs = {
         # TESTING CONFIG
 
         # Main simulation startup parameters
-        "seed": 42069,
+        "seed": random.seed(),
         "nr_households": 840, # https://www.cbs.nl/nl-nl/visualisaties/dashboard-bevolking/woonsituatie/huishoudens-nu#:~:text=Begin%202024%20waren%20er%208,gemiddelde%20huishoudensgrootte%20nog%203%2C49.
         "nr_residents": 1772,
         "simulation_years": 30,

@@ -46,10 +46,16 @@ const ConfigForm = () => {
      */
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await navigate({to: "/overview"});
+        await navigate({ to: "/overview" });
 
         try {
-            await configFormController.startSimulation(formData);
+            // Als seed leeg is (""), gebruik 0 als default
+            const payload = {
+                ...formData,
+                seed: formData.seed === "" ? 0 : Number(formData.seed)
+            };
+
+            await configFormController.startSimulation(payload);
         } catch (error) {
             console.error("Simulation start failed", error);
         }
@@ -115,7 +121,7 @@ const ConfigForm = () => {
                                 onChange={handleChange}
                                 className="form-input"
                                 min="0"
-                                placeholder="Leave empty for random"
+                                placeholder="0 (default if empty)"
                             />
                         </div>
 
