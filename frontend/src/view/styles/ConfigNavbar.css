@@ -9,14 +9,10 @@
 
 .navbar .logo {
     height: 50px;
+    padding: 3px;
     width: auto;
 }
 
-.navbar-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-}
 
 .navbar h1 {
     margin: 0;

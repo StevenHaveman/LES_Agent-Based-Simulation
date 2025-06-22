@@ -9,9 +9,9 @@
  */
 
 import React from "react";
-import "../styles/Navbar.css";
+import "../styles/ConfigNavbar.css";
 
-const Navbar = ({ title }) => {
+const ConfigNavbar = ({ title }) => {
     return (
         <div className="navbar">
             <img className="logo" src="LES_logo.png" alt="Logo links" />
@@ -25,4 +25,4 @@ const Navbar = ({ title }) => {
     );
 };
 
-export default Navbar;
+export default ConfigNavbar;
