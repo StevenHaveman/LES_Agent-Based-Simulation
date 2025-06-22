@@ -1,24 +1,21 @@
 .form-container {
     min-height: 100vh;
+    display: flex;
+    align-items: center; /* Verticaal centreren */
+    justify-content: center; /* Horizontaal centreren */
     background-color: white;
     padding: 20px;
 }
 
+
+
 .form-wrapper {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    padding: 40px;
     background-color: white;
+    padding: 40px;
     border-radius: 8px;
-
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-
-    margin: 40px auto;
     width: fit-content;
-    min-height: auto;
-    height: auto;
-    align-items: flex-start;
+    max-width: 90vw;
 }
 
 .form-card {
@@ -56,18 +53,24 @@
 .form-group {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: 5px;
+    width: 100%;
+    max-width: 300px;  /* Limiteert de breedte */
+    margin: 0 auto;     /* Centreert binnen de form */
 }
 
 .form-label {
     font-size: 14px;
     color: #333;
     font-weight: 500;
+    text-align: left;
+    margin-left: 3px;
 }
+
 
 .form-input-wrapper {
     position: relative;
-
 
 }
 
@@ -75,8 +78,11 @@
     padding: 10px;
     border: 1px solid #ddd;
     font-size: 14px;
-
+    border-radius: 10px;
+    width: 260px;
+    box-sizing: border-box;
 }
+
 
 .form-input:focus {
     outline: none;
@@ -108,6 +114,7 @@
     background-color: #09460c;
     color: white;
     padding: 12px;
+    width: 285px;
     border: none;
     border-radius: 4px;
     font-size: 14px;

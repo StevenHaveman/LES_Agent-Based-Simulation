@@ -5,6 +5,7 @@ import detailController from "../../controller/DetailController.js";
 const HouseholdInfo = ({ selectedHouseholdId, visible }) => {
     const [households, setHouseholds] = useState([]);
 
+
     useEffect(() => {
         const fetchHouseholds = async () => {
             try {
@@ -24,11 +25,10 @@ const HouseholdInfo = ({ selectedHouseholdId, visible }) => {
     const selectedHousehold = households.find(h => h.id === selectedHouseholdId);
 
     return (
-        <div className="info-container">
-            <div className="info">
+        <div className="household_info-container">
                 <h3>Naam: {selectedHousehold ? selectedHousehold.name : ""}</h3>
                 <h3>Adres: {selectedHousehold ? selectedHousehold.address : ""}</h3>
-            </div>
+
         </div>
     );
 };

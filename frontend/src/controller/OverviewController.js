@@ -1,6 +1,5 @@
 import OverviewService from "../service/OverviewService.js";
 
-
 class OverviewController {
 
     constructor(service) {
@@ -17,8 +16,18 @@ class OverviewController {
             throw error;
         }
     }
+
+    async getDelay() {
+        try {
+            const result = await this.service.getSimulationDelay();
+            console.log("Simulation delay fetched successfully");
+            return result;
+        } catch (error) {
+            console.error("Simulation delay fetch failed:", error);
+            throw error;
+        }
+    }
 }
 
-
-const configFormController = new OverviewController(OverviewService);
-export default configFormController;
+const overviewController = new OverviewController(OverviewService);
+export default overviewController;

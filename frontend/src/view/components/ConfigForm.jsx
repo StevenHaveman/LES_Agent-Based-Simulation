@@ -23,11 +23,11 @@ import { useNavigate } from "@tanstack/react-router";
 
 const ConfigForm = () => {
     const [formData, setFormData] = useState({
-        email: "",
-        password: "",
         nr_households: 10,
         nr_residents: 10,
-        simulation_years: 30
+        simulation_years: 30,
+        seed: ""
+
     });
     const navigate = useNavigate();
 
@@ -46,13 +46,12 @@ const ConfigForm = () => {
      */
     const handleSubmit = async (e) => {
         e.preventDefault();
+        await navigate({to: "/overview"});
+
         try {
             await configFormController.startSimulation(formData);
-            console.log("Simulation successfully started");
-            await navigate({ to: "/overview" });
         } catch (error) {
-            alert("Something went wrong");
-            console.error("Simulation failed", error);
+            console.error("Simulation start failed", error);
         }
     };
 
@@ -104,6 +103,19 @@ const ConfigForm = () => {
                                 className="form-input"
                                 min="1"
                                 required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="seed" className="form-label">Random Seed (optional)</label>
+                            <input
+                                type="number"
+                                id="seed"
+                                name="seed"
+                                value={formData.seed}
+                                onChange={handleChange}
+                                className="form-input"
+                                min="0"
+                                placeholder="Leave empty for random"
                             />
                         </div>
 

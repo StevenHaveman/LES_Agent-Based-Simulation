@@ -16,8 +16,21 @@ class OverviewService {
 
         return await response.json();
     }
+
+    /**
+     * Fetches the current simulation delay from the backend.
+     * @returns {Promise<Object>} - { delay: number }
+     */
+    async getSimulationDelay() {
+        const response = await fetch(`${API_URL}/get_delay`);
+
+        if (!response.ok) {
+            throw new Error("Fetching delay failed");
+        }
+
+        return await response.json();
+    }
 }
 
-// Exporting an instance of OverviewService.
 const overviewService = new OverviewService();
-export default overviewService
+export default overviewService;

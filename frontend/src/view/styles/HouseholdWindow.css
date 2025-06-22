@@ -1,4 +1,6 @@
 .select-household-hint{
+    grid-row: 3 / 21;
+    grid-column: 1 / 11;
     display: flex;
     justify-content: center;
     align-items: center;
