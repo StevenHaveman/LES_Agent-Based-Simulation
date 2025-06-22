@@ -60,7 +60,7 @@ const OverviewNavbar = ({title}) => {
                         <option value="3">3 sec</option>
                         <option value="5">5 sec</option>
                         <option value="10">10 sec</option>
-                        <option value="0">0 </option>
+                        <option value="0">0 sec </option>
 
                     </select>
                 </div>
