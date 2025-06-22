@@ -131,8 +131,13 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
         if config['collect_data']:
             model.export_data(file_name, year + 1)
 
+        time.sleep(get_delay())
+
+
     households_data.clear()
     households_data.extend(model.collect_household_information())
+
+
 
 
 if __name__ == "__main__":
