@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import "../styles/Parameters.css";
 import parameterController from "../../controller/ParametersController";
 
@@ -7,27 +7,40 @@ const Parameters = () => {
     const [selectedKey, setSelectedKey] = useState("");
     const [inputValue, setInputValue] = useState("");
 
+    // Ophalen van parameteropties bij laden component
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const opts = await parameterController.getDropdownOptions();
-                setOptions(opts);
-            } catch (error) {
-                console.error("Fout bij ophalen parameters:", error);
-            }
-        };
-        fetchData();
+        fetchOptions();
     }, []);
 
-    const handleSubmit = async () => {
+    // Functie om dropdown-opties op te halen
+    const fetchOptions = async () => {
         try {
-            const result = await parameterController.updateParameter(selectedKey, parseFloat(inputValue));
-            console.log("Update gelukt:", result);
+            const opts = await parameterController.getDropdownOptions();
+            setOptions(opts);
         } catch (error) {
-            console.error("Fout bij updaten:", error);
+            console.error("Fout bij ophalen parameters:", error);
         }
     };
 
+    // Afhandelen van parameterupdate
+    const handleSubmit = async () => {
+        try {
+            const newValue = parseFloat(inputValue);
+            const result = await parameterController.updateParameter(selectedKey, newValue);
+
+            alert(`Parameter "${selectedKey}" is bijgewerkt naar waarde: ${newValue}`);
+
+            // Dropdown updaten met nieuwe waardes
+            await fetchOptions();
+
+            // Formulier resetten
+            setSelectedKey("");
+            setInputValue("");
+        } catch (error) {
+            console.error("Fout bij updaten:", error);
+            alert("Bijwerken mislukt. Zie console voor details.");
+        }
+    };
 
     return (
         <div className="parameters-config-container">
@@ -56,10 +69,15 @@ const Parameters = () => {
                     type="number"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
+                    disabled={!selectedKey}
                 />
             </div>
 
-            <button className="form-button" onClick={handleSubmit}>
+            <button
+                className="form-button"
+                onClick={handleSubmit}
+                disabled={!selectedKey || inputValue === ""}
+            >
                 Update parameter
             </button>
         </div>
