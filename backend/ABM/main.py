@@ -3,7 +3,7 @@ Main script for running the agent-based model simulation.
 
 This script initializes the simulation environment and runs it for a specified
 number of years. It collects data for visualization and detailed household
-information at the end of the simulation.
+information at the end of each simulation year.
 """
 
 import random
@@ -16,40 +16,33 @@ from shared_state import get_delay
 import os
 import glob
 
+# Load configuration
 config_id, config = utilities.choose_config()
-# TODO DENK DAT DIT IN EEN DATA CLASSE MOET GAAN GEBEUREN ZODDAT DE DATA IN DE GUI KAN WORDEN GETOONT EN HET OP EEN PLEK IS.
-graphics_data = []
-households_data = []
+
+# Global lists to store data from the simulation for potential use by an API or UI.
+graphics_data = []  # Stores yearly aggregated data for charts/graphs.
+households_data = []  # Stores detailed household information per year (updated yearly)
+
+# Global pause flag
+simulation_paused = False
 
 
 def initialize_data_collection(model: Environment):
     save_folder = config['data_save_folder']
     os.makedirs(save_folder, exist_ok=True)
 
-    # Find existing files matching the pattern
     existing_files = glob.glob(os.path.join(save_folder, "simulation_data_*.json"))
     run_number = len(existing_files) + 1
     file_name = os.path.join(save_folder, f"simulation_data_{run_number:03d}.json")
 
-    # Write the data structure to a Json file
     model.setup_data_structure(file_name)
 
     return file_name
 
 
-# Global lists to store data from the simulation for potential use by an API or UI.
-graphics_data = []  # Stores yearly aggregated data for charts/graphs.
-households_data = []  # Stores detailed household information at the end of the simulation.
-
-# Global pause flag
-simulation_paused = False
-
-
 def toggle_simulation_pause():
     """
     Toggle the global pause state of the simulation.
-
-
     Returns:
         bool: The new paused state (True if paused, False if running).
     """
@@ -61,7 +54,6 @@ def toggle_simulation_pause():
 def is_simulation_paused():
     """
     Check if the simulation is currently paused.
-
     Returns:
         bool: True if paused, False otherwise.
     """
@@ -76,14 +68,10 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
     number of simulation years, and collects data.
 
     Args:
-        nr_households (int, optional): The number of households in the simulation.
-                                       Defaults to 10.
-        nr_residents (int, optional): The total number of residents, distributed
-                                      among households. Defaults to 10.
-        simulation_years (int, optional): The number of years the simulation
-                                          will run. Defaults to 30.
-        seed (int, optional): Seed for random number generators for reproducibility.
-                              If None, a random seed is used. Defaults to None.
+        nr_households (int): The number of households in the simulation.
+        nr_residents (int): The total number of residents, distributed among households.
+        simulation_years (int): The number of years the simulation will run.
+        seed (int): Seed for random number generators for reproducibility.
 
     Returns:
         dict: A dictionary containing a message indicating simulation completion.
@@ -98,10 +86,10 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
     np.random.seed(seed)
 
     graphics_data.clear()
+    households_data.clear()
 
     model = Environment(nr_households=nr_households, nr_residents=nr_residents)
 
-    # Setup data collection structure to a dedicated json file
     if config['collect_data']:
         file_name = initialize_data_collection(model)
 
@@ -131,15 +119,18 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
         if config['collect_data']:
             model.export_data(file_name, year + 1)
 
+        # Update household data (per year)
+        households_data.clear()
+        households_data.extend(model.collect_household_information())
+
+        # Wait before next simulation year
         time.sleep(get_delay())
 
 
-    households_data.clear()
-    households_data.extend(model.collect_household_information())
-
-
-
-
 if __name__ == "__main__":
-    simulation_result = run_simulation(config['nr_households'], config['nr_residents'], config['simulation_years'],
-                                       config['seed'])
+    simulation_result = run_simulation(
+        config['nr_households'],
+        config['nr_residents'],
+        config['simulation_years'],
+        config['seed']
+    )
