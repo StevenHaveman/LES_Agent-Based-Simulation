@@ -25,7 +25,7 @@ llm_handler = AgentLLMHandler("llama3.1:8b", chosen_config)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 
 
-@app.route('/config', methods=['POST'])
+@app.route('/simulation', methods=['POST'])
 def start_simulation():
     data = request.get_json()
 
