@@ -1,7 +1,6 @@
 import React, {useState} from "react";
 import {createRoute} from "@tanstack/react-router";
 import {rootRoute} from "./root";
-import Navbar from "../components/Navbar.jsx";
 import "../styles/overviewpage.css"
 import "../styles/globalPageStyles.css";
 

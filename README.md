@@ -62,7 +62,7 @@ De `root.jsx` bevat alle routes naar de verschillende pagina's en vormt daarmee 
 ```jsx
 import { createRoute } from "@tanstack/react-router";
 import { rootRoute } from "./root";
-import Navbar from "../components/Navbar.jsx";
+import Navbar from "../components/ConfigNavbar.jsx";
 import NewPage from "../components/NewPage.jsx";
 
 export const newPageRoute = createRoute({
