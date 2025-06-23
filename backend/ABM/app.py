@@ -201,6 +201,11 @@ def get_full_config_ids():
         "config": config.configs[config_id]
     })
 
+@app.route('/config', methods=["GET"])
+def get_sim_config():
+    return jsonify(chosen_config)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -22,7 +22,7 @@
 
 import React, { useState } from "react";
 import "../styles/ConfigForm.css";
-import configFormController from "../../controller/ConfigFormController.js";
+import configFormController from "../../controller/ConfigController.js";
 import { useNavigate } from "@tanstack/react-router";
 
 const ConfigForm = () => {

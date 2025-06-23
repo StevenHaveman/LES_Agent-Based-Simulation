@@ -54,8 +54,8 @@ const Graphic = ({ title = "", yAxisKey = "" }) => {
         };
 
         const fetchInterval = async () => {
-            const res = await overviewController.getDelay(); // ← haal de delay op via controller
-            const delay = parseInt(res.delay || 3) * 1000; // omzetten naar milliseconden
+            const res = await overviewController.getSimulationDelay()
+            const delay = parseInt(res.delay || 3) * 1000;
 
             await fetchData(); // initieel ophalen
 

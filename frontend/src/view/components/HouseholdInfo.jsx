@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "../styles/HouseholdInfo.css";
-import detailController from "../../controller/DetailController.js";
+import overviewController from "../../controller/OverviewController.js";
+
 
 const HouseholdInfo = ({ selectedHouseholdId, visible }) => {
     const [households, setHouseholds] = useState([]);
@@ -9,7 +10,7 @@ const HouseholdInfo = ({ selectedHouseholdId, visible }) => {
     useEffect(() => {
         const fetchHouseholds = async () => {
             try {
-                const data = await detailController.fetch_households();
+                const data = await overviewController.fetch_households();
                 setHouseholds(data);
             } catch (error) {
                 console.error('Error fetching households:', error);

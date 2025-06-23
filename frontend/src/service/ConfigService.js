@@ -22,7 +22,7 @@
 
 const API_URL = "http://127.0.0.1:5000";
 
-class ConfigFormService {
+class ConfigService {
 
     async start_simulation(config) {
         const response = await fetch(`${API_URL}/simulation`, {
@@ -40,5 +40,5 @@ class ConfigFormService {
     }
 }
 
-const configFormService = new ConfigFormService();
+const configFormService = new ConfigService();
 export default configFormService;
