@@ -5,19 +5,25 @@ import glob
 
 class AgentLLMHandler:
     def __init__(self, model_name,chosen_config):
+        """
+        Setup the starting parameters for the class.
+        """
         self.model_name = model_name
         self.chosen_config = chosen_config
         self.file_name = self.get_json_file_name()
         self.current_agent_id = 0
         self.current_agent_conversation = []
-        # self.conversations = {}  # per agent_id
-
-
 
     def set_current_agent_id(self,agent_id):
+        """
+        Sets the current agent id
+        """
         self.current_agent_id = agent_id
 
     def get_json_file_name(self):
+        """
+        Gather the json's file name 
+        """
         save_folder = self.chosen_config['data_save_folder']
         os.makedirs(save_folder, exist_ok=True)
 
@@ -29,6 +35,9 @@ class AgentLLMHandler:
         return file_name
 
     def get_agent_conversation(self):
+        """
+        Gathers the agent conversation 
+        """
         if not os.path.exists(self.file_name):
             raise FileNotFoundError(f"Data file {self.file_name} not found.")
 
@@ -38,23 +47,26 @@ class AgentLLMHandler:
         agent_key = f"{self.current_agent_id}"
 
         self.current_agent_conversation = data["conversation_history"]["residents"][agent_key]
-        print(self.current_agent_conversation)
 
     def update_agent_conversation(self):
-        # Eerst lezen
+        """
+        Updates the conversation of the agent in the json file.
+        """
+        # Read First
         with open(self.file_name, 'r') as file:
             data = json.load(file)
 
         agent_key = f"{self.current_agent_id}"
         data["conversation_history"]["residents"][agent_key] = self.current_agent_conversation
 
-        # Daarna schrijven
+        # After Write
         with open(self.file_name, 'w') as file:
             json.dump(data, file, indent=4)
 
-        print(f"opslaan naar {self.file_name}")
-
     def _get_system_prompt(self):
+        """
+        First testing prompt to insert in to the model -- not in use right now.
+        """
         return {
             'role': 'system',
             'content': (
@@ -71,25 +83,22 @@ class AgentLLMHandler:
 
 
     def _get_system_prompt_second_version(self, max_years=5):
-
-        print("Test je moeder")
+        """
+        Second prompt that uses the building of score blocks and agent info of the last 'max_years' -- In use.
+        """
         if not os.path.exists(self.file_name):
             raise FileNotFoundError(f"Data file {self.file_name} not found.")
 
         with open(self.file_name, 'r') as file:
             data = json.load(file)
 
-        print(data["simulation_years"].keys())
-
-
         year_data_list = []
 
-        # Verzamel alle jaren met data voor deze agent
+        # Collect all the data of the years for the sellected agent.
         for year_key in data["simulation_years"].keys():
             year_number = int(year_key.split()[-1])
             year_data = data["simulation_years"][year_key]["residents_data"][f"{self.current_agent_id}"]
 
-            # print(year_data)
             if not year_data:
                 continue
 
@@ -99,14 +108,14 @@ class AgentLLMHandler:
 
             year_data_list.append((year_number, attitude, subj_norm, behavioral_control))
 
-        # Pak de laatste 'max_years' jaren, oudste eerst
+        # Get the last 'max_years' years, oldest first.
         year_data_list = sorted(year_data_list, key=lambda x: x[0], reverse=True)[:max_years]
-        year_data_list = sorted(year_data_list, key=lambda x: x[0])  # opnieuw sorteren, oudste eerst
+        year_data_list = sorted(year_data_list, key=lambda x: x[0]) # Sort again oldes first.
 
         if not year_data_list:
             return self._get_system_prompt()
 
-        # Bouw string per jaar op
+        # Build string for every year.
         year_lines = []
         for year, att, sn_dict, bc_dict in year_data_list:
             sn_str = ", ".join(f"{k}: {v:.2f}" for k, v in sn_dict.items())
@@ -119,9 +128,8 @@ class AgentLLMHandler:
                 f"  Perceived Behavioral Control: {bc_str}"
             )
 
+        # Block of scores in strings.
         score_block = "\n".join(year_lines)
-
-        print(score_block)
 
         return {
             'role': 'system',
@@ -138,43 +146,34 @@ class AgentLLMHandler:
             )
         }
 
-
-
-
     def _init_conversation(self, agent_id):
-            self.set_current_agent_id(agent_id)
-            self.get_json_file_name()
-            self.get_agent_conversation()
-            if len(self.current_agent_conversation) == 0: 
-                # self.current_agent_conversation = [self._get_system_prompt_second_version()]
-                self.current_agent_conversation = [self._get_system_prompt_second_version()]
+        """
+        Start the chat and is setting agent id, gathers json info, gets conversation.
+        """
+        self.set_current_agent_id(agent_id)
+        self.get_json_file_name()
+        self.get_agent_conversation()
+        if len(self.current_agent_conversation) == 0: 
+            self.current_agent_conversation = [self._get_system_prompt_second_version()]
 
     def chat(self, agent_id, prompt):
+        """
+        Every time a prompt is send in the front end this function will be called to get a response from the llm.
+        """
         if not prompt.strip():
             raise ValueError("Prompt is leeg.")
 
         self._init_conversation(agent_id)
 
         self.current_agent_conversation.append({'role': 'user', 'content': prompt})
-        print(self.current_agent_conversation)
 
         response = ollama.chat(
             model=self.model_name,
             messages=self.current_agent_conversation
         )
 
-        # print(response)
-        # print(model_reply)
-
         model_reply = response.message.content
         self.current_agent_conversation.append({'role': 'assistant', 'content': model_reply})
-        # print(model_reply)
 
         self.update_agent_conversation()
         return model_reply
-
-    # def reset_conversation(self, agent_id):
-    #     self.conversations[agent_id] = [self._get_system_prompt()]
-
-    # def get_history(self, agent_id):
-    #     return self.conversations.get(agent_id, [])
