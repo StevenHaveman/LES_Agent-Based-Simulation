@@ -36,17 +36,21 @@ class AgentLLMHandler:
 
     def get_agent_conversation(self):
         """
-        Gathers the agent conversation 
+        Gathers the agent conversation.
         """
         if not os.path.exists(self.file_name):
-            raise FileNotFoundError(f"Data file {self.file_name} not found.")
+            # No file means no conversation
+            self.current_agent_conversation = []
+            return
 
-        # Load current JSON data
-        with open(self.file_name, 'r') as file:
-            data = json.load(file)
-        agent_key = f"{self.current_agent_id}"
-
-        self.current_agent_conversation = data["conversation_history"]["residents"][agent_key]
+        try:
+            with open(self.file_name, 'r') as file:
+                data = json.load(file)
+            agent_key = f"{self.current_agent_id}"
+            self.current_agent_conversation = data.get("conversation_history", {}).get("residents", {}).get(agent_key, [])
+        except (json.JSONDecodeError, KeyError):
+            # Incase format is weird or no json file
+            self.current_agent_conversation = []
 
     def update_agent_conversation(self):
         """
