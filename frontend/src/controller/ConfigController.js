@@ -17,9 +17,9 @@
  *     - An error if the simulation fails.
  */
 
-import ConfigFormService from "../service/ConfigFormService.js";
+import ConfigFormService from "../service/ConfigService.js";
 
-class ConfigFormController {
+class ConfigController {
     /**
      * Constructor for ConfigFormController.
      *
@@ -49,5 +49,5 @@ class ConfigFormController {
 }
 
 // Create an instance of ConfigFormController with the ConfigFormService.
-const configFormController = new ConfigFormController(ConfigFormService);
+const configFormController = new ConfigController(ConfigFormService);
 export default configFormController;
