@@ -74,9 +74,9 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
 
             const newPositions = {};
             households.forEach(household => {
-                const x = Math.random() * (width - 40); // Leave margin
+                const x = Math.random() * (width - 40);
                 const y = Math.random() * (height - 40);
-                newPositions[household.id] = { x, y, width: 32, height: 32 }; // Fixed icon size
+                newPositions[household.id] = { x, y, width: 32, height: 32 };
             });
 
             householdPositions.current = newPositions;
