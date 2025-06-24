@@ -61,7 +61,7 @@ class OverviewService {
 
 
     async getSimulationGraphicResults() {
-        const response = await fetch(`${API_URL}/overview`);
+        const response = await fetch(`${API_URL}/graphics_data`);
 
         if (!response.ok) {
             throw new Error("Fetching simulation graphic results failed");
