@@ -341,6 +341,7 @@ class Environment(Model):
 
             hh_data = {
                 "id": household.unique_id, # Assuming Household has unique_id from Mesa Agent
+                "address": "Dorpsstraat " + household.unique_id,
                 "name": f"Household {household.unique_id}", # Or however you identify them
                 "residents": resident_details
             }
