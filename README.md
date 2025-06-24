@@ -1,7 +1,7 @@
 # Quick Start(lokaal via IDE)
 
 Om het project lokaal via een IDE te starten, moet je zowel de Flask API als de lokale UI draaien. Om de AI-chat werkend te krijgen, moet je Ollama geïnstalleerd hebben.
-Een diepere uitleg volgt.
+
 
 ## Hoe start je de Flask API
 - Zorg dat je Python 3.12 of hoger op je machine hebt geïnstalleerd.
@@ -15,7 +15,7 @@ Een diepere uitleg volgt.
 - Start de UI met `npm run dev` 
 - De UI is bereikbaar op: [http://localhost:5173/INNO/](http://localhost:5173/INNO/)
 
-## Hoe je de AI-chat werkend krijgt met Ollama
+## Hoe krijg je de AI-chat werkend met Ollama
 
 Dit stappenplan helpt je om **Ollama** te installeren om de AI-chat werkend te krijgen.
 
