@@ -47,7 +47,7 @@ def start_simulation():
     return jsonify({"status": "ok", "result": result})
 
 
-@app.route("/overview", methods=["GET"])
+@app.route("/graphics_data", methods=["GET"])
 def get_graphics_data():
     """
     Retrieve the graphical data from the most recently run simulation.
