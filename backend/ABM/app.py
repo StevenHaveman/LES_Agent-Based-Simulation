@@ -63,7 +63,7 @@ def get_graphics_data():
     return jsonify(graphics_data)
 
 
-@app.route('/fetch_households', methods=['GET'])
+@app.route('/households', methods=['GET'])
 def fetch_households():
     """
     Retrieve detailed household data from the most recently run simulation.
@@ -190,8 +190,8 @@ def get_full_config_values():
     })
 
 
-@app.route('/get_full_config_ids', methods=['GET'])
-def get_full_config_ids():
+@app.route('/parameters', methods=['GET'])
+def parameters():
     if config_id not in config.configs:
         return jsonify({"status": "error", "message": f"Config ID {config_id} niet gevonden."}), 404
 

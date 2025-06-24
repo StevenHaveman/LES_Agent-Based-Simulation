@@ -1,12 +1,13 @@
-import ParametersService from "../service/ParametersService.js";
+import SimulationParametersService from "../service/SimulationParametersService.js";
 
-class ParametersController {
+
+class SimulationParametersController {
     constructor(service) {
         this.service = service;
     }
 
-    async getDropdownOptions() {
-        const res = await this.service.fetchAllParameters();
+    async fetchParameters() {
+        const res = await this.service.fetchParameters();
         const config = res.config;
 
         const exclude = ["nr_households", "nr_residents", "simulation_years", "seed"];
@@ -21,5 +22,5 @@ class ParametersController {
     }
 }
 
-const parameterController = new ParametersController(ParametersService);
-export default parameterController;
+const simulationParametersController = new SimulationParametersController(SimulationParametersService);
+export default simulationParametersController;

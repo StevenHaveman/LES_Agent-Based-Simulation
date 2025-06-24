@@ -1,8 +1,8 @@
 const API_URL = "http://127.0.0.1:5000";
 
-class ParametersService {
-    async fetchAllParameters() {
-        const response = await fetch(`${API_URL}/get_full_config_ids`);
+class SimulationParametersService {
+    async fetchParameters() {
+        const response = await fetch(`${API_URL}/parameters`);
         if (!response.ok) {
             throw new Error("Failed to fetch config");
         }
@@ -15,7 +15,7 @@ class ParametersService {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ parameter, value }),
+            body: JSON.stringify({parameter, value}),
         });
 
         if (!response.ok) {
@@ -26,5 +26,5 @@ class ParametersService {
     }
 }
 
-const parametersService = new ParametersService();
-export default parametersService;
+const simulationParametersService = new SimulationParametersService();
+export default simulationParametersService;
