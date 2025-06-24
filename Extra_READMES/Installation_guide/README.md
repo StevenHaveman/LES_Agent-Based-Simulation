@@ -76,6 +76,8 @@ Or with Conda:
 ```
 conda install --file requirements.txt
 ```
+![alt text](<photos\install requirments.png>)
+
 
 ### 4.2 Use Virtual Environment (Optional)
 Using Anaconda (recommended if working with multiple projects):
@@ -97,12 +99,16 @@ conda activate myenv <<< Can be whatever name you want ofcourse.
 
 ### 5.1 Install Node Packages
 Navigate to the frontend directory:
+![alt text](<photos\CMD prompt-1.png>)
 ```
 cd frontend
 npm install
 ```
+![alt text](<photos\npm install.png>)
 
 This will install all frontend dependencies from ```package.json.```
+
+![alt text](<photos\NPM install done.png>)
 
 ### 5.2 Start Frontend
 To launch the frontend:
@@ -116,6 +122,8 @@ If not, navigate using:
 ```
 cd frontend
 ```
+![alt text](<photos\project path cd frontend.png>)
+
 
 ---
 
@@ -125,12 +133,13 @@ Open two terminal windows or tabs.
 ```
 python backend/abm/app.py
 ```
+![alt text](<photos\Flask running.png>)
 **Frontend:**
 ```
 cd frontend
 npm run dev
 ```
-
+![alt text](<photos\Vite running.png>)
 ---
 
 ## 7. Verify Installation
