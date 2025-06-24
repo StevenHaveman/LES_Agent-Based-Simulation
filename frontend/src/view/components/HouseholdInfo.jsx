@@ -28,7 +28,7 @@ const HouseholdInfo = ({ selectedHouseholdId, visible }) => {
     return (
         <div className="household_info-container">
                 <h3>Naam: {selectedHousehold ? selectedHousehold.name : ""}</h3>
-                <h3>Adres: {selectedHousehold ? selectedHousehold.address : ""}</h3>
+
 
         </div>
     );
