@@ -6,27 +6,43 @@ This application provides endpoints to:
 - Retrieve aggregated data for graphical representation.
 - Fetch detailed data about individual households from the last simulation.
 """
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from main import run_simulation, graphics_data, households_data
-import utilities
 
-from AgentLLMHandler import AgentLLMHandler
-
-from main import toggle_simulation_pause, is_simulation_paused
+from main import (
+    run_simulation,
+    graphics_data,
+    households_data,
+    toggle_simulation_pause,
+    is_simulation_paused,
+)
 from shared_state import set_delay, get_delay
+from AgentLLMHandler import AgentLLMHandler
+import utilities
 import config
 
-# Initialize the Flask application
+# Initialize Flask app and configuration
 app = Flask(__name__)
 config_id, chosen_config = utilities.choose_config()
 llm_handler = AgentLLMHandler("llama3.1:8b", chosen_config)
-# Configure CORS to allow connections from the frontend
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 
+# Allow frontend access
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 
 @app.route('/config', methods=['POST'])
 def start_simulation():
+    """Start a new simulation using (optional) overrides in the JSON payload.
+
+    Expected JSON keys:
+        nr_households     - Number of households.
+        nr_residents      - Total number of residents.
+        simulation_years  - Duration of the simulation in years.
+        seed              - RNG seed for reproducibility.
+
+    On success the function triggers `run_simulation` and returns the model
+    result; otherwise it responds with HTTP 400 and an error message.
+    """
     data = request.get_json()
 
     try:
@@ -37,15 +53,18 @@ def start_simulation():
     except (ValueError, TypeError) as e:
         return jsonify({"status": "error", "message": "Invalid input: " + str(e)}), 400
 
-    config.configs[config_id]["nr_households"] = nr_households
-    config.configs[config_id]["nr_residents"] = nr_residents
-    config.configs[config_id]["simulation_years"] = simulation_years
-    config.configs[config_id]["seed"] = seed
+    # Persist overrides in the global config so subsequent requests see them.
+    config.configs[config_id].update(
+        {
+            "nr_households": nr_households,
+            "nr_residents": nr_residents,
+            "simulation_years": simulation_years,
+            "seed": seed,
+        }
+    )
 
     result = run_simulation(nr_households, nr_residents, simulation_years, seed=seed)
-
     return jsonify({"status": "ok", "result": result})
-
 
 @app.route("/overview", methods=["GET"])
 def get_graphics_data():
@@ -62,7 +81,6 @@ def get_graphics_data():
         return jsonify({"error": "No simulation data available"}), 400
     return jsonify(graphics_data)
 
-
 @app.route('/fetch_households', methods=['GET'])
 def fetch_households():
     """
@@ -78,18 +96,12 @@ def fetch_households():
         return jsonify({"error": "No household data available"}), 400
     return jsonify(households_data)
 
-
 @app.route('/AI_test_response', methods=['POST'])
 def ai_test_response():
-    ## Test updates -Dave
-    # Messages worden waarscheinlijk uit de json gehaald voor een specfieke agent.
-    # TODO: Veranderd dit naar een nette manier  Voor nu gehard code.
-
+    # Temporary test endpoint - handles user prompt and routes it to the LLM
     data = request.get_json()
-
     prompt = data.get("prompt", "")
     resident_info = data.get("resident_id")
-    # print(resident_id)
 
     print(f"Prompt: {prompt}, Resident ID: {resident_info['unique_id']}")
 
@@ -99,24 +111,24 @@ def ai_test_response():
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
-
 @app.route('/toggle_pause', methods=['POST'])
 def toggle_pause():
+    """Toggle the global paused state of the simulation and return the new state."""
     new_state = toggle_simulation_pause()
     return jsonify({
         "status": "ok",
         "paused": new_state,
-        "message": "Simulatie gepauzeerd" if new_state else "Simulatie hervat"
+        "message": "Simulatie gepauzeerd" if new_state else "Simulatie hervat",
     })
-
 
 @app.route('/pause_status', methods=['GET'])
 def get_pause_status():
+    """Return whether the simulation is currently paused (boolean)."""
     return jsonify({"paused": is_simulation_paused()})
-
 
 @app.route('/set_delay', methods=['POST'])
 def set_delay_route():
+    """Update the global simulation delay (seconds) with the value from JSON payload."""
     data = request.get_json()
     delay = data.get("delay")
 
@@ -127,14 +139,14 @@ def set_delay_route():
     except (ValueError, TypeError):
         return jsonify({"status": "error", "message": "Ongeldige delay-waarde."}), 400
 
-
 @app.route('/get_delay', methods=['GET'])
 def get_delay_route():
+    """Return the currently configured global delay in seconds."""
     return jsonify({"delay": get_delay()})
-
 
 @app.route('/get_config', methods=['GET'])
 def get_config():
+    """Return a subset of the active configuration relevant to the front-end UI."""
     if config_id not in config.configs:
         return jsonify({"status": "error", "message": f"Config ID {config_id} niet gevonden."}), 404
 
@@ -143,17 +155,22 @@ def get_config():
         "nr_households": conf.get("nr_households"),
         "nr_residents": conf.get("nr_residents"),
         "simulation_years": conf.get("simulation_years"),
-        "seed": conf.get("seed")
+        "seed": conf.get("seed"),
     }
     return jsonify({
         "status": "ok",
         "config_id": config_id,
-        "config": filtered_config
+        "config": filtered_config,
     })
-
 
 @app.route('/update_parameter', methods=['POST'])
 def update_single_parameter():
+    """Update a single configuration parameter at runtime.
+
+    JSON payload must contain:
+        parameter - key to update
+        value     - new value to assign
+    """
     data = request.get_json()
     key = data.get("parameter")
     value = data.get("value")
@@ -172,35 +189,33 @@ def update_single_parameter():
     return jsonify({
         "status": "ok",
         "updated": {key: value},
-        "message": f"Parameter '{key}' succesvol bijgewerkt."
+        "message": f"Parameter '{key}' succesvol bijgewerkt.",
     })
-
 
 @app.route('/get_full_config_values', methods=['GET'])
 def get_full_config_values():
+    """Return the complete configuration dict for the active config ID."""
     if config_id not in config.configs:
         return jsonify({"status": "error", "message": f"Config ID {config_id} niet gevonden."}), 404
 
     full_config = config.configs[config_id]
-
     return jsonify({
         "status": "ok",
         "config_id": config_id,
-        "config": full_config
+        "config": full_config,
     })
-
 
 @app.route('/get_full_config_ids', methods=['GET'])
 def get_full_config_ids():
+    """Return the full set of configuration IDs and their data."""
     if config_id not in config.configs:
         return jsonify({"status": "error", "message": f"Config ID {config_id} niet gevonden."}), 404
 
     return jsonify({
         "status": "ok",
         "config_id": config_id,
-        "config": config.configs[config_id]
+        "config": config.configs[config_id],
     })
-
 
 if __name__ == '__main__':
     app.run(debug=True)
