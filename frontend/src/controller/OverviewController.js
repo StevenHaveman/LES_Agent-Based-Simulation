@@ -53,7 +53,7 @@ class OverviewController {
     }
 
 
-    async getOverview() {
+    async getSimulationGraphicResults() {
         try {
             const result = await this.service.getSimulationGraphicResults();
             console.log("Simulation overview fetched successfully");
