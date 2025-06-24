@@ -42,6 +42,8 @@ const HouseholdInfo = ({ selectedHouseholdId, visible }) => {
         <div className="household_info-container">
             {/* Display the name of the selected household, or an empty string if not found */}
             <h3>Naam: {selectedHousehold ? selectedHousehold.name : ""}</h3>
+            <h3>Adres: {selectedHousehold ? selectedHousehold.address : ""}</h3>
+
         </div>
     );
 };
