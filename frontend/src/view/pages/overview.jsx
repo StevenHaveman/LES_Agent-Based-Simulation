@@ -15,8 +15,9 @@ import AIChatWindow from "../components/AIChatWindow.jsx";
 import OverviewNavbar from "../components/OverviewNavbar.jsx";
 
 import KPIWindow from "../components/KPIWindow.jsx";
+import SimulationParameters from "../components/SimulationParameters.jsx";
 
-import Parameters from "../components/Parameters.jsx";
+
 
 
 export const overviewRoute = createRoute({
@@ -90,7 +91,7 @@ export const overviewRoute = createRoute({
                         />
                     </div>
                     <div className="parameters-container">
-                      <Parameters> </Parameters>
+                      <SimulationParameters> </SimulationParameters>
                     </div>
                     <div className="KPI-container">
                         <KPIWindow />

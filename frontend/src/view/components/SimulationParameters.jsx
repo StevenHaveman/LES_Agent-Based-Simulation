@@ -1,39 +1,39 @@
 import React, { useEffect, useState } from "react";
 import "../styles/Parameters.css";
-import parameterController from "../../controller/ParametersController";
+import  simulationParametersController from "../../controller/SimulationParametersController.js";
 
-const Parameters = () => {
+const SimulationParameters = () => {
     const [options, setOptions] = useState([]);
     const [selectedKey, setSelectedKey] = useState("");
     const [inputValue, setInputValue] = useState("");
 
-    // Ophalen van parameteropties bij laden component
+
     useEffect(() => {
         fetchOptions();
     }, []);
 
-    // Functie om dropdown-opties op te halen
+
     const fetchOptions = async () => {
         try {
-            const opts = await parameterController.getDropdownOptions();
+            const opts = await simulationParametersController.fetchParameters();
             setOptions(opts);
         } catch (error) {
             console.error("Fout bij ophalen parameters:", error);
         }
     };
 
-    // Afhandelen van parameterupdate
+
     const handleSubmit = async () => {
         try {
             const newValue = parseFloat(inputValue);
-            const result = await parameterController.updateParameter(selectedKey, newValue);
+            const result = await simulationParametersController.updateParameter(selectedKey, newValue);
 
             alert(`Parameter "${selectedKey}" is bijgewerkt naar waarde: ${newValue}`);
 
-            // Dropdown updaten met nieuwe waardes
+
             await fetchOptions();
 
-            // Formulier resetten
+
             setSelectedKey("");
             setInputValue("");
         } catch (error) {
@@ -84,4 +84,4 @@ const Parameters = () => {
     );
 };
 
-export default Parameters;
+export default SimulationParameters
