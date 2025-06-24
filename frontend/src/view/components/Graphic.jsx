@@ -1,14 +1,35 @@
 /**
- * Component to display a simulation graph based on the provided data.
+ * Graphic Component
+ *
+ * This React component displays a simulation graph based on the provided data.
+ * It uses the `recharts` library to render a responsive line chart with data points
+ * representing the start and end states of a simulation year.
  *
  * Props:
- * @param {string} title - The title of the graph.
- * @param {string} yAxisKey - The key for the Y-axis data.
- * Valid keys:
- * - "solar_panel_price"
- * - "heat_pump_price"
- * - "solar_panel_households"
- * - "solar_panel_positive_decisions"
+ * - `title` (string): The title of the graph. Defaults to an empty string.
+ * - `yAxisKey` (string): The key for the Y-axis data. Valid keys include:
+ *   - "solar_panel_price"
+ *   - "heat_pump_price"
+ *   - "solar_panel_households"
+ *   - "solar_panel_positive_decisions"
+ *   If an invalid key is provided, the first valid key is used as a fallback.
+ *
+ * State:
+ * - `simulationData` (Array): The fetched simulation data used to populate the graph.
+ * - `loading` (boolean): Indicates whether the data is still being fetched.
+ *
+ * Effects:
+ * - Fetches simulation data and polling delay on component mount.
+ * - Sets up an interval to periodically fetch simulation data based on the polling delay.
+ * - Cleans up the interval on component unmount.
+ *
+ * Methods:
+ * - `fetchData()`: Fetches simulation data from the backend.
+ * - `fetchInterval()`: Fetches the polling delay and sets up periodic data fetching.
+ *
+ * Returns:
+ * - A responsive line chart displaying the simulation data for the selected Y-axis key.
+ * - A loading message if the data is still being fetched.
  */
 
 import React, { useState, useEffect } from "react";
@@ -25,6 +46,7 @@ import {
 
 import "../styles/Graphic.css";
 import overviewController from "../../controller/OverviewController.js";
+import simulationRunController from "../../controller/SimulationRunController.js";
 
 const validKeys = [
     "solar_panel_price",
@@ -44,7 +66,7 @@ const Graphic = ({ title = "", yAxisKey = "" }) => {
 
         const fetchData = async () => {
             try {
-                const result = await overviewController.getOverview();
+                const result = await overviewController.getSimulationGraphicResults();
                 setSimulationData(result);
                 setLoading(false);
             } catch (error) {
@@ -54,10 +76,10 @@ const Graphic = ({ title = "", yAxisKey = "" }) => {
         };
 
         const fetchInterval = async () => {
-            const res = await overviewController.getDelay(); // ← haal de delay op via controller
-            const delay = parseInt(res.delay || 3) * 1000; // omzetten naar milliseconden
+            const res = await simulationRunController.getSimulationDelay()
+            const delay = parseInt(res.delay || 3) * 1000;
 
-            await fetchData(); // initieel ophalen
+            await fetchData(); // Initial fetch
 
             intervalId = setInterval(fetchData, delay);
         };

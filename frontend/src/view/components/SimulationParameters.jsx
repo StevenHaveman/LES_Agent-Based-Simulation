@@ -1,39 +1,56 @@
 import React, { useEffect, useState } from "react";
 import "../styles/Parameters.css";
-import parameterController from "../../controller/ParametersController";
+import simulationParametersController from "../../controller/SimulationParametersController.js";
 
-const Parameters = () => {
+/**
+ * SimulationParameters component provides a user interface for managing simulation parameters.
+ * It allows users to select a parameter, input a new value, and update the parameter.
+ *
+ * @returns {JSX.Element} The rendered SimulationParameters component.
+ */
+const SimulationParameters = () => {
+    // State to store the list of available simulation parameters.
     const [options, setOptions] = useState([]);
+    // State to store the currently selected parameter key.
     const [selectedKey, setSelectedKey] = useState("");
+    // State to store the input value for the selected parameter.
     const [inputValue, setInputValue] = useState("");
 
-    // Ophalen van parameteropties bij laden component
+    /**
+     * Fetches the list of simulation parameters when the component is mounted.
+     */
     useEffect(() => {
         fetchOptions();
     }, []);
 
-    // Functie om dropdown-opties op te halen
+    /**
+     * Fetches the simulation parameters from the controller and updates the state.
+     * Logs an error to the console if the fetch operation fails.
+     */
     const fetchOptions = async () => {
         try {
-            const opts = await parameterController.getDropdownOptions();
+            const opts = await simulationParametersController.fetchParameters();
             setOptions(opts);
         } catch (error) {
             console.error("Fout bij ophalen parameters:", error);
         }
     };
 
-    // Afhandelen van parameterupdate
+    /**
+     * Handles the submission of a new parameter value.
+     * Updates the selected parameter with the new value and refreshes the parameter list.
+     * Displays an alert with the update result or logs an error if the update fails.
+     */
     const handleSubmit = async () => {
         try {
             const newValue = parseFloat(inputValue);
-            const result = await parameterController.updateParameter(selectedKey, newValue);
+            const result = await simulationParametersController.updateParameter(selectedKey, newValue);
 
             alert(`Parameter "${selectedKey}" is bijgewerkt naar waarde: ${newValue}`);
 
-            // Dropdown updaten met nieuwe waardes
             await fetchOptions();
 
-            // Formulier resetten
+            // Reset the form fields after successful update.
             setSelectedKey("");
             setInputValue("");
         } catch (error) {
@@ -84,4 +101,4 @@ const Parameters = () => {
     );
 };
 
-export default Parameters;
+export default SimulationParameters;

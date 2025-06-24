@@ -47,7 +47,7 @@ def start_simulation():
     return jsonify({"status": "ok", "result": result})
 
 
-@app.route("/overview", methods=["GET"])
+@app.route("/graphics_data", methods=["GET"])
 def get_graphics_data():
     """
     Retrieve the graphical data from the most recently run simulation.
@@ -63,7 +63,7 @@ def get_graphics_data():
     return jsonify(graphics_data)
 
 
-@app.route('/fetch_households', methods=['GET'])
+@app.route('/households', methods=['GET'])
 def fetch_households():
     """
     Retrieve detailed household data from the most recently run simulation.
@@ -79,7 +79,7 @@ def fetch_households():
     return jsonify(households_data)
 
 
-@app.route('/AI_test_response', methods=['POST'])
+@app.route('/AI_response', methods=['POST'])
 def ai_test_response():
     ## Test updates -Dave
     # Messages worden waarscheinlijk uit de json gehaald voor een specfieke agent.
@@ -190,8 +190,8 @@ def get_full_config_values():
     })
 
 
-@app.route('/get_full_config_ids', methods=['GET'])
-def get_full_config_ids():
+@app.route('/parameters', methods=['GET'])
+def parameters():
     if config_id not in config.configs:
         return jsonify({"status": "error", "message": f"Config ID {config_id} niet gevonden."}), 404
 
@@ -200,6 +200,11 @@ def get_full_config_ids():
         "config_id": config_id,
         "config": config.configs[config_id]
     })
+
+@app.route('/config', methods=["GET"])
+def get_sim_config():
+    return jsonify(chosen_config)
+
 
 
 if __name__ == '__main__':
