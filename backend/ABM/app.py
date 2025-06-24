@@ -79,7 +79,7 @@ def fetch_households():
     return jsonify(households_data)
 
 
-@app.route('/AI_test_response', methods=['POST'])
+@app.route('/AI_response', methods=['POST'])
 def ai_test_response():
     ## Test updates -Dave
     # Messages worden waarscheinlijk uit de json gehaald voor een specfieke agent.
