@@ -61,40 +61,40 @@ Dit stappenplan helpt je om **Ollama** te installeren om de AI-chat werkend te k
 
 ---
 
-# 🏗️ Architectuur
+# Architectuur
 
-## 🔧 Back-end
+## Back-end
 ...
 
-## 🎨 Front-end
+## Front-end
 
-### 🖼️ Plaatje
+### Plaatje
 ![img_1.png](img_1.png)
 
-### 🔄 Services
+### Services
 De services maken gebruik van de Flask API om simulatiegegevens op te halen en weer te geven in de UI. Daarnaast ontvangen ze gebruikersinvoer vanuit de UI en sturen deze door naar de simulatie.
 
-### 🧭 Controller
+### Controller
 De controller dient als schakel tussen de UI en de services. Volgens de conventies van MVC is de controller verantwoordelijk voor het afhandelen van gebruikersinvoer en het aanroepen van de juiste services. Daarnaast presenteert de controller de verwerkte gegevens aan de gebruiker via de view.
 
-### 👁️ View
+### View
 De view-laag is verantwoordelijk voor het weergeven van de gegevens uit de simulatie aan de gebruiker in de vorm van een visuele interface (UI).
 
-#### 🧩 Components
+#### Components
 Dit zijn de herbruikbare onderdelen van de UI die op verschillende pagina’s worden gebruikt.
 
-#### 📄 Pages
+#### Pages
 De pagina’s zijn de verschillende schermen die de gebruiker kan zien. Elke pagina maakt gebruik van componenten om gegevens weer te geven en interactie mogelijk te maken. De standaardroute met de URL `/` verwijst naar de `config.jsx` pagina.
 
-#### Styles 🖌️
+#### Styles 
 Hierin zitten de CSS-bestanden die de styling van de UI componenten en pagina's regelen.
 
-##### 🌐 `root.jsx`
+##### `root.jsx`
 De `root.jsx` bevat alle routes naar de verschillende pagina's en vormt daarmee het centrale punt voor de routing.
 
 ---
 
-# ❓ Questions & Answers
+# Questions & Answers
 
 ## Front-End
 
