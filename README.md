@@ -1,6 +1,6 @@
 # Inleiding 
 
-In deze readme legeenwe uit hoe je dsiualtie loaakl kan draaein en hoe de forn enbancedn  eer qua architetur in ekalar zit., tnsoltoee hebebn we vrsgneen atnwroden 
+In deze README leggen we uit hoe je de simulatie lokaal kunt draaien en hoe de frontend en backend zijn opgezet qua architectuur in Elixir. Tot slot hebben we veelgestelde vragen opgenomen.
 
 # Inhoudsopgave
 1. [Quick Start(lokaal via IDE)](./docs/quickstart_local.md)
