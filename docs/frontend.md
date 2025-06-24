@@ -3,7 +3,8 @@
 ## Architectuur
 
 ### Plaatje
-![img_1.png](img_1.png)
+<img width="758" alt="Scherm­afbeelding 2025-06-24 om 22 52 07" src="https://github.com/user-attachments/assets/5ac96f8c-2916-455e-b7e9-ecf5f86c292c" />
+
 
 ### Services
 De services maken gebruik van de Flask API om simulatiegegevens op te halen en weer te geven in de UI. Daarnaast ontvangen ze gebruikersinvoer vanuit de UI en sturen deze door naar de simulatie.
