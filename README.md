@@ -15,13 +15,9 @@ Een diepere uitleg volgt.
 - Start de UI met `npm run dev` 
 - De UI is bereikbaar op: [http://localhost:5173/INNO/](http://localhost:5173/INNO/)
 
-# Hoe je de AI-chat werkend krijgt met Ollama
+## Hoe je de AI-chat werkend krijgt met Ollama
 
-Dit stappenplan helpt je om **Ollama** te installeren en een **AI-model** te draaien voor je lokale chat.
-
----
-
-## ✅ Stap 1: Ollama installeren
+Dit stappenplan helpt je om **Ollama** te installeren om de AI-chat werkend te krijgen.
 
 1.  **Download Ollama**
     Ga naar de officiële website: [https://ollama.com/download](https://ollama.com/download).
@@ -59,7 +55,7 @@ Dit stappenplan helpt je om **Ollama** te installeren en een **AI-model** te dra
     ```bash
     ollama run llama3.1:8b
     ```
-    Je kunt nu met het AI-model communiceren via deze terminal.
+    Je kunt nu met het AI-model communiceren via de  AI-chat
 
 
 
