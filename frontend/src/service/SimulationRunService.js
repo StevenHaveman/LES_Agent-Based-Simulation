@@ -34,6 +34,18 @@ class SimulationRunService {
         });
         return response.json();
     }
+
+
+    async getSimulationDelay() {
+        const response = await fetch(`${API_URL}/get_delay`);
+
+        if (!response.ok) {
+            throw new Error("Fetching delay failed");
+        }
+
+        return await response.json();
+    }
+
 }
 
 

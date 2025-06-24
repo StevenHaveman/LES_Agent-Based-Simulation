@@ -46,6 +46,7 @@ import {
 
 import "../styles/Graphic.css";
 import overviewController from "../../controller/OverviewController.js";
+import simulationRunController from "../../controller/SimulationRunController.js";
 
 const validKeys = [
     "solar_panel_price",
@@ -75,7 +76,7 @@ const Graphic = ({ title = "", yAxisKey = "" }) => {
         };
 
         const fetchInterval = async () => {
-            const res = await overviewController.getSimulationDelay()
+            const res = await simulationRunController.getSimulationDelay()
             const delay = parseInt(res.delay || 3) * 1000;
 
             await fetchData(); // Initial fetch

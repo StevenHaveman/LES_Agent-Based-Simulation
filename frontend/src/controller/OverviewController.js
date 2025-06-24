@@ -40,7 +40,6 @@ class OverviewController {
         this.service = service;
     }
 
-
     async fetch_households(config) {
         try {
             const result = await this.service.fetchHouseholds(config);
@@ -51,7 +50,6 @@ class OverviewController {
             throw error;
         }
     }
-
 
     async getSimulationGraphicResults() {
         try {
@@ -68,17 +66,6 @@ class OverviewController {
         return await this.service.fetchSimulationConfig();
     }
 
-
-    async getSimulationDelay() {
-        try {
-            const result = await this.service.getSimulationDelay();
-            console.log("Simulation delay fetched successfully");
-            return result;
-        } catch (error) {
-            console.error("Simulation delay fetch failed:", error);
-            throw error;
-        }
-    }
 }
 
 const overviewController = new OverviewController(OverviewService);

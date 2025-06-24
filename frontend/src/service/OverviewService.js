@@ -39,18 +39,6 @@ class OverviewService {
         return await response.json();
     }
 
-
-    async getSimulationDelay() {
-        const response = await fetch(`${API_URL}/get_delay`);
-
-        if (!response.ok) {
-            throw new Error("Fetching delay failed");
-        }
-
-        return await response.json();
-    }
-
-
     async fetchSimulationConfig() {
         const response = await fetch(`${API_URL}/config`, { method: "GET" });
         if (!response.ok) {
