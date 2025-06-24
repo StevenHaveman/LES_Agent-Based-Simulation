@@ -24,6 +24,17 @@ class SimulationRunController {
         return await this.service.getDelay();
     }
 
+    async getSimulationDelay() {
+        try {
+            const result = await this.service.getSimulationDelay();
+            console.log("Simulation delay fetched successfully");
+            return result;
+        } catch (error) {
+            console.error("Simulation delay fetch failed:", error);
+            throw error;
+        }
+    }
+
 }
 
 const simulationRunController = new SimulationRunController(SimulationRunService);
