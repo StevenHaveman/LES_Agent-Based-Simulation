@@ -52,8 +52,7 @@ Dit stappenplan helpt je om **Ollama** te installeren en een **AI-model** te dra
     ```bash
     ollama run llama3.1:8b
     ```
-    *(Opmerking: Hoewel je in je voorbeeld 'llama version' noemde, is `llama3.1:8b` het specifieke model dat je later wilt gebruiken, dus dit is een betere test.)*
-
+    
 6.  **Run Ollama met de juiste versie**
     Als de vorige stap succesvol was en het model gedownload is, kun je nu het model `llama3.1:8b` draaien met Ollama. Blijf hiervoor in de terminal waar je al `ollama run llama3.1:8b` hebt uitgevoerd, of start een nieuwe terminal en voer het commando opnieuw uit:
 
