@@ -1,6 +1,6 @@
 # Backend
 
-## 🗂️ Project Structure & File Descriptions
+## Project Structure & File Descriptions
 This backend supports an agent-based simulation system designed to model household decision-making (e.g., around sustainability). Below is a breakdown of the project structure, including what each module does.
 
 ```
@@ -19,12 +19,12 @@ Backend/
 ├── utillitie.py                 # Helper functions (e.g., config selection, formatting)
 ```
 
-## 📄 Module Descriptions
+## Module Descriptions
 Contains the model definition itself, including the Mesa model class and possibly data collection, step logic, and scheduling. This is the simulation’s engine.
 
-### Agents/
+## Agents/
 
-#### household_agent.py
+## household_agent.py
 This file defines the ```Household``` class, a ```Mesa Agent``` representing a household unit within the agent-based sustainability simulation. A household contains multiple ```Resident``` agents (created via ```create_residents```) and collectively decides whether to adopt sustainability packages (like solar panels or heat pumps) based on residents’ individual decisions.
 
 Key features and methods:
@@ -42,7 +42,7 @@ Attributes:
 
 This agent is central in modeling group decision-making and environmental impact at the household level within the simulation.
 
-#### resident_agent.py
+## resident_agent.py
 This file defines the **Resident** class, a **Mesa Agent** that models an individual within a household. Each resident evaluates sustainability packages based on a behavioral decision model incorporating attitude, subjective norms, and perceived behavioral control. These individual decisions feed into collective household adoption behavior.
 
 Key features and methods:
@@ -65,7 +65,7 @@ If this score exceeds the decision_threshold, the resident adopts the package.
 - **step():** Simulation step logic. Triggers decision-making (calc_decision()), applies a random raise to income, and re-evaluates behavioral control and norms.
 This agent models the micro-level dynamics of sustainability decisions, supporting the simulation’s broader goal of understanding household and community adoption patterns.
 
-### AgentLLMHandler.py
+## AgentLLMHandler.py
 
 This module defines the AgentLLMHandler class, responsible for managing conversations between a resident agent and a local LLM (e.g., via Ollama). It handles prompt generation, conversation memory, and reading/writing data to JSON for persistence across simulation steps.
 
@@ -125,10 +125,10 @@ This class enables more human-like simulation of resident behavior by interfacin
 
 
 
-### app.py
+## app.py
 This module sets up the Flask application that serves as the backend API for controlling and interacting with the agent-based simulation. It handles simulation lifecycle, data exchange, and integration with a local LLM (via AgentLLMHandler).
 
-**Main Purpose:**
+#### Main Purpose:**
 Provide API endpoints to run simulations, access aggregated data, query simulated agents using LLMs, and dynamically update simulation parameters.
 
 **Core setup**
@@ -184,7 +184,7 @@ app = Flask(__name__)
 
 This API layer enables interactive experimentation with agent-based simulations of household decision-making in the context of sustainability adoption.
 
-### config.py
+## config.py
 This module defines configurable simulation parameters used across the sustainability adoption model. It contains multiple predefined configurations (e.g., for testing or real-world approximation), allowing easy switching between setups by adjusting the CHOSEN_CONFIG variable.
 
 **Global Variable**
@@ -244,7 +244,7 @@ This is the main testing configuration (CHOSEN_CONFIG = 1). It simulates a full 
 - It balances realism with performance, using social norm levels at the street scale and economic parameters that evolve over time.
 - Designed to observe long-term adoption patterns of solar panels and heat pumps influenced by price, norms, and personal beliefs.
 
-### enviroment.py
+## enviroment.py
 This module defines the Environment class, the main simulation controller, responsible for initializing and coordinating all agents and sustainability mechanisms within the simulation
 
 #### Initialization & Setup
@@ -297,7 +297,7 @@ This module defines the Environment class, the main simulation controller, respo
 **__str__()**
 - Returns a human-readable string summary of the environment's current state, including CO₂ savings and package decisions.
 
-### main.py
+## main.py
 #### Summary of Responsibilities
 This script is the entry point of the simulation. It sets up the environment, controls the simulation loop over time, and manages data collection and export.
 
@@ -353,7 +353,7 @@ This script is the entry point of the simulation. It sets up the environment, co
 **if __name__ == "__main__"**
 - Starts the simulation using values from the loaded configuration.
 
-### shared_state.py
+## shared_state.py
 #### Summary of Responsibilities
 This module provides a shared global state for controlling simulation speed (delay between years), useful for UI interaction or manual pacing.
 
@@ -372,7 +372,7 @@ This module provides a shared global state for controlling simulation speed (del
 #### Purpose
 Acts as a lightweight interface between the simulation engine and potential user interfaces, allowing dynamic run-speed adjustment without tightly coupling modules.
 
-### utillities.py
+## utillities.py
 #### Summary of Responsibilities
 This module contains utility functions that support the simulation by providing helper logic for random value generation and configuration selection.
 
@@ -392,7 +392,7 @@ This module contains utility functions that support the simulation by providing 
 #### Purpose
 Encapsulates common support functions to keep the simulation core clean and modular, ensuring separation of concerns between model logic and setup randomness/config management.
 
-### test_mvp.py
+## test_mvp.py
 #### Summary of Responsibilities
 This module provides a test suite for validating the core functionality of the agent-based model using pytest. It focuses on verifying the correct behavior of Resident, Household, and Environment classes.
 
