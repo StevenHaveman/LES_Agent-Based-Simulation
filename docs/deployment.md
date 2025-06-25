@@ -11,7 +11,7 @@ Voor de backend hebben wij de serverprovider Render gebruikt. De verantwoording 
 1. Op https://dashboard.render.com kan je de stauts van de server bekijken
 2. Render deployt de  applciatie automatich na elke commit voor een bepalsd branch dit is int esteleln in die instelligen
 3. Voor een manuele deployment kilk je eersrt op de server
-4. rechtsboven kakn je de backend manueel deplyen met berscoleldne insrellignen
+4. rechtsboven kakn je de backend manueel deployen
 
 
 <img width="1366" alt="Scherm­afbeelding 2025-06-25 om 15 44 45" src="https://github.com/user-attachments/assets/4864a9b8-7535-45e5-9b55-99ec1725ce6d" />
