@@ -11,11 +11,10 @@ We willen benadrukken dat er geen diepgaand vergelijkend onderzoek is gedaan naa
 Voor de backend hebben wij de serverprovider Render gebruikt. De bevoegden hebben toegang tot het account waarop de backend draait. Op de Render-server draait de Flask API waarmee de frontend communiceert.
 
 ### Hoe deploy ik de backend
-1. Op https://dashboard.render.com kan je de stauts van de server bekijken
-2. Render deployt de  applciatie automatich na elke commit voor een bepalsd branch dit is int esteleln in die instelligen
-3. Voor een manuele deployment kilk je eersrt op de server
-4. rechtsboven kakn je de backend manueel deployen
-
+	1.	Ga naar https://dashboard.render.com om de status van de server te bekijken.
+	2.	Render deployt de applicatie automatisch na elke commit naar een specifieke branch. Dit is ingesteld in de Render-instellingen.
+	3.	Voor een handmatige deployment klik je eerst op de betreffende server.
+	4.	Rechtsboven kun je de backend handmatig deployen via de knop Manual Deploy.
 
 <img width="1366" alt="Scherm­afbeelding 2025-06-25 om 15 44 45" src="https://github.com/user-attachments/assets/4864a9b8-7535-45e5-9b55-99ec1725ce6d" />
 
