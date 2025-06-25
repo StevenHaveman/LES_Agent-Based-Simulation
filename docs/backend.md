@@ -126,10 +126,62 @@ This class enables more human-like simulation of resident behavior by interfacin
 
 
 ### app.py
+This module sets up the Flask application that serves as the backend API for controlling and interacting with the agent-based simulation. It handles simulation lifecycle, data exchange, and integration with a local LLM (via AgentLLMHandler).
 
+**Main Purpose:**
+Provide API endpoints to run simulations, access aggregated data, query simulated agents using LLMs, and dynamically update simulation parameters.
 
+**Core setup**
+```
+app = Flask(__name__)
+```
+- Initializes the Flask app.
+- Configures CORS to allow frontend access (localhost:5173).
+- Chooses a configuration and initializes an AgentLLMHandler instance.
 
+**Key Endpoints**
+**Simulation Control**
+- **/simulation POST:** Starts a new simulation with parameters like number of households, residents, simulation years, and seed.
+- **/toggle_pause POST:** Pauses or resumes the simulation (toggles a global shared state).
+- **/pause_status GET:** Returns whether the simulation is currently paused.
+- **/set_delay POST:** Sets the simulation delay between steps (useful for pacing real-time animations).
+- **/get_delay GET:** Retrieves the currently configured delay.
 
+**Data Access**
+- **/graphics_data GET:** Returns yearly aggregated statistics suitable for plotting (e.g., adoption rates).
+- **/households GET:** Returns detailed household and resident data from the last simulation run.
+
+**Agent-LLM Interaction**
+**/AI_response POST:** Sends a user prompt to a specific resident agent, using the AgentLLMHandler to simulate a response via LLM.
+**Example body:**
+```
+{
+"role": "system",
+"content": "Why did you install solar panels?",
+}
+```
+
+**Configuration Management**
+- **/get_config GET:** Returns the currently selected simulation config (households, residents, seed, etc.).
+- **/update_parameter POST:** Updates a single config parameter (e.g., simulation_years).
+- **/get_full_config_values GET:** Returns the full config dictionary, including internal parameters.
+- **/parameters GET:** Alias for getting the active config.
+- **/config GET:** Returns the initially chosen config (used by frontend to initialize sliders, etc.).
+
+**Integrated Modules**
+- **main.py:** Provides the run_simulation function and tracks global data (graphics_data, households_data).
+- **AgentLLMHandler.py:** Manages AI communication with resident agents.
+- **shared_state.py:** Controls simulation pause state and delay timing.
+- **utilities.py:** Provides config loading and selection utilities.
+- **config.py:** Stores and manages simulation configuration presets.
+
+**Behavior Summary**
+- Responds to frontend inputs by launching and managing simulations.
+- Exposes simulation results and agent data through a clean REST API.
+- Bridges the agent simulation with a conversational AI to simulate realistic agent reasoning.
+- Supports runtime configurability and pause/resume interactivity for step-wise or animated simulations.
+
+This API layer enables interactive experimentation with agent-based simulations of household decision-making in the context of sustainability adoption.
 
 ### config.py
 
