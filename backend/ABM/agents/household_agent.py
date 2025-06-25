@@ -1,8 +1,8 @@
 from mesa import Agent
 import random
-from agents.resident_agent import Resident
-import utilities
-from sustainability_packages.solar_panel import SolarPanel
+from .resident_agent import Resident
+from .. import utilities
+from ..sustainability_packages.solar_panel import SolarPanel
 
 class Household(Agent):
     """

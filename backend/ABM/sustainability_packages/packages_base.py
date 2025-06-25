@@ -1,6 +1,6 @@
 import random
 import numpy as np
-import utilities
+from .. import utilities
 
 class SustainabilityPackage:
     """

@@ -9,9 +9,9 @@ information at the end of each simulation year.
 import random
 import numpy as np
 import time
-from environment import Environment
-import utilities
-from shared_state import get_delay
+from .environment import Environment
+from . import utilities
+from .shared_state import get_delay
 
 import os
 import glob

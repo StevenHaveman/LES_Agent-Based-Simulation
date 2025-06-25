@@ -5,7 +5,7 @@ This module provides helper functions, such as generating random values
 and loading configurations.
 """
 import random
-import config
+from . import config
 
 def gen_random_value(range_min: float, range_max: float):
     """

@@ -1,6 +1,6 @@
 import random
 import numpy as np
-from sustainability_packages.packages_base import SustainabilityPackage
+from .packages_base import SustainabilityPackage
 
 
 class HeatPump(SustainabilityPackage):

@@ -1,7 +1,7 @@
 import random
 import numpy as np
-import utilities
-from sustainability_packages.packages_base import SustainabilityPackage
+from .. import utilities
+from .packages_base import SustainabilityPackage
 
 
 class SolarPanel(SustainabilityPackage):

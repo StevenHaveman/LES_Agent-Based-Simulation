@@ -1,10 +1,10 @@
 import random
 from mesa import Model
 import numpy as np
-from agents.household_agent import Household
-import utilities
-from sustainability_packages.solar_panel import SolarPanel
-from sustainability_packages.heat_pump import HeatPump
+from .agents.household_agent import Household
+from . import utilities
+from .sustainability_packages.solar_panel import SolarPanel
+from .sustainability_packages.heat_pump import HeatPump
 import json
 import os
 
@@ -379,5 +379,3 @@ class Environment(Model):
         output += f"    Total CO2 saved so far: {total_yearly_co2_saved / 1000:.1f} tons\n"
         output += f"    % of CO2 emission relative to district total: {self.current_co2 / self.total_co2 * 100:.1f}"
         return output
-        
-        

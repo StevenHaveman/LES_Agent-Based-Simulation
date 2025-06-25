@@ -1,8 +1,8 @@
 from mesa import Agent
 import numpy as np
 import random
-import utilities
-from sustainability_packages.solar_panel import SolarPanel
+from .. import utilities
+from ..sustainability_packages.solar_panel import SolarPanel
 
 class Resident(Agent):
     """
