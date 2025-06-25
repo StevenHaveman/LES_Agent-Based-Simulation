@@ -1,11 +1,14 @@
 # Deployment
 
 ## Inleiding
-De opdrachtgever heeft aangegeven dat de applicatie online live beschikbaar moet zijn. Dat betekent dat iedereen, zonder ICT-kennis of IDE, de applicatie zou moeten kunnen gebruiken. Hiervoor moesten we zowel de backend als de frontend deployen en hosten. Wij hebben hiervoor een poging gewaagd. De manier waarop wij dit hebben gedaan, dient als opzet of voorbeeld van hoe het zou kunnen.
+
+De opdrachtgever heeft in de laatste sprint aangegeven dat de applicatie online live beschikbaar moet zijn. Dat betekent dat iedereen, zonder ICT-kennis of IDE, de applicatie zou moeten kunnen gebruiken. Hiervoor moesten we zowel de backend als de frontend deployen en hosten. Wij hebben hiervoor een praktische opzet gemaakt. De manier waarop wij dit hebben gedaan, dient als voorbeeld van hoe het zou kunnen worden aangepakt. 
+
+We willen benadrukken dat er geen diepgaand vergelijkend onderzoek is gedaan naar verschillende deploymentproviders. We hebben enkele opties verkend, maar de keuze voor Render is voornamelijk gebaseerd op de beschikbaarheid en ervaring binnen het team. Deze opzet is bedoeld als uitgangspunt, niet als definitieve aanbeveling. Een uitgebreider onderzoek naar de beste oplossing qua deployment zou door het volgende team kunnen worden opgepakt.
 
 ## Backend
 
-Voor de backend hebben wij de serverprovider Render gebruikt. De verantwoording hiervoor is te vinden in het verantwoordingsdocument. De bevoegden hebben toegang tot het account waarop de backend draait. Op de Render-server draait de Flask API waarmee de frontend communiceert.
+Voor de backend hebben wij de serverprovider Render gebruikt. De bevoegden hebben toegang tot het account waarop de backend draait. Op de Render-server draait de Flask API waarmee de frontend communiceert.
 
 ### Hoe deploy ik de backend
 1. Op https://dashboard.render.com kan je de stauts van de server bekijken
