@@ -176,6 +176,7 @@ app = Flask(__name__)
 - **config.py:** Stores and manages simulation configuration presets.
 
 **Behavior Summary**
+
 - Responds to frontend inputs by launching and managing simulations.
 - Exposes simulation results and agent data through a clean REST API.
 - Bridges the agent simulation with a conversational AI to simulate realistic agent reasoning.
@@ -184,8 +185,69 @@ app = Flask(__name__)
 This API layer enables interactive experimentation with agent-based simulations of household decision-making in the context of sustainability adoption.
 
 ### config.py
+This module defines configurable simulation parameters used across the sustainability adoption model. It contains multiple predefined configurations (e.g., for testing or real-world approximation), allowing easy switching between setups by adjusting the CHOSEN_CONFIG variable.
+
+**Global Variable**
+```
+CHOSEN_CONFIG = 1
+```
+- Determines which configuration dictionary (e.g., configs[1]) is used during simulation runs.
+
+**configs**  
+A dictionary of numbered simulation configurations. Each config defines all key parameters for residents, households, environment, and simulation data collection.
+
+**Config 1 – Full-Scale Realistic Testing Setup**
+This is the main testing configuration (CHOSEN_CONFIG = 1). It simulates a full neighborhood based on realistic Dutch data (2024). It supports 30 years of adoption behavior, environmental pricing, and includes probabilistic adoption chances.
+
+**Simulation Startup**
+- **nr_households:** 840 — Approximate number of households based on CBS statistics.
+- **nr_residents:** 1772 — Based on average Dutch household size (2.1).
+- **simulation_years:** 30 — Long-term simulation to analyze adoption trends over decades.
+- **seed:** Random seed initialization for reproducibility.
+
+**Environment Parameters**
+- **subjective_norm:** 0.0 — Initial social influence, modifiable during simulation.
+- **solar_panel_price:** €410 — Initial cost of solar panels.
+- **heat_pump_price:** €6000 — Realistic average installation cost.
+- **energy_price:** €0.32/kWh — Based on Dutch electricity prices (2024).
+- **gas_price:** €1.29/m³ — Market average for gas in the Netherlands.
+- **yearly_energy_usage:** (1600, 5000) — Range of household energy needs (kWh).
+- **yearly_gas_usage:** (900, 1900) — Range of gas consumption per year (m³).
+- **CO2_electricity:** 0.27 kg/kWh — Emissions from electricity.
+- **CO2_gas:** 1.78 kg/m³ — Emissions from gas usage.
+- **yearly_heatpump_usage:** (2000, 2500) kWh — Electricity usage of a typical heat pump.
+- **initial_solarpanel_chance:** 32% — Adoption rate at simulation start.
+- **initial_heatpump_chance:** 7% — Based on CBS adoption estimates.
+- **solarpanel_price_increase:** (0, 20) €/year — Random yearly cost changes.
+- **heatpump_price_increase:** (0, 300) €/year — Variable price trajectory.
+- **min_nr_houses:** 20, max_nr_houses: 60 — Determines street/district size for norm calculation.
+- **subj_norm_level:** "Street" — Social influence is calculated at the street level.
+
+**Household Agent Parameters**
+- **solar_panel_amount_options:** [6, 8, 10] — Choices for panel installations.
+- **energy_generation_range:** (298, 425) kWh — Per panel annual output.
+- **household_decision_threshold:** 0.5 — At least 50% of residents must agree to adopt.
+
+**Resident Agent Parameters**
+- **median_income:** €3300/month — Median Dutch income (2024).
+- **sigma_normal:** €700 — Income standard deviation.
+- **raise_income:** [1.00–1.05] — Annual stochastic income growth factors.
+- **decision_threshold:** 0.5 — Minimum internal motivation needed to adopt.
+- **attitude, attitude_mod, subj_norm_mod, behavioral_mod:** Initially set to None — dynamically assigned during simulation to capture behavioral evolution.
+
+**Data Collection**
+- **collect_data:** True — Enables simulation logging.
+- **data_save_folder:** 'data/' — Path for data output.
+
+**Behavior Summary**
+- This configuration enables a large-scale, multi-decade sustainability simulation grounded in Dutch statistics.
+- It balances realism with performance, using social norm levels at the street scale and economic parameters that evolve over time.
+- Designed to observe long-term adoption patterns of solar panels and heat pumps influenced by price, norms, and personal beliefs.
 
 ### enviroment.py
+
+
+
 
 ### main.py
 
