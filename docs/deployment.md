@@ -5,7 +5,6 @@ De opdrachtgever heeft aangegeven dat de applicatie online live beschikbaar moet
 
 ## Backend
 
-### Intro
 Voor de backend hebben wij de serverprovider Render gebruikt. De verantwoording hiervoor is te vinden in het verantwoordingsdocument. De bevoegden hebben toegang tot het account waarop de backend draait. Op de Render-server draait de Flask API waarmee de frontend communiceert.
 
 ### Hoe deploy ik de backend
