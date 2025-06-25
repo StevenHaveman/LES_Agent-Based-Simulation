@@ -10,12 +10,12 @@ This application provides endpoints to:
 from __future__ import annotations
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from .main import run_simulation, graphics_data, households_data
+from main import run_simulation, graphics_data, households_data
 import utilities
 
 from AgentLLMHandler import AgentLLMHandler
 
-from .main import toggle_simulation_pause, is_simulation_paused
+from main import toggle_simulation_pause, is_simulation_paused
 from shared_state import set_delay, get_delay
 import config
 
