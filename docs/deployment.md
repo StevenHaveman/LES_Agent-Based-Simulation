@@ -24,6 +24,6 @@ De applicatie gebruikt veel RAM, waardoor je met een beperkt aantal configuratie
   "simulation_years": 10,
 }```
 
-Dit is het maximum voor de gratis versie van Render, die slechts 512 MB RAM toestaat. Dat is onvoldoende om een simulatie van de echte wereld uit te voeren. Om dat mogelijk te maken, zou je het abonnement moeten upgraden naar een betaald plan.”
+Dit is het maximum voor de gratis versie van Render, die slechts 512 MB RAM toestaat. Dat is onvoldoende om een simulatie van de echte wereld uit te voeren. Om dat mogelijk te maken, zou je het abonnement moeten upgraden naar een betaald plan.
 
 ## Frontend
