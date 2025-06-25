@@ -373,5 +373,23 @@ This module provides a shared global state for controlling simulation speed (del
 Acts as a lightweight interface between the simulation engine and potential user interfaces, allowing dynamic run-speed adjustment without tightly coupling modules.
 
 ### utillities.py
+#### Summary of Responsibilities
+This module contains utility functions that support the simulation by providing helper logic for random value generation and configuration selection.
+
+#### Random Value Utility
+**gen_random_value(range_min, range_max)**
+- Generates a random float within the specified range.
+- Used in the simulation for injecting variability into agent or environment behavior.
+
+#### Configuration Management
+**choose_config()**
+- Fetches the active simulation configuration based on CHOSEN_CONFIG from the config module.
+-Falls back to config 0 if the selected ID does not exist.
+- Returns a tuple of:
+- - The selected config ID (int)
+- - The corresponding config dictionary (dict)
+
+#### Purpose
+Encapsulates common support functions to keep the simulation core clean and modular, ensuring separation of concerns between model logic and setup randomness/config management.
 
 ### test_mvp.py
