@@ -90,43 +90,35 @@ def __init__(self, model_name, chosen_config)
 - **_save_json():** Writes back only if _data_dirty flag is True.
 
 **Conversation Management**
-get_agent_conversation(): Loads the existing chat history for the current agent.
+- **get_agent_conversation():** Loads the existing chat history for the current agent.
+- **update_agent_conversation():** Updates the JSON if the current conversation has changed.
 
-update_agent_conversation(): Updates the JSON if the current conversation has changed.
+**Prompt Generation**
+- **_get_system_prompt():** Returns a static system prompt with current values for attitude, norms, and control.
+- **_get_system_prompt_second_version(max_years=5):** Builds a time-series-based prompt using historic simulation values per year for the current agent. Returns fallback if no data available.
 
-Prompt Generation
-_get_system_prompt(): Returns a static system prompt with current values for attitude, norms, and control.
-
-_get_system_prompt_second_version(max_years=5): Builds a time-series-based prompt using historic simulation values per year for the current agent. Returns fallback if no data available.
-
-Conversation Initialization
-python
-Kopiëren
-Bewerken
+**Conversation Initialization**
+```
 def _init_conversation(agent_id)
-Loads past history for a given agent or initializes a new conversation using a system prompt (preferably with historic data).
+```
+- Loads past history for a given agent or initializes a new conversation using a system prompt (preferably with historic data).
 
-Chat with the LLM
-python
-Kopiëren
-Bewerken
+**Chat with the LLM**
+```
 def chat(agent_id, prompt)
-Initializes conversation if necessary.
+```
+- Initializes conversation if necessary.
 
-Appends the user prompt and sends it to the model using ollama.chat(...).
+- Appends the user prompt and sends it to the model using ollama.chat(...).
 
-Receives the assistant's response, stores it, and updates the JSON data.
+- Receives the assistant's response, stores it, and updates the JSON data.
 
-Behavior Summary
-Uses structured JSON files to store:
-
-Per-agent conversation history.
-
-Yearly simulation data (attitude, norms, control).
-
-Adjusts prompts dynamically based on agent history.
-
-Allows querying an LLM to simulate nuanced agent responses.
+**Behavior Summary**
+- Uses structured JSON files to store:
+- - Per-agent conversation history.
+- - Yearly simulation data (attitude, norms, control).
+- Adjusts prompts dynamically based on agent history.
+- Allows querying an LLM to simulate nuanced agent responses.
 
 This class enables more human-like simulation of resident behavior by interfacing simulation data with a local language model and managing persistent memory per agent.
 
@@ -134,6 +126,10 @@ This class enables more human-like simulation of resident behavior by interfacin
 
 
 ### app.py
+
+
+
+
 
 ### config.py
 
