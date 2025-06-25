@@ -1,0 +1,13 @@
+Flask
+flask-cors
+gunicorn
+numpy
+jinja2
+blinker
+itsdangerous
+click
+markupsafe
+packaging
+mesa
+openai
+requests

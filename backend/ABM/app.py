@@ -6,6 +6,8 @@ This application provides endpoints to:
 - Retrieve aggregated data for graphical representation.
 - Fetch detailed data about individual households from the last simulation.
 """
+
+from __future__ import annotations
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from main import run_simulation, graphics_data, households_data
