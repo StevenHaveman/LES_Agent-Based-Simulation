@@ -2,7 +2,6 @@
 
 Om het project lokaal via een IDE te starten, moet je zowel de Flask API als de lokale UI draaien. Om de AI-chat werkend te krijgen, moet je Ollama geïnstalleerd hebben.
 
-
 ## Hoe start je de Flask API
 - Zorg dat je Python 3.12 of hoger op je machine hebt geïnstalleerd.
 - Installeer de benodigde packages 
