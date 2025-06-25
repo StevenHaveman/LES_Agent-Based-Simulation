@@ -24,7 +24,10 @@ app = Flask(__name__)
 config_id, chosen_config = utilities.choose_config()
 llm_handler = AgentLLMHandler("llama3.1:8b", chosen_config)
 # Configure CORS to allow connections from the frontend
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": [
+    "http://localhost:5173",
+    "https://jouw-frontend-url.netlify.app"
+]}}, supports_credentials=True)
 
 
 @app.route('/simulation', methods=['POST'])
