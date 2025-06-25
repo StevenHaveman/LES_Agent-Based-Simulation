@@ -12,7 +12,7 @@ Voor de backend hebben wij de serverprovider Render gebruikt. De bevoegden hebbe
 
 ### Hoe deploy ik de backend
 1.	Ga naar https://dashboard.render.com om de status van de server te bekijken.
-2.	2.	Render deployt de applicatie automatisch na elke commit naar een specifieke branch. Dit is ingesteld in de Render-instellingen
+2.	Render deployt de applicatie automatisch na elke commit naar een specifieke branch. Dit is ingesteld in de Render-instellingen
 3.	Voor een handmatige deployment klik je eerst op de betreffende server.
 4.	Rechtsboven kun je de backend handmatig deployen via de knop Manual Deploy.
 
