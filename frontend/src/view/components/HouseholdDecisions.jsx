@@ -61,14 +61,14 @@ const HouseholdDecisions = ({ selectedHouseholdId, visible }) => {
         <div className="household-decisions-container">
             {/* Solar panels decision section */}
             <div className="solar-panels">
-                <img src="/INNO/solar_panel.png" alt="Solar Panel" className="solar_panel_icon" />
+                <img src="solar_panel.png" alt="Solar Panel" className="solar_panel_icon" />
                 <h2 className={hasSolarDecision ? "text-green" : "text-red"}>
                     {hasSolarDecision ? "Yes" : "No"}
                 </h2>
             </div>
             {/* Heat pumps decision section */}
             <div className="heat-pumps">
-                <img src="/INNO/heat_pump.png" alt="Heat Pump" className="heat_pump_icon" />
+                <img src="heat_pump.png" alt="Heat Pump" className="heat_pump_icon" />
                 <h2 className={hasHeatPumpDecision ? "text-green" : "text-red"}>
                     {hasHeatPumpDecision ? "Yes" : "No"}
                 </h2>

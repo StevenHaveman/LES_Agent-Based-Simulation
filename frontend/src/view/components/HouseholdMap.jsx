@@ -59,7 +59,7 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
 
     useEffect(() => {
         const icon = new Image();
-        icon.src = "/INNO/Household_icon.png";
+        icon.src = "Household_icon.png"; // Path to your household icon image
         icon.onload = () => {
             iconRef.current = icon;
             drawCanvas();
