@@ -26,9 +26,9 @@ llm_handler = AgentLLMHandler("llama3.1:8b", chosen_config)
 # Configure CORS to allow connections from the frontend
 CORS(app, resources={r"/*": {"origins": [
     "http://localhost:5173",
-    "https://inno-2025-groep-625.onrender.com"
+    "https://inno-2025-groep-625.onrender.com",
+    "https://davehendrikshu.github.io"
 ]}}, supports_credentials=True)
-
 
 @app.route('/simulation', methods=['POST'])
 def start_simulation():
