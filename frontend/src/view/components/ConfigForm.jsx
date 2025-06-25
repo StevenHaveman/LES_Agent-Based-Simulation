@@ -29,8 +29,8 @@ const ConfigForm = () => {
     // State to manage form data
     const [formData, setFormData] = useState({
         nr_households: 10, // Default number of households
-        nr_residents: 10,  // Default number of residents per household
-        simulation_years: 30, // Default simulation duration in years
+        nr_residents: 20,  // Default number of residents per household
+        simulation_years: 10, // Default simulation duration in years
         seed: "" // Default random seed (empty string)
     });
 
