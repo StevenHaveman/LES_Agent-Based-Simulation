@@ -298,12 +298,80 @@ This module defines the Environment class, the main simulation controller, respo
 - Returns a human-readable string summary of the environment's current state, including CO₂ savings and package decisions.
 
 ### main.py
+#### Summary of Responsibilities
+This script is the entry point of the simulation. It sets up the environment, controls the simulation loop over time, and manages data collection and export.
 
+#### Initialization & Configuration
+**choose_config()**
+- Loads simulation settings from a predefined configuration file.
+**initialize_data_collection(model)**
+- Prepares a .json file for data output based on the current run number.
+- Creates the output folder if it doesn't exist.
 
+#### Pause Functionality
+**toggle_simulation_pause()**
+- Toggles the global simulation pause state (for external UI control)
+**is_simulation_paused()**
+- Checks whether the simulation is currently paused.
 
+#### Core Simulation Loop
+**run_simulation()**
+
+- Inputs: number of households, number of residents, years to simulate, random seed.
+
+- Sets the random seed for reproducibility.
+
+- Initializes the Environment model.
+
+- For each simulation year:
+
+- - Waits if the simulation is paused.
+
+- - Prints pre-year and post-year environment state.
+
+- - Collects beginning-of-year statistics.
+
+- - Advances the simulation by one year via model.step().
+
+- - Collects end-of-year stats and stores them in graphics_data.
+
+- - Optionally exports data to .json.
+
+- - Updates households_data with the latest household/resident info.
+
+- - Waits (sleep) before continuing to the next year (based on UI delay).
+
+#### Data Structures
+**graphics_data**
+- Stores aggregated metrics per year for charts/visualization.
+**households_data**
+- Stores detailed household and resident info per year (for UI/API access).
+**file_name**
+- Dynamic filename for JSON export, uniquely determined per run.
+
+#### Execution
+**if __name__ == "__main__"**
+- Starts the simulation using values from the loaded configuration.
 
 ### shared_state.py
+#### Summary of Responsibilities
+This module provides a shared global state for controlling simulation speed (delay between years), useful for UI interaction or manual pacing.
 
-### test_mvp.py
+#### Simulation Delay Control
+**current_delay**
+- A global variable storing the current delay (in seconds) between simulation steps. Default is 3.
+
+**set_delay(value)**
+- Sets the global delay to a new value.
+- Typically called by a UI or controller to adjust pacing dynamically.
+
+**get_delay()**
+- Returns the current delay value.
+- Called at the end of each simulation year in main.py to determine how long to pause.
+
+#### Purpose
+Acts as a lightweight interface between the simulation engine and potential user interfaces, allowing dynamic run-speed adjustment without tightly coupling modules.
 
 ### utillities.py
+
+### test_mvp.py
