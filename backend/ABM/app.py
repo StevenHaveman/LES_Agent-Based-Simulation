@@ -26,7 +26,7 @@ llm_handler = AgentLLMHandler("llama3.1:8b", chosen_config)
 # Configure CORS to allow connections from the frontend
 CORS(app, resources={r"/*": {"origins": [
     "http://localhost:5173",
-    "https://jouw-frontend-url.netlify.app"
+    "https://inno-2025-groep-625.onrender.com"
 ]}}, supports_credentials=True)
 
 
