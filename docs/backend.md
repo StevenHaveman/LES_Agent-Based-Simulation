@@ -245,11 +245,62 @@ This is the main testing configuration (CHOSEN_CONFIG = 1). It simulates a full 
 - Designed to observe long-term adoption patterns of solar panels and heat pumps influenced by price, norms, and personal beliefs.
 
 ### enviroment.py
+This module defines the Environment class, the main simulation controller, responsible for initializing and coordinating all agents and sustainability mechanisms within the simulation
 
+#### Initialization & Setup
+**__init__()**
+- Loads simulation configuration.
+- Initializes sustainability packages (SolarPanel, HeatPump).
+- Creates households and residents.
+- Groups households into streets.
+- Calculates initial CO₂ emissions and installs initial packages probabilistically.
 
+**create_agents()**
+- Distributes residents evenly across households.
+- Assigns initial package installations with configuration-based probabilities.
+- Initializes agents’ norms and flags for package decisions.
 
+**generate_streets()**
+- Clusters households into streets of variable size using random sampling and configured limits.
+
+**update_subjective_norm()**
+- Calls each package’s norm-update method to revise residents' social norms.
+
+#### Simulation Lifecycle
+**Step**
+- Resets decision counters.
+- Advances all households by one step (e.g., one year).
+- Updates norms and package states.
+
+#### Data Collection & Export
+**collect_environment_data()**
+- Gathers high-level metrics (e.g., energy price, average income, norms, behavioral control).
+
+**setup_data_structure(file_name)**
+- Initializes a .json data file with simulation metadata and an empty structure for results.
+
+**export_data(file_name, year)**
+- Writes per-resident and environment-level data for the specified year into the results file.
+
+**collect_start_of_year_data(year)**
+- Logs package-related stats (decisions, installations, prices) at the beginning of the year.
+- Stores yearly CO₂ savings.
+
+**collect_end_of_year_data(data_from_start_of_year)**
+- Appends end-of-year statistics to the existing yearly data.
+
+**collect_household_information()**
+- Returns detailed info per household and resident, useful for user interface or analysis.
+
+#### Other
+
+**__str__()**
+- Returns a human-readable string summary of the environment's current state, including CO₂ savings and package decisions.
 
 ### main.py
+
+
+
 
 ### shared_state.py
 
