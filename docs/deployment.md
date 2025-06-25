@@ -18,11 +18,11 @@ Voor de backend hebben wij de serverprovider Render gebruikt. De verantwoording 
 
 ### Beperkignen
 De applicatie gebruikt veel RAM, waardoor je met een beperkt aantal configuratiewaarden de simulatie succesvol kunt draaien op de server. Het huidige maximum ligt op:
-```{
+"{
   "nr_households": 10,
   "nr_residents": 20,
   "simulation_years": 10,
-}```
+}"
 
 Dit is het maximum voor de gratis versie van Render, die slechts 512 MB RAM toestaat. Dat is onvoldoende om een simulatie van de echte wereld uit te voeren. Om dat mogelijk te maken, zou je het abonnement moeten upgraden naar een betaald plan.
 
