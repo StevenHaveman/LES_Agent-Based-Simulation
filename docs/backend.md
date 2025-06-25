@@ -393,3 +393,40 @@ This module contains utility functions that support the simulation by providing 
 Encapsulates common support functions to keep the simulation core clean and modular, ensuring separation of concerns between model logic and setup randomness/config management.
 
 ### test_mvp.py
+#### Summary of Responsibilities
+This module provides a test suite for validating the core functionality of the agent-based model using pytest. It focuses on verifying the correct behavior of Resident, Household, and Environment classes.
+
+#### Resident Agent Tests
+**test_resident_initialization()**
+- Checks if a Resident is initialized correctly with given attributes and defaults (solar_panels should be False).
+
+**test_resident_behavioral_influence()**
+- Validates that the calculated behavioral influence is within expected bounds (between -0.3 and 0.3).
+
+**test_resident_calc_decision()**
+- Tests whether a decision is made based on given inputs. The return should be a bool or None.
+
+**test_resident_income_update()**
+- Ensures the resident’s income does not decrease after a decision cycle.
+
+**test_resident_no_solar_panels_by_default()**
+- Asserts that a resident does not have solar panels by default.
+ 
+**test_resident_decision_threshold()**
+- Checks that a resident does not adopt solar panels if the decision threshold is unrealistically high.
+
+#### Household Agent Tests
+**test_household_initialization()**
+- Validates the correct creation of a Household with expected ID and solar panel status.
+
+
+#### Environment Tests
+**test_environment_initialization()**
+- Ensures Environment initializes with solar panel price in expected range and zero influence.
+
+**test_environment_change_influence()**
+- Confirms that environmental influence increases based on the number of solar-equipped households.
+
+**test_environment_behavioral_influence_increase()**
+- Verifies that behavioral influence increases when solar adoption increases.
+
