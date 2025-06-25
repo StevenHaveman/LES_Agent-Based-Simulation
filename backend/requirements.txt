@@ -11,3 +11,4 @@ packaging
 mesa
 openai
 requests
+ollama
