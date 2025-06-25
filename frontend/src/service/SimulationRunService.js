@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL_LOCAL;
 
 /**
  * SimulationRunService class provides methods to interact with the backend API
