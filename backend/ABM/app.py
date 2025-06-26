@@ -12,12 +12,11 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from .main import run_simulation, graphics_data, households_data
 from . import utilities
-
 from .AgentLLMHandler import AgentLLMHandler
-
 from .main import toggle_simulation_pause, is_simulation_paused
 from .shared_state import set_delay, get_delay
 from . import config
+from threading import Thread
 
 # Initialize the Flask application
 app = Flask(__name__)
@@ -42,15 +41,16 @@ def start_simulation():
     except (ValueError, TypeError) as e:
         return jsonify({"status": "error", "message": "Invalid input: " + str(e)}), 400
 
+    # Config opslaan
     config.configs[config_id]["nr_households"] = nr_households
     config.configs[config_id]["nr_residents"] = nr_residents
     config.configs[config_id]["simulation_years"] = simulation_years
     config.configs[config_id]["seed"] = seed
 
-    result = run_simulation(nr_households, nr_residents, simulation_years, seed=seed)
+    # Start simulatie in aparte thread
+    run_in_background(nr_households, nr_residents, simulation_years, seed)
 
-    return jsonify({"status": "ok", "result": result})
-
+    return jsonify({"status": "ok", "message": "Simulatie gestart in achtergrond."})
 
 @app.route("/graphics_data", methods=["GET"])
 def get_graphics_data():
@@ -209,6 +209,12 @@ def parameters():
 @app.route('/config', methods=["GET"])
 def get_sim_config():
     return jsonify(chosen_config)
+
+def run_in_background(nr_households, nr_residents, simulation_years, seed):
+    def simulation_task():
+        run_simulation(nr_households, nr_residents, simulation_years, seed)
+    thread = Thread(target=simulation_task)
+    thread.start()
 
 
 
