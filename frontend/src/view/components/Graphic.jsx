@@ -149,7 +149,7 @@ const Graphic = ({ title = "", yAxisKey = "" }) => {
                         />
                         <YAxis
                             domain={[yMin, yMax]}
-                            allowDecimals={true}
+                            allowDecimals={false}
                             tickFormatter={value => value.toFixed(0)}
                         />
                         <Tooltip formatter={value => value.toFixed(0)} />

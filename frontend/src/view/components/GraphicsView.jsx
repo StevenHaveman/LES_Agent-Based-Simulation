@@ -28,7 +28,7 @@ const GraphicsView = () => {
             {/* Wrapper for the graphic displaying households with sustainability packages */}
             <div className="graphic-wrapper">
                 <Graphic
-                    title="Households with Package" // Title of the graphic
+                    title="Households with Solarpanel package" // Title of the graphic
                     yAxisKey="solar_panel_households" // Key for the Y-axis data
                 />
             </div>
