@@ -44,18 +44,24 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
     const householdPositions = useRef({});
     const iconRef = useRef(null);
 
-    useEffect(() => {
-        const fetchHouseholds = async () => {
+
+    const fetchHouseholdsWithRetry = async (retries = 20, delay = 1000) => {
+        for (let attempt = 0; attempt < retries; attempt++) {
             try {
-                await new Promise(resolve => setTimeout(resolve, 100));
                 const data = await overviewController.fetch_households();
                 setHouseholds(data);
+                return;
             } catch (error) {
-                console.error('Error fetching households:', error);
+                if (attempt === retries - 1) {
+                    console.error("Failed to fetch households after retries:", error);
+                } else {
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
             }
-        };
-        fetchHouseholds();
-    }, []);
+        }
+    };
+
+    fetchHouseholdsWithRetry();
 
     useEffect(() => {
         const icon = new Image();
