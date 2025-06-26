@@ -7,6 +7,7 @@ In deze README leggen we uit hoe je de simulatie lokaal kunt draaien en hoe de f
 2. [Quick Start(deployment)](./docs/deployment.md)
 3. [Frontend](./docs/frontend.md)
 4. [Backend](./docs/backend.md)
+5. [LLM](.docs/LLM_README.md)
 5. [Q&A](./docs/Q&A.md)
 
 
