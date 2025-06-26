@@ -121,7 +121,7 @@ const Graphic = ({ title = "", yAxisKey = "" }) => {
             }
         };
 
-        extract(yKey, start_state_per_package, "Start");
+        // extract(yKey, start_state_per_package, "Start");
         extract(yKey, end_state_per_package, "End");
 
         return entries;
@@ -154,7 +154,7 @@ const Graphic = ({ title = "", yAxisKey = "" }) => {
                         />
                         <Tooltip formatter={value => value.toFixed(0)} />
                         <Legend />
-                        <Line
+                        {/* <Line
                             type="monotone"
                             dataKey="value"
                             data={flattenedData.filter(d => d.state === "Start")}
@@ -163,7 +163,7 @@ const Graphic = ({ title = "", yAxisKey = "" }) => {
                             strokeWidth={2}
                             dot={{ r: 4 }}
                             activeDot={{ r: 6 }}
-                        />
+                        /> */}
                         <Line
                             type="monotone"
                             dataKey="value"
