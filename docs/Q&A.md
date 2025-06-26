@@ -36,11 +36,11 @@ export const routeTree = rootRoute.addChildren([
 ]);
 ```
 
-## Wat doet de API zelf
+## What does the API do  and where is it located
 
 The API is located in the back-end of the project. Specifically, it is implemented in the `app.py` file. The API acts as
 a communication layer between the frontend and the simulation.
 
-## Welk framework is er gebruikt voor de simulatie zelf
+## Which simulation framework is used and why
 
-Mesa, de verantwoording hiervoor is te vinden in het verantwoordingsdocument.
+The simulation uses the Mesa framework. The justification for this choice can be found in the `Onderzoek Verschillende Sim Frameworks.pdf` file in the `docs` folder.
