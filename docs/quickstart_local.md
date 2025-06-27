@@ -79,17 +79,24 @@ Using pip:
 pip install -r requirements.txt
 ```
 ### 4.2 (Optional) Use Virtual Environment
-Recommended for working on multiple Python projects.
-For example Anaconda.
+Using a virtual environment is recommended if you're working on multiple Python projects, as it keeps dependencies isolated.
 
-```
-conda install --file requirements.txt
-```
-myenv: Can be whatever name you need it to be.
+There are several ways to set up a virtual environment:
+**Using Conda:**
 ```
 conda create --name myenv python=3.12
 conda activate myenv
 ```
+**Using built-in Python (no Conda):**
+```
+python -m venv myenv
+source myenv/bin/activate      # On macOS/Linux
+myenv\Scripts\activate.bat     # On Windows
+```
+**Using an IDE:**
+Most IDEs (such as PyCharm or VSCode) allow you to create and manage virtual environments through their graphical interface. Refer to your IDE’s documentation for details.
+
+You can name the environment anything you like (we use myenv as an example).
 
 ## 5. Set Up Node.js (Frontend)
 ### 5.1 Install Node Dependencies
