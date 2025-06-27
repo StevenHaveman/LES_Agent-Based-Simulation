@@ -68,17 +68,23 @@ cd INNO-2025-Groep-625
 Ask the project owner for a ZIP file and extract it locally.
 
 ## 4. Set Up Python (Flask API)
+To ensure everything works as expected, make sure you are inside the INNO-2025-Groep-625 directory.
+If you followed step 3.1 (cd INNO-2025-Groep-625), you're already in the right place.
+However, if you're using an IDE or skipped that step, please navigate to that folder manually before continuing 
+
 ### 4.1 Install Python Dependencies
+Install the required packages. You must run these commands from the directory where the requirements.txt file is located (usually INNO-2025-Groep-625).
 Using pip:
 ```
 pip install -r requirements.txt
 ```
-Or using Conda:
+### 4.2 (Optional) Use Virtual Environment
+Recommended for working on multiple Python projects.
+For example Anaconda.
+
 ```
 conda install --file requirements.txt
 ```
-### 4.2 (Optional) Use Virtual Environment
-Recommended for working on multiple Python projects.
 myenv: Can be whatever name you need it to be.
 ```
 conda create --name myenv python=3.12
