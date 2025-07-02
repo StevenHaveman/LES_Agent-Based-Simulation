@@ -44,7 +44,7 @@ The backend (Flask API) is hosted on Render.com.
 
 ### 3.2 Manual Deployment
 
-1. Go to [https://dashboard.render.com](https://dashboard.render.com) and log in.
+1. Go to [https://dashboard.render.com](https://dashboard.render.com) and log in.(inlog detials need to be shared)
 2. Select the backend server from your services.
 3. Click the **Manual Deploy** button in the top right to trigger a manual deployment.
 
