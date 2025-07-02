@@ -34,6 +34,5 @@ class AIChatService {
     }
 }
 
-// Singleton instance of AIChatService for reuse across the application.
 const aiChatService = new AIChatService();
 export default aiChatService;
