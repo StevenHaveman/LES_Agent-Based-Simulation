@@ -97,7 +97,7 @@ To publish the build to GitHub Pages, run
 
 This command pushes the contents of the dist folder to the gh-pages branch of your repository, making the site available at:
 
-https://davehendrikshu.github.io/INNO-2025-Groep-625/
+https://StevenHaveman.github.io/LES_Agent-Based-Simulation/
 
 Make sure the homepage field in your package.json is set correctly for your repository.
 
