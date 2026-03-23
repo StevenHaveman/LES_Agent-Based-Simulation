@@ -53,13 +53,13 @@ class Environment(Model):
         self.energy_price = self.config['energy_price'] 
         self.households = []  # gewone Python-lijst voor filteren/gemak
         self.residents = []  # gewone Python-lijst voor filteren/gemak
-        self.streets = []
+        self.streets = [] # Needed for the GIS MAP Maybe? Or all the households will have actual cordinates.
         self.yearly_stats = []
         self.total_co2 = 0
         self.current_co2 = 0
 
         self.create_agents(nr_households, nr_residents)
-        self.generate_streets()
+        self.generate_streets() 
         self.update_subjective_norm()
 
     def create_agents(self, nr_households: int, nr_residents: int):
@@ -112,7 +112,7 @@ class Environment(Model):
                     if package.name not in res_obj.package_subjective_norms:
                          res_obj.package_subjective_norms[package.name] = self.config.get('subjective_norm', 0.0)
 
-    def generate_streets(self,):
+    def generate_streets(self,): # TODO: Not used as of now maybe in the future
         """
         Generate a list of streets, where each street is a list of households.
 
@@ -178,7 +178,7 @@ class Environment(Model):
         for package in self.sustainability_packages:
             package.step()
 
-    def collect_environment_data(self):
+    def collect_environment_data(self): # update this function to collect all the needed info from all the agents within the simulation.
         environment_data = {
             "energy_price": self.energy_price,
             "nr_agents_with_solar_panel": "nog doen", # TODO: ...
@@ -221,7 +221,7 @@ class Environment(Model):
         with open(file_name, 'w+') as file:
             json.dump(data, file, indent=4)
 
-    def export_data(self, file_name, year: int) -> None:
+    def export_data(self, file_name, year: int) -> None: # TODO I dont believe this is working as a button in the GUI yet?
         if not os.path.exists(file_name):
             raise FileNotFoundError(f"Data file {file_name} not found.")
 
@@ -285,7 +285,7 @@ class Environment(Model):
         self.yearly_stats.append(data)
         return data
 
-    def collect_end_of_year_data(self, data_from_start_of_year):
+    def collect_end_of_year_data(self, data_from_start_of_year): # TODO Will need to update when new attributes are added top the agents and households.
         """
         Collects and appends data at the end of a simulation year to the
         data collected at the start of the year.
@@ -318,7 +318,7 @@ class Environment(Model):
         data_from_start_of_year["decisions_this_year_total_end"] = total_decisions_this_year_end 
         data_from_start_of_year["decisions_this_year_per_package_end"] = dict(self.decided_residents_this_step_per_package)
 
-    def collect_household_information(self):
+    def collect_household_information(self): # TODO WIll need to update this function to include new information.
         """
         Collects detailed information about each household and its residents.
 
