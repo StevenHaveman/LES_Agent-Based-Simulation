@@ -33,7 +33,7 @@ class Resident(Agent):
         self.subj_norm = {package.name: None for package in self.environment.sustainability_packages}
         self.behavioral_control = {package.name: None for package in self.environment.sustainability_packages}
         
-        if self.config_id == 0 or self.config_id == 1:
+        if self.config_id in (0, 1):
             self.attitude = utilities.gen_random_value(0, 1)
             self.attitude_mod = utilities.gen_random_value(0, 2)
             self.subj_norm_mod = utilities.gen_random_value(0, 2)
@@ -66,8 +66,8 @@ class Resident(Agent):
         median = self.config['median_income']
         sigma_normal = self.config['sigma_normal']
         mu = np.log(median)
-        sigma_lognormaal = np.sqrt(np.log(1 + (sigma_normal / median) ** 2))
-        return np.random.lognormal(mu, sigma_lognormaal)
+        sigma_lognormal = np.sqrt(np.log(1 + (sigma_normal / median) ** 2))
+        return np.random.lognormal(mu, sigma_lognormal)
     
     def calc_behavioral_control(self):
         """
