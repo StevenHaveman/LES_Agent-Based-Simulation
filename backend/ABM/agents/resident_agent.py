@@ -111,9 +111,10 @@ class Resident(Agent):
             if self.package_decisions.get(package.name, False):
                 continue
             
+            MAX_MOD_SUM = 6 # 3 factoren * max modifier 2
             decision_stat = (self.attitude * self.attitude_mod +
                              self.subj_norm[package.name] * package.subj_norm_mod * self.subj_norm_mod +
-                             self.behavioral_control[package.name] * self.behavioral_mod) / 6 # Normalize (sum of max mods if all are 2)
+                             self.behavioral_control[package.name] * self.behavioral_mod) / MAX_MOD_SUM # Normalize (sum of max mods if all are 2)
 
             if decision_stat > self.decision_threshold:
                 self.package_decisions[package.name] = True
