@@ -134,9 +134,9 @@ class Resident(Agent):
             "subj_norm_mod": self.subj_norm_mod,
             "behavioral_control": self.behavioral_control,
             "behavioral_mod": self.behavioral_mod,
-            "solar_panels": self.package_decisions.get("Solar Panels", False),
-            "heat_pump": self.package_decisions.get("Heat Pump", False),
         }
+        for package in self.environment.sustainability_packages:
+            agent_data[package.name] = self.package_decisions[package.name]
 
         return agent_data
 
@@ -150,7 +150,7 @@ class Resident(Agent):
         """
         if not all(self.package_decisions.get(p.name, False) for p in self.environment.sustainability_packages):
             self.calc_decision()
-        self.income = int(round(self.income * random.choice(self.config['raise_income']), -1))
+        self.income = int(round(self.income * np.random.choice(self.config['raise_income']), -1))
 
         # If all decisions are made, recalculate subjective norm and behavioral control
         self.calc_subjective_norm()
