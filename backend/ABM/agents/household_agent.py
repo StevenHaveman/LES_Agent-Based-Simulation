@@ -38,7 +38,6 @@ class Household(Agent):
         self.config_id, self.config = utilities.choose_config()
         self.unique_id = id
         self.residents = []
-        self.environment = model
         self.package_installations = {}
 
         # Flags for "Direct" subjective norm, per package
@@ -104,7 +103,7 @@ class Household(Agent):
         if avg_score >= self.config['household_decision_threshold']:
             self.package_installations[package.name] = True
 
-            self.environment.current_co2 -= package.calc_co2_savings(self)
+            self.model.current_co2 -= package.calc_co2_savings(self)
 
     def calc_co2_emissions(self,):
         co2_electricity = self.energy_usage * self.config['CO2_electricity']
@@ -124,7 +123,7 @@ class Household(Agent):
         for resident in self.residents:
             resident.step()
         
-        for package in self.environment.sustainability_packages:
+        for package in self.model.sustainability_packages:
             self.calc_avg_decision(package)
             self.co2_saved_yearly += package.calc_co2_savings(self)
 
