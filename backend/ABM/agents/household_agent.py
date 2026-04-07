@@ -36,9 +36,13 @@ class Household(Agent):
     def __init__(self, id, model):
         super().__init__(model)
         self.config_id, self.config = utilities.choose_config()
+        # self.gis_data = utilities.load_gis_data(self.config['gis_data_path']) #TODO data path en functie maken om deze te vullen
         self.unique_id = id
         self.residents = []
-        self.package_installations = {}
+        self.package_installations = {
+            package.name: False
+            for package in self.model.sustainability_packages
+            }
 
         # Flags for "Direct" subjective norm, per package
         self.skip_prev_flags = {} # {package_name: False/True}
@@ -51,7 +55,7 @@ class Household(Agent):
         self.heatpump_usage = random.randint(*self.config['yearly_heatpump_usage'])
         self.co2_saved_yearly = 0
 
-    def create_residents(self, nr_residents: int, id_counter: int) -> int:
+    def create_residents(self, nr_residents: int, id_counter: int) -> int: #TODO Veranderen in verband met survey data.
         """
         Create and add Resident agents to the household.
 
@@ -76,7 +80,7 @@ class Household(Agent):
 
         return id_counter
 
-    def calc_avg_decision(self, package):
+    def calc_avg_decision(self, package): #TODO Naam veranderen hij doet meer dan alleen calculeren
         """
         Determines if the household installs a given sustainability package based
         on the average decision of its residents.
@@ -125,7 +129,11 @@ class Household(Agent):
         
         for package in self.model.sustainability_packages:
             self.calc_avg_decision(package)
-            self.co2_saved_yearly += package.calc_co2_savings(self)
+            if self.package_installations[package.name]: # TODO Inprincipe bespaar je elk jaar het zelfde hoeveelheid co2 Dus hoeft dit maar een keer opgeteld te worden
+                self.co2_saved_yearly += package.calc_co2_savings(self)
+            # self.co2_saved_yearly += package.calc_co2_savings(self) # TODO Nagaan of dit nog goed werkt? aangezien de step per maand is.
+
+
 
 
     def __str__(self):
