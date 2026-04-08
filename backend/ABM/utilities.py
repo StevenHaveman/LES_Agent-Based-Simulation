@@ -55,8 +55,11 @@ def load_gis_data(gis_data_path: str):
 
     # Remove leading/trailing whitespace from column names to ensure they match expected names in the code.
     df.columns = df.columns.str.strip()
+
+    # Clean the data by dropping rows with missing critical GIS attributes (e.g., 'bouwjaar', 'woning type', 'WoonplaatsNaam').
+    df_clean = df.dropna(subset=['Bouwjaar', 'Woning type', 'WoonplaatsNaam'])
     # print(df.columns) ## Test print to check column names and formatting, adjust as needed for the actual data file.
 
-    print(df[["OBJECTID","Oppervlakte","Huisnummer","Postcode","OpenbareRuimteNaam","WoonplaatsNaam","Energielabel","Bouwjaar","Latitude","Longitude"]].head())
+    # print(df[["OBJECTID","Oppervlakte","Huisnummer","Postcode","OpenbareRuimteNaam","WoonplaatsNaam","Energielabel","Bouwjaar","Latitude","Longitude", "Woning type"]].head())
 
-    return df[["OBJECTID","Oppervlakte","Huisnummer","Postcode","OpenbareRuimteNaam","WoonplaatsNaam","Energielabel","Bouwjaar","Latitude","Longitude"]].head(10)
+    return df_clean[["OBJECTID","Oppervlakte","Huisnummer","Postcode","OpenbareRuimteNaam","WoonplaatsNaam","Energielabel","Bouwjaar","Latitude","Longitude", "Woning type"]].tail(100)

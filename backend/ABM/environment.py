@@ -392,8 +392,8 @@ class Environment(Model):
 
             hh_data = {
                 "id": household.unique_id, # Assuming Household has unique_id from Mesa Agent
-                "address": f"{household.gis_attributes['OpenbareRuimteNaam']}",
-                "name": f"Household  {household.gis_attributes['Huisnummer']}", # Or however you identify them
+                "address": f"{household.gis_attributes['WoonplaatsNaam']} | {household.gis_attributes['OpenbareRuimteNaam']}",
+                "name": f"Household  {household.gis_attributes['Huisnummer']}",
                 "GIS_attributes": household.gis_attributes, # Include all GIS attributes for reference
                 "residents": resident_details
             }
