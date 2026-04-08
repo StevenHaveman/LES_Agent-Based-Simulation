@@ -392,8 +392,9 @@ class Environment(Model):
 
             hh_data = {
                 "id": household.unique_id, # Assuming Household has unique_id from Mesa Agent
-                "address": f"Dorpsstraat {household.unique_id}",
-                "name": f"Household {household.unique_id}", # Or however you identify them
+                "address": f"{household.gis_attributes['OpenbareRuimteNaam']}",
+                "name": f"Household  {household.gis_attributes['Huisnummer']}", # Or however you identify them
+                "GIS_attributes": household.gis_attributes, # Include all GIS attributes for reference
                 "residents": resident_details
             }
             for pkg_name in [p.name for p in self.sustainability_packages]:
