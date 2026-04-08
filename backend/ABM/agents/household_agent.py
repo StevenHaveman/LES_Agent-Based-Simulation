@@ -33,11 +33,12 @@ class Household(Agent):
         gas_usage (int): Annual gas usage of the household (kWh).
         heatpump_usage (int): Annual electricity usage by a heat pump if installed (kWh).
     """
-    def __init__(self, id, model):
+    def __init__(self, id, model,gis_attributes=None):
         super().__init__(model)
         self.config_id, self.config = utilities.choose_config()
         self.gis_attributes = None # Placeholder for GIS attributes, to be populated when GIS data is loaded and assigned to households.
         self.unique_id = id
+        self.gis_attributes = gis_attributes or {}
         self.residents = []
         self.package_installations = {
             package.name: False
@@ -55,30 +56,26 @@ class Household(Agent):
         self.heatpump_usage = random.randint(*self.config['yearly_heatpump_usage'])
         self.co2_saved_yearly = 0
 
-    def create_residents(self, nr_residents: int, id_counter: int) -> int: #TODO Veranderen in verband met survey data.
-        """
-        Create and add Resident agents to the household.
+    # def create_residents(self, nr_residents: int, id_counter: int) -> int: #TODO Veranderen in verband met survey data.
+    #     """
+    #     Create and add Resident agents to the household.
 
-        Newly created residents inherit the household's current package installation
-        status as their initial decision state for those packages.
+    #     Newly created residents inherit the household's current package installation
+    #     status as their initial decision state for those packages.
 
-        Args:
-            nr_residents (int): Number of residents to create for this household.
-        """
-        for _ in range(nr_residents):
-            resident = Resident(
-                id_counter,
-                self.model,
-                self  # link naar household
-            )
-            id_counter += 1
+    #     Args:
+    #         nr_residents (int): Number of residents to create for this household.
+    #     """
+    #     for _ in range(nr_residents):
+    #         resident = Resident(id_counter,self.model,self)
+    #         id_counter += 1
 
-            for package_name, is_installed in self.package_installations.items():
-                if is_installed:
-                    resident.package_decisions[package_name] = True
-            self.residents.append(resident)
+    #         for package_name, is_installed in self.package_installations.items():
+    #             if is_installed:
+    #                 resident.package_decisions[package_name] = True
+    #         self.residents.append(resident)
 
-        return id_counter
+    #     return id_counter
 
     def calc_avg_decision(self, package): #TODO Naam veranderen hij doet meer dan alleen calculeren
         """
