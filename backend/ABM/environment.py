@@ -57,11 +57,50 @@ class Environment(Model):
         self.yearly_stats = []
         self.total_co2 = 0
         self.current_co2 = 0
+        self.gis_data = utilities.load_gis_data("data/AmstelHeuvelWijk2_TableToExcel.xlsx")
+
+        print("Nu komt een error voor test")
+
 
         self.create_agents(nr_households, nr_residents)
         self.generate_streets() 
         self.update_subjective_norm()
 
+    def create_household_agents(self): # TODO: This is a new version of the create_agents function that will use GIS data to create households with more realistic attributes and distributions. This will likely involve parsing the GIS data to determine household locations, sizes, and other relevant attributes, and then creating Household agents accordingly.
+        
+        for i in range(len(self.gis_data)):
+            hh = Household(i, self)
+            hh.gis_attributes = self.gis_data.iloc[i].to_dict() # Assuming GIS data is in a DataFrame, convert each row to a dictionary and assign to the household.
+
+            hh_emissions = hh.calc_co2_emissions()
+            self.total_co2 += hh_emissions
+            self.current_co2 += hh_emissions
+            for package in self.sustainability_packages:
+                chance_key = f"initial_{package.name.lower().replace(' ', '')}_chance"
+                initial_chance = self.config.get(chance_key, 0.0) # Default to 0% if not in config
+                
+                hh.package_installations[package.name] = (random.random() < initial_chance)
+
+                if hh.package_installations.get(package.name, False):
+                    initial_savings = package.calc_co2_savings(hh)
+                    hh.co2_saved_yearly += initial_savings
+                    self.current_co2 -= initial_savings
+                
+                hh.skip_prev_flags[package.name] = False
+                hh.skip_next_flags[package.name] = False
+
+            self.households.append(hh)
+
+        pass
+
+    # def create_resident_agents(self, nr_residents): # TODO: This function will create Resident agents for a given Household agent, using attributes from the GIS data to assign realistic characteristics to the residents (e.g., income, attitudes). The number of residents created will be based on the household size determined from the GIS data.
+
+    #     pass
+
+    # def create_resdent_agents_survey(self, survey_data): # TODO: This function will create Resident agents for a given Household agent, using attributes from the survey data to assign realistic characteristics to the residents (e.g., income, attitudes). The number of residents created will be based on the household size determined from the GIS data.
+
+    #     pass
+    
     def create_agents(self, nr_households: int, nr_residents: int):
         """
         Creates a specified number of Household agents and distributes residents among them.

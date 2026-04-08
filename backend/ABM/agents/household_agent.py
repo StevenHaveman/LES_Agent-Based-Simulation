@@ -36,7 +36,7 @@ class Household(Agent):
     def __init__(self, id, model):
         super().__init__(model)
         self.config_id, self.config = utilities.choose_config()
-        # self.gis_data = utilities.load_gis_data(self.config['gis_data_path']) #TODO data path en functie maken om deze te vullen
+        self.gis_attributes = None # Placeholder for GIS attributes, to be populated when GIS data is loaded and assigned to households.
         self.unique_id = id
         self.residents = []
         self.package_installations = {
