@@ -6,7 +6,7 @@ import {
     createRouter,
     createHashHistory,
 } from '@tanstack/react-router';
-import { routeTree } from './view/pages/root.jsx';
+import { routeTree } from './pages/root.jsx';
 
 const hashHistory = createHashHistory();
 

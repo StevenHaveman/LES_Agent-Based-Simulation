@@ -31,7 +31,7 @@
  *     - An error if the service call fails.
  */
 
-import OverviewService from '../service/OverviewService.js';
+import OverviewService from '../services/OverviewService.js';
 
 class OverviewController {
 

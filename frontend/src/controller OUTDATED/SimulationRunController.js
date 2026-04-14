@@ -1,4 +1,4 @@
-import SimulationRunService from '../service/SimulationRunService.js';
+import SimulationRunService from '../services/SimulationRunService.js';
 
 /**
  * SimulationRunController class acts as a mediator between the SimulationRunService

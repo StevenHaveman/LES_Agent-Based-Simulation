@@ -1,4 +1,4 @@
-import SimulationParametersService from '../service/SimulationParametersService.js';
+import SimulationParametersService from '../services/SimulationParametersService.js';
 
 /**
  * SimulationParametersController class acts as a mediator between the SimulationParametersService

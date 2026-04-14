@@ -17,7 +17,7 @@
  *     - An error if the simulation fails.
  */
 
-import ConfigFormService from '../service/ConfigService.js';
+import ConfigFormService from '../services/ConfigService.js';
 
 class ConfigController {
     /**
