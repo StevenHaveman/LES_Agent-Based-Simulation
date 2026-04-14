@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import simulationRunController from "../controller/SimulationRunController.js";
+import simulationRunController from "../controller OUTDATED/SimulationRunController.js";
 import "../styles/OverviewNavbar.css";
 
 /**

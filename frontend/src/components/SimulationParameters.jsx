@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../styles/Parameters.css";
-import simulationParametersController from "../controller/SimulationParametersController.js";
+import simulationParametersController from "../controller OUTDATED/SimulationParametersController.js";
 
 /**
  * SimulationParameters component provides a user interface for managing simulation parameters.

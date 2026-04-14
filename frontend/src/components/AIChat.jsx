@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../styles/AIChat.css";
-import aiChatController from "../controller/AIChatController.js";
+import aiChatController from "../controller OUTDATED/AIChatController.js";
 
 /**
  * AIChat component provides a chat interface for interacting with an AI system.
