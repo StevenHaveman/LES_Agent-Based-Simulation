@@ -42,7 +42,7 @@ class Environment(Model):
                                 distribute among households.
         """
         super().__init__()
-        self.config_id, self.config = utilities.choose_config()
+        self.config_id, self.config = utilities.choose_config() # Load the chosen configuration This is not used in the frontend defaults to config 1
 
         self.solar_panel = SolarPanel(self)
         self.heat_pump = HeatPump(self)
