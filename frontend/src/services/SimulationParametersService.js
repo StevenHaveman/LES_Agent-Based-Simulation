@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:5000";
+const API_URL = 'http://127.0.0.1:5000';
 
 /**
  * SimulationParametersService class provides methods to interact with the backend API
@@ -14,7 +14,7 @@ class SimulationParametersService {
     async fetchParameters() {
         const response = await fetch(`${API_URL}/parameters`);
         if (!response.ok) {
-            throw new Error("Failed to fetch config");
+            throw new Error('Failed to fetch config');
         }
         return await response.json();
     }
@@ -29,15 +29,15 @@ class SimulationParametersService {
      */
     async updateParameter(parameter, value) {
         const response = await fetch(`${API_URL}/update_parameter`, {
-            method: "POST",
+            method: 'POST',
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({ parameter, value }),
         });
 
         if (!response.ok) {
-            throw new Error("Parameter update failed");
+            throw new Error('Parameter update failed');
         }
 
         return await response.json();

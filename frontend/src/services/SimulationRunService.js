@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:5000";
+const API_URL = 'http://127.0.0.1:5000';
 
 /**
  * SimulationRunService class provides methods to interact with the backend API
@@ -75,7 +75,7 @@ class SimulationRunService {
         const response = await fetch(`${API_URL}/get_delay`);
 
         if (!response.ok) {
-            throw new Error("Fetching delay failed");
+            throw new Error('Fetching delay failed');
         }
 
         return await response.json();

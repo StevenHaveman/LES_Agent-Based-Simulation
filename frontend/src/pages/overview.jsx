@@ -1,49 +1,45 @@
-import React, {useState} from "react";
-import {createRoute} from "@tanstack/react-router";
-import {rootRoute} from "./root";
-import "../styles/overviewpage.css"
-import "../styles/globalPageStyles.css";
+import React, { useState } from 'react';
+import { createRoute } from '@tanstack/react-router';
+import { rootRoute } from './root';
+import '../styles/overviewpage.css';
+import '../styles/globalPageStyles.css';
 
-import GraphicsView from "../components/GraphicsView.jsx";
-import HouseholdMap from "../components/HouseholdMap.jsx";
-import HouseholdWindow from "../components/HouseholdWindow.jsx";
-import HouseholdNavbar from "../components/HouseholdNavbar.jsx";
-import ResidentNavbar from "../components/ResidentNavbar.jsx";
-import ResidentWindow from "../components/ResidentWindow.jsx";
-import ResidentDropdown from "../components/ResidentDropdown.jsx";
-import AIChatWindow from "../components/AIChatWindow.jsx";
-import OverviewNavbar from "../components/OverviewNavbar.jsx";
+import GraphicsView from '../components/GraphicsView.jsx';
+import HouseholdMap from '../components/HouseholdMap.jsx';
+import HouseholdWindow from '../components/HouseholdWindow.jsx';
+import HouseholdNavbar from '../components/HouseholdNavbar.jsx';
+import ResidentNavbar from '../components/ResidentNavbar.jsx';
+import ResidentWindow from '../components/ResidentWindow.jsx';
+import ResidentDropdown from '../components/ResidentDropdown.jsx';
+import AIChatWindow from '../components/AIChatWindow.jsx';
+import OverviewNavbar from '../components/OverviewNavbar.jsx';
 
-import KPIWindow from "../components/KPIWindow.jsx";
-import SimulationParameters from "../components/SimulationParameters.jsx";
-
-
-
+import KPIWindow from '../components/KPIWindow.jsx';
+import SimulationParameters from '../components/SimulationParameters.jsx';
 
 export const overviewRoute = createRoute({
     getParentRoute: () => rootRoute,
-    path: "/overview",
+    path: '/overview',
     component: function Overview() {
         const [selectedResidents, setSelectedResidents] = useState([]);
         const [selectedHouseholdId, setSelectedHouseholdId] = useState(null);
         const [selectedResidentIndex, setSelectedResidentIndex] = useState(null);
-        const [householdWindow, setHouseholdWindow] = useState("");
-        const [residentWindow, setResidentWindow] = useState("");
+        const [householdWindow, setHouseholdWindow] = useState('');
+        const [residentWindow, setResidentWindow] = useState('');
         const [selectedTab, setSelectedTab] = useState(null);
-        const [chatWindow, setChatWindow] = useState("");
+        const [chatWindow, setChatWindow] = useState('');
 
         const handleHouseholdSelect = (household) => {
             setSelectedHouseholdId(household.id);
             setSelectedResidents(household.residents);
         };
 
-
         return (
             <>
                 <OverviewNavbar title="Overview"> </OverviewNavbar>
                 <div className="overview-container">
                     <div className="map-container">
-                        {chatWindow === "ai" ? (
+                        {chatWindow === 'ai' ? (
                             <AIChatWindow
                                 chatWindow={chatWindow}
                                 residents={selectedResidents}
@@ -81,8 +77,8 @@ export const overviewRoute = createRoute({
                             setSelectedTab={setSelectedTab}
                         />
                         <ResidentDropdown residents={selectedResidents}
-                                          selectedResidentIndex={selectedResidentIndex}
-                                          onSelectResident={setSelectedResidentIndex}> </ResidentDropdown>
+                            selectedResidentIndex={selectedResidentIndex}
+                            onSelectResident={setSelectedResidentIndex}> </ResidentDropdown>
                         <ResidentWindow
                             residentWindow={residentWindow}
                             setWindow={setResidentWindow}
@@ -91,7 +87,7 @@ export const overviewRoute = createRoute({
                         />
                     </div>
                     <div className="parameters-container">
-                      <SimulationParameters> </SimulationParameters>
+                        <SimulationParameters> </SimulationParameters>
                     </div>
                     <div className="KPI-container">
                         <KPIWindow />

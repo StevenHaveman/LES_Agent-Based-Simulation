@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import "../styles/Parameters.css";
-import simulationParametersController from "../controller OUTDATED/SimulationParametersController.js";
+import React, { useEffect, useState } from 'react';
+import '../styles/Parameters.css';
+import simulationParametersController from '../controller OUTDATED/SimulationParametersController.js';
 
 /**
  * SimulationParameters component provides a user interface for managing simulation parameters.
@@ -12,9 +12,9 @@ const SimulationParameters = () => {
     // State to store the list of available simulation parameters.
     const [options, setOptions] = useState([]);
     // State to store the currently selected parameter key.
-    const [selectedKey, setSelectedKey] = useState("");
+    const [selectedKey, setSelectedKey] = useState('');
     // State to store the input value for the selected parameter.
-    const [inputValue, setInputValue] = useState("");
+    const [inputValue, setInputValue] = useState('');
 
     /**
      * Fetches the list of simulation parameters when the component is mounted.
@@ -32,7 +32,7 @@ const SimulationParameters = () => {
             const opts = await simulationParametersController.fetchParameters();
             setOptions(opts);
         } catch (error) {
-            console.error("Fout bij ophalen parameters:", error);
+            console.error('Fout bij ophalen parameters:', error);
         }
     };
 
@@ -51,11 +51,11 @@ const SimulationParameters = () => {
             await fetchOptions();
 
             // Reset the form fields after successful update.
-            setSelectedKey("");
-            setInputValue("");
+            setSelectedKey('');
+            setInputValue('');
         } catch (error) {
-            console.error("Fout bij updaten:", error);
-            alert("Bijwerken mislukt. Zie console voor details.");
+            console.error('Fout bij updaten:', error);
+            alert('Bijwerken mislukt. Zie console voor details.');
         }
     };
 
@@ -93,7 +93,7 @@ const SimulationParameters = () => {
             <button
                 className="form-button"
                 onClick={handleSubmit}
-                disabled={!selectedKey || inputValue === ""}
+                disabled={!selectedKey || inputValue === ''}
             >
                 Update parameter
             </button>

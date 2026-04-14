@@ -1,5 +1,5 @@
-import "../styles/ResidentDropdown.css";
-import "../styles/SharedListStyles.css";
+import '../styles/ResidentDropdown.css';
+import '../styles/SharedListStyles.css';
 import React, { useState } from 'react';
 
 /**
@@ -34,7 +34,7 @@ const ResidentDropdown = ({ residents, selectedResidentIndex, onSelectResident }
             <div className="dropdown">
                 {/* Button to toggle the dropdown menu */}
                 <button className="dropdown-toggle" onClick={() => setIsOpen(!isOpen)}>
-                    {residents[selectedResidentIndex]?.name || "Select Resident..."} ▼
+                    {residents[selectedResidentIndex]?.name || 'Select Resident...'} ▼
                 </button>
                 {/* Dropdown menu displaying the list of residents */}
                 {isOpen && (
@@ -47,7 +47,7 @@ const ResidentDropdown = ({ residents, selectedResidentIndex, onSelectResident }
                             ))
                         ) : (
                             <li>Geen residents beschikbaar</li>
-                            )}
+                        )}
                     </ul>
                 )}
             </div>

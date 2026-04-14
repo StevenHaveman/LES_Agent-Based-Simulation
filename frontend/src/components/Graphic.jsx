@@ -32,7 +32,7 @@
  * - A loading message if the data is still being fetched.
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
     LineChart,
     Line,
@@ -42,20 +42,20 @@ import {
     Tooltip,
     ResponsiveContainer,
     Legend
-} from "recharts";
+} from 'recharts';
 
-import "../styles/Graphic.css";
-import overviewController from "../controller OUTDATED/OverviewController.js";
-import simulationRunController from "../controller OUTDATED/SimulationRunController.js";
+import '../styles/Graphic.css';
+import overviewController from '../controller OUTDATED/OverviewController.js';
+import simulationRunController from '../controller OUTDATED/SimulationRunController.js';
 
 const validKeys = [
-    "solar_panel_price",
-    "heat_pump_price",
-    "solar_panel_households",
-    "solar_panel_positive_decisions"
+    'solar_panel_price',
+    'heat_pump_price',
+    'solar_panel_households',
+    'solar_panel_positive_decisions'
 ];
 
-const Graphic = ({ title = "", yAxisKey = "" }) => {
+const Graphic = ({ title = '', yAxisKey = '' }) => {
     const [simulationData, setSimulationData] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -70,13 +70,13 @@ const Graphic = ({ title = "", yAxisKey = "" }) => {
                 setSimulationData(result);
                 setLoading(false);
             } catch (error) {
-                console.error("Error fetching simulation data", error);
+                console.error('Error fetching simulation data', error);
                 setLoading(false);
             }
         };
 
         const fetchInterval = async () => {
-            const res = await simulationRunController.getSimulationDelay()
+            const res = await simulationRunController.getSimulationDelay();
             const delay = parseInt(res.delay || 3) * 1000;
 
             await fetchData(); // Initial fetch
@@ -87,7 +87,7 @@ const Graphic = ({ title = "", yAxisKey = "" }) => {
         fetchInterval();
 
         return () => {
-            if (intervalId) clearInterval(intervalId);
+            if (intervalId) {clearInterval(intervalId);}
         };
     }, []);
 
@@ -102,17 +102,17 @@ const Graphic = ({ title = "", yAxisKey = "" }) => {
         const extract = (key, stateObj, stateLabel) => {
             let value = null;
             switch (key) {
-                case "solar_panel_price":
-                    value = stateObj?.["Solar Panel"]?.price;
+                case 'solar_panel_price':
+                    value = stateObj?.['Solar Panel']?.price;
                     break;
-                case "heat_pump_price":
-                    value = stateObj?.["Heat Pump"]?.price;
+                case 'heat_pump_price':
+                    value = stateObj?.['Heat Pump']?.price;
                     break;
-                case "solar_panel_households":
-                    value = stateObj?.["Solar Panel"]?.households_with_package;
+                case 'solar_panel_households':
+                    value = stateObj?.['Solar Panel']?.households_with_package;
                     break;
-                case "solar_panel_positive_decisions":
-                    value = stateObj?.["Solar Panel"]?.residents_positive_decision;
+                case 'solar_panel_positive_decisions':
+                    value = stateObj?.['Solar Panel']?.residents_positive_decision;
                     break;
             }
 
@@ -122,7 +122,7 @@ const Graphic = ({ title = "", yAxisKey = "" }) => {
         };
 
         // extract(yKey, start_state_per_package, "Start");
-        extract(yKey, end_state_per_package, "End");
+        extract(yKey, end_state_per_package, 'End');
 
         return entries;
     });
@@ -167,7 +167,7 @@ const Graphic = ({ title = "", yAxisKey = "" }) => {
                         <Line
                             type="monotone"
                             dataKey="value"
-                            data={flattenedData.filter(d => d.state === "End")}
+                            data={flattenedData.filter(d => d.state === 'End')}
                             name="End of the year"
                             stroke="#82ca9d"
                             strokeWidth={2}

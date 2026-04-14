@@ -1,4 +1,4 @@
-import SimulationRunService from "../service/SimulationRunService.js";
+import SimulationRunService from '../service/SimulationRunService.js';
 
 /**
  * SimulationRunController class acts as a mediator between the SimulationRunService
@@ -77,10 +77,10 @@ class SimulationRunController {
     async getSimulationDelay() {
         try {
             const result = await this.service.getSimulationDelay();
-            console.log("Simulation delay fetched successfully");
+            console.log('Simulation delay fetched successfully');
             return result;
         } catch (error) {
-            console.error("Simulation delay fetch failed:", error);
+            console.error('Simulation delay fetch failed:', error);
             throw error;
         }
     }

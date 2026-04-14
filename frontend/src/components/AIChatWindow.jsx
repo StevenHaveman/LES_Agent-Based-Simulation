@@ -1,29 +1,27 @@
 
-import "../styles/AIChatWindow.css";
-import React from "react";
-import AIChat from "./AIChat.jsx";
+import '../styles/AIChatWindow.css';
+import React from 'react';
+import AIChat from './AIChat.jsx';
 
-
-const AIChatWindow = ({chatWindow, residents, selectedResidentIndex }) => {
+const AIChatWindow = ({ chatWindow, residents, selectedResidentIndex }) => {
 
     const renderContent = () => {
         switch (chatWindow) {
-            case "ai":
+            case 'ai':
                 return (
                     <AIChat  resident={residents && selectedResidentIndex !== null ? residents[selectedResidentIndex] : null}
-                             visible={true}> </AIChat>
+                        visible={true}> </AIChat>
 
                 );
             default:
                 return (
                     <AIChat  resident={residents && selectedResidentIndex !== null ? residents[selectedResidentIndex] : null}
-                             visible={true}> </AIChat>
+                        visible={true}> </AIChat>
                 );
         }
     };
 
     return renderContent();
 };
-
 
 export default AIChatWindow;

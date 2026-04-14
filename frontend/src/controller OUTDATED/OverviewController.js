@@ -31,10 +31,9 @@
  *     - An error if the service call fails.
  */
 
-import OverviewService from "../service/OverviewService.js";
+import OverviewService from '../service/OverviewService.js';
 
 class OverviewController {
-
 
     constructor(service) {
         this.service = service;
@@ -43,10 +42,10 @@ class OverviewController {
     async fetch_households(config) {
         try {
             const result = await this.service.fetchHouseholds(config);
-            console.log("Households fetched successfully");
+            console.log('Households fetched successfully');
             return result;
         } catch (error) {
-            console.error("Fetching households failed", error);
+            console.error('Fetching households failed', error);
             throw error;
         }
     }
@@ -54,10 +53,10 @@ class OverviewController {
     async getSimulationGraphicResults() {
         try {
             const result = await this.service.getSimulationGraphicResults();
-            console.log("Simulation overview fetched successfully");
+            console.log('Simulation overview fetched successfully');
             return result;
         } catch (error) {
-            console.error("Simulation overview fetch failed:", error);
+            console.error('Simulation overview fetch failed:', error);
             throw error;
         }
     }

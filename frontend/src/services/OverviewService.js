@@ -27,32 +27,31 @@
  *     - An error if the API call fails (e.g., non-OK HTTP response).
  */
 
-const API_URL = "http://127.0.0.1:5000";
+const API_URL = 'http://127.0.0.1:5000';
 
 class OverviewService {
 
     async fetchHouseholds() {
         const response = await fetch(`${API_URL}/households`);
         if (!response.ok) {
-            throw new Error("Fetching households failed");
+            throw new Error('Fetching households failed');
         }
         return await response.json();
     }
 
     async fetchSimulationConfig() {
-        const response = await fetch(`${API_URL}/config`, { method: "GET" });
+        const response = await fetch(`${API_URL}/config`, { method: 'GET' });
         if (!response.ok) {
-            throw new Error("Fetching sim config failed");
+            throw new Error('Fetching sim config failed');
         }
         return await response.json();
     }
-
 
     async getSimulationGraphicResults() {
         const response = await fetch(`${API_URL}/graphics_data`);
 
         if (!response.ok) {
-            throw new Error("Fetching simulation graphic results failed");
+            throw new Error('Fetching simulation graphic results failed');
         }
 
         return await response.json();

@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 
-import "../styles/ResidentWindow.css";
-import "./ResidentInfo.jsx";
-import ResidentInfo from "./ResidentInfo.jsx";
+import '../styles/ResidentWindow.css';
+import './ResidentInfo.jsx';
+import ResidentInfo from './ResidentInfo.jsx';
 
 /**
  * ResidentWindow component dynamically renders content based on the selected resident
@@ -25,7 +25,7 @@ const ResidentWindow = ({ residentWindow, residents, selectedResidentIndex }) =>
      */
     const renderContent = () => {
         switch (residentWindow) {
-            case "info-resident":
+            case 'info-resident':
                 return (
                     <ResidentInfo
                         resident={residents && selectedResidentIndex !== null ? residents[selectedResidentIndex] : null}

@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:5000";
+const API_URL = 'http://127.0.0.1:5000';
 
 /**
  * AIChatService class provides methods to interact with the AI backend service.
@@ -15,9 +15,9 @@ class AIChatService {
      */
     async sendPrompt(prompt, residentId) {
         const response = await fetch(`${API_URL}/AI_response`, {
-            method: "POST",
+            method: 'POST',
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 prompt: prompt,
@@ -26,7 +26,7 @@ class AIChatService {
         });
 
         if (!response.ok) {
-            throw new Error("Failed to fetch AI response");
+            throw new Error('Failed to fetch AI response');
         }
 
         return await response.json(); // Contains: { response: "..." }

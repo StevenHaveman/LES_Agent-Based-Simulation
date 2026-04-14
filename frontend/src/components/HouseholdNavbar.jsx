@@ -1,4 +1,4 @@
-import "../styles/HouseholdNavbar.css";
+import '../styles/HouseholdNavbar.css';
 
 /**
  * HouseholdNavbar component renders a navigation bar for households, allowing toggling
@@ -14,15 +14,15 @@ const HouseholdNavbar = ({ householdWindow, setHouseholdWindow }) => {
         <div className="navbar-container">
             {/* Info tab button */}
             <div
-                className={`info-tab${householdWindow === "info" ? " selected" : ""}`}
-                onClick={() => setHouseholdWindow("info")}
+                className={`info-tab${householdWindow === 'info' ? ' selected' : ''}`}
+                onClick={() => setHouseholdWindow('info')}
             >
                 <h4> Info </h4>
             </div>
             {/* Decisions tab button */}
             <div
-                className={`decisions-tab${householdWindow === "decision" ? " selected" : ""}`}
-                onClick={() => setHouseholdWindow("decision")}
+                className={`decisions-tab${householdWindow === 'decision' ? ' selected' : ''}`}
+                onClick={() => setHouseholdWindow('decision')}
             >
                 <h4>Decisions</h4>
             </div>

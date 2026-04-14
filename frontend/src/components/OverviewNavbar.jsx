@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import simulationRunController from "../controller OUTDATED/SimulationRunController.js";
-import "../styles/OverviewNavbar.css";
+import React, { useEffect, useState } from 'react';
+import simulationRunController from '../controller OUTDATED/SimulationRunController.js';
+import '../styles/OverviewNavbar.css';
 
 /**
  * OverviewNavbar component provides a navigation bar for the simulation overview page.
@@ -22,7 +22,7 @@ const OverviewNavbar = ({ title }) => {
      */
     const togglePause = async () => {
         const result = await simulationRunController.togglePause();
-        if (result.status === "ok") {
+        if (result.status === 'ok') {
             alert(result.message);
             setPaused(result.paused);
         }
@@ -61,8 +61,8 @@ const OverviewNavbar = ({ title }) => {
         };
 
         fetchInitialData();
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
     return (
@@ -75,7 +75,7 @@ const OverviewNavbar = ({ title }) => {
                 </div>
                 <div className="control-bar">
                     <button className="pause-button" onClick={togglePause}>
-                        {paused ? "Hervat Simulatie" : "Pauzeer Simulatie"}
+                        {paused ? 'Hervat Simulatie' : 'Pauzeer Simulatie'}
                     </button>
                     <h5> Delay: </h5>
                     <select className="delay-select" value={delay} onChange={updateDelay}>

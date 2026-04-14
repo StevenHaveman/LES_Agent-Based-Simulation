@@ -35,8 +35,8 @@
  */
 
 import React, { useEffect, useRef, useState } from 'react';
-import "../styles/HouseholdMap.css";
-import overviewController from "../controller OUTDATED/OverviewController.js";
+import '../styles/HouseholdMap.css';
+import overviewController from '../controller OUTDATED/OverviewController.js';
 
 const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdId }) => {
     const [households, setHouseholds] = useState([]);
@@ -59,7 +59,7 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
 
     useEffect(() => {
         const icon = new Image();
-        icon.src = "/INNO/Household_icon.png";
+        icon.src = '/INNO/Household_icon.png';
         icon.onload = () => {
             iconRef.current = icon;
             drawCanvas();
@@ -100,18 +100,18 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
         canvas.width = canvas.offsetWidth;
         canvas.height = canvas.offsetHeight;
 
-        ctx.fillStyle = "#b0f5a0";
+        ctx.fillStyle = '#b0f5a0';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         households.forEach((household) => {
             const pos = householdPositions.current[household.id];
-            if (!pos) return;
+            if (!pos) {return;}
 
             ctx.drawImage(iconRef.current, pos.x, pos.y, 32, 32);
 
             if (household.id === selectedHouseholdId) {
                 ctx.beginPath();
-                ctx.strokeStyle = "black";
+                ctx.strokeStyle = 'black';
                 ctx.lineWidth = 1;
                 ctx.arc(pos.x + 16, pos.y + 16, 20, 0, 2 * Math.PI);
                 ctx.stroke();

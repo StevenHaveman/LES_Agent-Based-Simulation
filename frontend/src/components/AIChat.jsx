@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import "../styles/AIChat.css";
-import aiChatController from "../controller OUTDATED/AIChatController.js";
+import React, { useState } from 'react';
+import '../styles/AIChat.css';
+import aiChatController from '../controller OUTDATED/AIChatController.js';
 
 /**
  * AIChat component provides a chat interface for interacting with an AI system.
@@ -13,7 +13,7 @@ import aiChatController from "../controller OUTDATED/AIChatController.js";
 const AIChat = ({ resident }) => {
 
     // State to manage the current prompt input.
-    const [prompt, setPrompt] = useState("");
+    const [prompt, setPrompt] = useState('');
     // State to manage the list of chat messages.
     const [messages, setMessages] = useState([]);
 
@@ -33,14 +33,14 @@ const AIChat = ({ resident }) => {
      * Updates the chat messages with the user's input and the AI's response.
      */
     const handleSend = async () => {
-        if (prompt.trim() === "") return;
+        if (prompt.trim() === '') {return;}
 
-        const userMessage = { role: "user", content: prompt };
+        const userMessage = { role: 'user', content: prompt };
         setMessages((prev) => [...prev, userMessage]);
-        setPrompt("");
+        setPrompt('');
 
         // Temporary placeholder for AI response.
-        setMessages((prev) => [...prev, { role: "ai", content: "..." }]);
+        setMessages((prev) => [...prev, { role: 'ai', content: '...' }]);
 
         try {
             // Simulate a delay for the AI response.
@@ -50,13 +50,13 @@ const AIChat = ({ resident }) => {
             const result = await aiChatController.sendPrompt(prompt, resident);
             setMessages((prev) => [
                 ...prev.slice(0, -1),
-                { role: "ai", content: result.response },
+                { role: 'ai', content: result.response },
             ]);
         } catch (error) {
             // Handle errors by displaying an error message in the chat.
             setMessages((prev) => [
                 ...prev.slice(0, -1),
-                { role: "ai", content: "Er ging iets mis met de AI." },
+                { role: 'ai', content: 'Er ging iets mis met de AI.' },
             ]);
         }
     };
@@ -68,7 +68,7 @@ const AIChat = ({ resident }) => {
      * @param {KeyboardEvent} e - The keyboard event.
      */
     const handleKeyDown = (e) => {
-        if (e.key === "Enter" && !e.shiftKey) {
+        if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSend();
         }

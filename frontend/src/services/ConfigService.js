@@ -20,21 +20,21 @@
  *     - An error if the API call fails (e.g., non-OK HTTP response).
  */
 
-const API_URL = "http://127.0.0.1:5000";
+const API_URL = 'http://127.0.0.1:5000';
 
 class ConfigService {
 
     async start_simulation(config) {
         const response = await fetch(`${API_URL}/simulation`, {
-            method: "POST",
+            method: 'POST',
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify(config),
         });
 
         if (!response.ok) {
-            throw new Error("Starting simulation failed");
+            throw new Error('Starting simulation failed');
         }
         return await response.json();
     }

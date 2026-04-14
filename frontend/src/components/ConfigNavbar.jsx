@@ -18,8 +18,8 @@
  * - Ensure the `LES_logo.png` and `LES_logo2.png` images are available in the appropriate directory.
  */
 
-import React from "react";
-import "../styles/ConfigNavbar.css";
+import React from 'react';
+import '../styles/ConfigNavbar.css';
 
 const ConfigNavbar = ({ title }) => {
     return (

@@ -17,7 +17,7 @@
  *     - An error if the simulation fails.
  */
 
-import ConfigFormService from "../service/ConfigService.js";
+import ConfigFormService from '../service/ConfigService.js';
 
 class ConfigController {
     /**
@@ -39,10 +39,10 @@ class ConfigController {
     async startSimulation(config) {
         try {
             const result = await this.service.start_simulation(config);
-            console.log("Simulation started successfully");
+            console.log('Simulation started successfully');
             return result;
         } catch (error) {
-            console.error("Simulation Failed", error);
+            console.error('Simulation Failed', error);
             throw error;
         }
     }

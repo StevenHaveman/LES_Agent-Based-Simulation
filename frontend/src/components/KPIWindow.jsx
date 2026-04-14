@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react';
 
-import overview_controller from "../controller OUTDATED/OverviewController.js";
+import overview_controller from '../controller OUTDATED/OverviewController.js';
 
-import "../styles/KPIWindow.css";
-import simulationRunController from "../controller OUTDATED/SimulationRunController.js";
+import '../styles/KPIWindow.css';
+import simulationRunController from '../controller OUTDATED/SimulationRunController.js';
 
 const KPIWindow = () => {
     /** @type {[Array<{
@@ -66,7 +66,7 @@ const KPIWindow = () => {
                 set_house_hold_data(await overview_controller.fetch_households(undefined));
                 set_sim_config(await overview_controller.fetchSimulationConfig());
             } catch (error) {
-                console.error("error fetching household data:", error);
+                console.error('error fetching household data:', error);
             }
 
             set_loading(false);
@@ -86,16 +86,16 @@ const KPIWindow = () => {
 
         return function () {
             if (interval_id)
-                clearInterval(interval_id);
+            {clearInterval(interval_id);}
         };
     }, []);
 
     if (loading)
-        return <div><h3>Loading...</h3></div>;
+    {return <div><h3>Loading...</h3></div>;}
 
-    const counted_solar_data_hh = house_hold_data.reduce((prev, cur) => cur["Solar Panel_installed"] ? prev + 1 : prev, 0);
-    const counted_heat_pump_data_hh = house_hold_data.reduce((prev, cur) => cur["Heat Pump_installed"] ? prev + 1 : prev, 0);
-    const counted_full_data_hh = house_hold_data.reduce((prev, cur) => cur["Heat Pump_installed"] && cur["Solar Panel_installed"] ? prev + 1 : prev, 0);
+    const counted_solar_data_hh = house_hold_data.reduce((prev, cur) => cur['Solar Panel_installed'] ? prev + 1 : prev, 0);
+    const counted_heat_pump_data_hh = house_hold_data.reduce((prev, cur) => cur['Heat Pump_installed'] ? prev + 1 : prev, 0);
+    const counted_full_data_hh = house_hold_data.reduce((prev, cur) => cur['Heat Pump_installed'] && cur['Solar Panel_installed'] ? prev + 1 : prev, 0);
     const counted_income_total_hh = house_hold_data.reduce((prev, cur) => prev + (cur.residents.reduce((p, c) => p + c.income, 0) / cur.residents.length), 0);
 
     return (
@@ -106,7 +106,7 @@ const KPIWindow = () => {
             <h3>Average Income: {Math.round((counted_income_total_hh / house_hold_data.length))}€</h3>
             <h3>Subjective Norm ({sim_config.subj_norm_level}): {sim_config.subjective_norm}</h3>
         </>
-    )
+    );
 };
 
 export default KPIWindow;

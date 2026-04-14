@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import "../styles/HouseholdInfo.css";
-import overviewController from "../controller OUTDATED/OverviewController.js";
+import React, { useEffect, useState } from 'react';
+import '../styles/HouseholdInfo.css';
+import overviewController from '../controller OUTDATED/OverviewController.js';
 
 /**
  * HouseholdInfo component displays detailed information about a selected household.
@@ -41,8 +41,8 @@ const HouseholdInfo = ({ selectedHouseholdId, visible }) => {
     return (
         <div className="household_info-container">
             {/* Display the name of the selected household, or an empty string if not found */}
-            <h3>Naam: {selectedHousehold ? selectedHousehold.name : ""}</h3>
-            <h3>Adres: {selectedHousehold ? selectedHousehold.address : ""}</h3>
+            <h3>Naam: {selectedHousehold ? selectedHousehold.name : ''}</h3>
+            <h3>Adres: {selectedHousehold ? selectedHousehold.address : ''}</h3>
 
         </div>
     );

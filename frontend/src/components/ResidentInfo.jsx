@@ -1,4 +1,4 @@
-import "../styles/ResidentInfo.css";
+import '../styles/ResidentInfo.css';
 
 /**
  * ResidentInfo component displays detailed information about a selected resident,
@@ -12,16 +12,16 @@ import "../styles/ResidentInfo.css";
  */
 const ResidentInfo = ({ resident }) => {
     // If no resident is selected, render a hint message.
-    if (!resident) return <div className="select-resident-hint">
+    if (!resident) {return <div className="select-resident-hint">
         <h3> Click on a Resident</h3>
-    </div>;
+    </div>;}
 
     // Render the resident's information.
     return (
         <div className="resident_info-container">
             <div className="info">
                 <h3>Naam: {resident.name}</h3>
-                <h3>Inkomen: €{resident.income + ",-"}</h3>
+                <h3>Inkomen: €{resident.income + ',-'}</h3>
             </div>
         </div>
     );

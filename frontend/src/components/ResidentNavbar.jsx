@@ -1,5 +1,5 @@
-import React from "react";
-import "../styles/ResidentNavbar.css";
+import React from 'react';
+import '../styles/ResidentNavbar.css';
 
 /**
  * ResidentNavbar component renders a navigation bar for residents, allowing toggling
@@ -14,21 +14,21 @@ import "../styles/ResidentNavbar.css";
  * @returns {JSX.Element} The rendered ResidentNavbar component.
  */
 const ResidentNavbar = ({
-                            residentWindow,
-                            setResidentWindow,
-                            setSelectedTab,
-                            chatWindow,
-                            setChatWindow,
-                        }) => {
+    residentWindow,
+    setResidentWindow,
+    setSelectedTab,
+    chatWindow,
+    setChatWindow,
+}) => {
     /**
      * Toggles the resident information tab. If the tab is already open, it closes it;
      * otherwise, it opens the tab.
      */
     const toggleInfoTab = () => {
-        if (residentWindow === "info-resident") {
+        if (residentWindow === 'info-resident') {
             setResidentWindow(null);
         } else {
-            setResidentWindow("info-resident");
+            setResidentWindow('info-resident');
         }
     };
 
@@ -37,12 +37,12 @@ const ResidentNavbar = ({
      * otherwise, it opens the tab and sets it as the selected tab.
      */
     const toggleAiTab = () => {
-        if (chatWindow === "ai") {
-            setChatWindow("");
+        if (chatWindow === 'ai') {
+            setChatWindow('');
             setSelectedTab(null);
         } else {
-            setChatWindow("ai");
-            setSelectedTab("ai");
+            setChatWindow('ai');
+            setSelectedTab('ai');
         }
     };
 
@@ -50,14 +50,14 @@ const ResidentNavbar = ({
         <div className="navbar-container-resident">
             {/* Info tab button */}
             <div
-                className={`info-tab-resident${residentWindow === "info-resident" ? " selected" : ""}`}
+                className={`info-tab-resident${residentWindow === 'info-resident' ? ' selected' : ''}`}
                 onClick={toggleInfoTab}
             >
                 <h4>Info</h4>
             </div>
             {/* AI chat tab button */}
             <div
-                className={`AI-chat-resident${chatWindow === "ai" ? " selected" : ""}`}
+                className={`AI-chat-resident${chatWindow === 'ai' ? ' selected' : ''}`}
                 onClick={toggleAiTab}
             >
                 <h4>AI-Chat</h4>

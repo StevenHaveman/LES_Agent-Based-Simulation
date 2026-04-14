@@ -1,6 +1,6 @@
-import React from "react";
-import "../styles/GraphicsView.css";
-import Graphic from "./Graphic.jsx";
+import React from 'react';
+import '../styles/GraphicsView.css';
+import Graphic from './Graphic.jsx';
 
 /**
  * GraphicsView component renders a collection of graphical representations

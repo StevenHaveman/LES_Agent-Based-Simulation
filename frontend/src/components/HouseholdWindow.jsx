@@ -1,7 +1,7 @@
-import React from "react";
-import HouseholdDecisions from "./HouseholdDecisions";
-import "../styles/HouseholdWindow.css";
-import HouseholdInfo from "./HouseholdInfo.jsx";
+import React from 'react';
+import HouseholdDecisions from './HouseholdDecisions';
+import '../styles/HouseholdWindow.css';
+import HouseholdInfo from './HouseholdInfo.jsx';
 
 /**
  * HouseholdWindow component dynamically renders content based on the selected household
@@ -35,14 +35,14 @@ const HouseholdWindow = ({ householdWindow, selectedHouseholdId }) => {
      */
     const renderContent = () => {
         switch (householdWindow) {
-            case "decision":
+            case 'decision':
                 return (
                     <HouseholdDecisions
                         selectedHouseholdId={selectedHouseholdId}
                         visible={true}
                     />
                 );
-            case "info":
+            case 'info':
                 return (
                     <HouseholdInfo
                         selectedHouseholdId={selectedHouseholdId}

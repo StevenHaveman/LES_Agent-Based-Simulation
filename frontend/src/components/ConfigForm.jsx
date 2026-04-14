@@ -20,10 +20,10 @@
  * - A React component that renders a form for configuring the simulation.
  */
 
-import React, { useState } from "react";
-import "../styles/ConfigForm.css";
-import configFormController from "../controller OUTDATED/ConfigController.js";
-import { useNavigate } from "@tanstack/react-router";
+import React, { useState } from 'react';
+import '../styles/ConfigForm.css';
+import configFormController from '../controller OUTDATED/ConfigController.js';
+import { useNavigate } from '@tanstack/react-router';
 
 const ConfigForm = () => {
     // State to manage form data
@@ -31,7 +31,7 @@ const ConfigForm = () => {
         nr_households: 10, // Default number of households
         nr_residents: 10,  // Default number of residents per household
         simulation_years: 30, // Default simulation duration in years
-        seed: "" // Default random seed (empty string)
+        seed: '' // Default random seed (empty string)
     });
 
     // Hook for navigation
@@ -56,19 +56,19 @@ const ConfigForm = () => {
      */
     const handleSubmit = async (e) => {
         e.preventDefault(); // Prevent default form submission behavior
-        await navigate({ to: "/overview" }); // Navigate to the overview page
+        await navigate({ to: '/overview' }); // Navigate to the overview page
 
         try {
             // Prepare the payload for the simulation
             const payload = {
                 ...formData,
-                seed: formData.seed === "" ? 0 : Number(formData.seed) // Default seed to 0 if empty
+                seed: formData.seed === '' ? 0 : Number(formData.seed) // Default seed to 0 if empty
             };
 
             // Start the simulation using the controller
             await configFormController.startSimulation(payload);
         } catch (error) {
-            console.error("Simulation start failed", error); // Log any errors
+            console.error('Simulation start failed', error); // Log any errors
         }
     };
 

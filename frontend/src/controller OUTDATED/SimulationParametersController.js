@@ -1,4 +1,4 @@
-import SimulationParametersService from "../service/SimulationParametersService.js";
+import SimulationParametersService from '../service/SimulationParametersService.js';
 
 /**
  * SimulationParametersController class acts as a mediator between the SimulationParametersService
@@ -26,7 +26,7 @@ class SimulationParametersController {
         const config = res.config;
 
         // List of parameter keys to exclude from the results.
-        const exclude = ["nr_households", "nr_residents", "simulation_years", "seed"];
+        const exclude = ['nr_households', 'nr_residents', 'simulation_years', 'seed'];
 
         return Object.keys(config)
             .filter((key) => !exclude.includes(key))
