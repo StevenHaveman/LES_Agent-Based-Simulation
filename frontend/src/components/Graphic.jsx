@@ -45,8 +45,8 @@ import {
 } from "recharts";
 
 import "../styles/Graphic.css";
-import overviewController from "../../controller/OverviewController.js";
-import simulationRunController from "../../controller/SimulationRunController.js";
+import overviewController from "../controller/OverviewController.js";
+import simulationRunController from "../controller/SimulationRunController.js";
 
 const validKeys = [
     "solar_panel_price",

@@ -36,7 +36,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import "../styles/HouseholdMap.css";
-import overviewController from "../../controller/OverviewController.js";
+import overviewController from "../controller/OverviewController.js";
 
 const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdId }) => {
     const [households, setHouseholds] = useState([]);

@@ -1,9 +1,9 @@
 import React from "react";
 
-import overview_controller from "../../controller/OverviewController.js";
+import overview_controller from "../controller/OverviewController.js";
 
 import "../styles/KPIWindow.css";
-import simulationRunController from "../../controller/SimulationRunController.js";
+import simulationRunController from "../controller/SimulationRunController.js";
 
 const KPIWindow = () => {
     /** @type {[Array<{

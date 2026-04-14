@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../styles/HouseholdDecisions.css";
-import overviewController from "../../controller/OverviewController.js";
+import overviewController from "../controller/OverviewController.js";
 
 /**
  * HouseholdDecisions component displays decisions made by residents of a selected household

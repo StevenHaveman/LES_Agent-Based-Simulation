@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../styles/HouseholdInfo.css";
-import overviewController from "../../controller/OverviewController.js";
+import overviewController from "../controller/OverviewController.js";
 
 /**
  * HouseholdInfo component displays detailed information about a selected household.

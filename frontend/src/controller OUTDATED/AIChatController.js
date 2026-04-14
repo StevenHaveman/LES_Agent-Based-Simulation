@@ -1,4 +1,4 @@
-import AIChatService from "../service/AIChatService.js";
+import AIChatService from "../services/AIChatService.js";
 
 /**
  * AIChatController class acts as a mediator between the AIChatService and the frontend components.
