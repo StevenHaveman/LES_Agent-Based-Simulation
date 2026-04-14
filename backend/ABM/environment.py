@@ -2,6 +2,7 @@ import random
 from mesa import Model
 import numpy as np
 from agents.household_agent import Household
+from agents.resident_agent import Resident
 import utilities
 from sustainability_packages.solar_panel import SolarPanel
 from sustainability_packages.heat_pump import HeatPump
@@ -30,7 +31,8 @@ class Environment(Model):
         streets (list[list[Household]]): Households grouped into streets.
         yearly_stats (list[dict]): List to store aggregated data collected each year.
     """
-    def __init__(self, nr_households, nr_residents):
+    # def __init__(self, nr_households, nr_residents): # Maybe no longer needed when we create households based on GIS data, and survey data for residents.
+    def __init__(self):
         """
         Initializes the simulation environment.
 
@@ -57,32 +59,19 @@ class Environment(Model):
         self.yearly_stats = []
         self.total_co2 = 0
         self.current_co2 = 0
+        self.gis_data = utilities.load_gis_data("data/AmstelHeuvelWijk2_TableToExcel.xlsx")
 
-        self.create_agents(nr_households, nr_residents)
+        # self.create_agents(nr_households, nr_residents)
+        self.create_household_agents()
+        self.create_resident_agents(nr_residents=1) #TODO This is currently set to create 1 resident per household for testing, will need to update when we have survey data to determine household sizes and resident attributes.
         self.generate_streets() 
         self.update_subjective_norm()
 
-    def create_agents(self, nr_households: int, nr_residents: int):
-        """
-        Creates a specified number of Household agents and distributes residents among them.
-
-        Initializes households with a chance to have pre-installed sustainability packages
-        based on configuration. Residents are then created within these households.
-
-        Args:
-            nr_households (int): The number of household agents to create.
-            nr_residents (int): The total number of resident agents to create and
-                                distribute among the households.
-        """
-        base = nr_residents // nr_households
-        remainder = nr_residents % nr_households
-
-        # Initialize the agent ID counter
-        id_counter = 0
-
-        for i in range(nr_households):
+    def create_household_agents(self): # TODO: This is a new version of the create_agents function that will use GIS data to create households with more realistic attributes and distributions. This will likely involve parsing the GIS data to determine household locations, sizes, and other relevant attributes, and then creating Household agents accordingly.
         
-            hh = Household(i, self)
+        for i, row in self.gis_data.iterrows():
+            hh = Household(i, self,gis_attributes=row.to_dict()) # Assuming the Household class can accept GIS attributes as a dictionary, adjust as needed based on actual implementation.
+
             hh_emissions = hh.calc_co2_emissions()
             self.total_co2 += hh_emissions
             self.current_co2 += hh_emissions
@@ -102,17 +91,79 @@ class Environment(Model):
 
             self.households.append(hh)
 
-            nr_res_for_hh = base + (1 if i < remainder else 0)
-            id_counter = hh.create_residents(nr_res_for_hh, id_counter)
-            self.residents.extend(hh.residents)
-        
-        for hh_obj in self.households:
-            for res_obj in hh_obj.residents:
-                for package in self.sustainability_packages:
-                    if package.name not in res_obj.package_subjective_norms:
-                         res_obj.package_subjective_norms[package.name] = self.config.get('subjective_norm', 0.0)
+        pass
 
-    def generate_streets(self,): # TODO: Not used as of now maybe in the future
+    def create_resident_agents(self, nr_residents=1): # TODO: This function will create Resident agents for a given Household agent, using attributes from the GIS data to assign realistic characteristics to the residents (e.g., income, attitudes). The number of residents created will be based on the household size determined from the GIS data.
+
+        id_counter = 0
+
+        for hh in self.households:
+            for _ in range(nr_residents):
+                resident = Resident(id_counter, self, hh)
+
+                for package_name, installed in hh.package_installations.items():
+                    if installed:
+                        resident.package_decisions[package_name] = True
+
+                hh.residents.append(resident)
+                self.residents.append(resident)
+
+                id_counter += 1
+    # def create_resdent_agents_survey(self, survey_data): # TODO: This function will create Resident agents for a given Household agent, using attributes from the survey data to assign realistic characteristics to the residents (e.g., income, attitudes). The number of residents created will be based on the household size determined from the GIS data.
+
+    #     pass
+    
+    # def create_agents(self, nr_households: int, nr_residents: int):
+    #     """
+    #     Creates a specified number of Household agents and distributes residents among them.
+
+    #     Initializes households with a chance to have pre-installed sustainability packages
+    #     based on configuration. Residents are then created within these households.
+
+    #     Args:
+    #         nr_households (int): The number of household agents to create.
+    #         nr_residents (int): The total number of resident agents to create and
+    #                             distribute among the households.
+    #     """
+    #     base = nr_residents // nr_households
+    #     remainder = nr_residents % nr_households
+
+    #     # Initialize the agent ID counter
+    #     id_counter = 0
+
+    #     for i in range(nr_households):
+        
+    #         hh = Household(i, self)
+    #         hh_emissions = hh.calc_co2_emissions()
+    #         self.total_co2 += hh_emissions
+    #         self.current_co2 += hh_emissions
+    #         for package in self.sustainability_packages:
+    #             chance_key = f"initial_{package.name.lower().replace(' ', '')}_chance"
+    #             initial_chance = self.config.get(chance_key, 0.0) # Default to 0% if not in config
+                
+    #             hh.package_installations[package.name] = (random.random() < initial_chance)
+
+    #             if hh.package_installations.get(package.name, False):
+    #                 initial_savings = package.calc_co2_savings(hh)
+    #                 hh.co2_saved_yearly += initial_savings
+    #                 self.current_co2 -= initial_savings
+                
+    #             hh.skip_prev_flags[package.name] = False
+    #             hh.skip_next_flags[package.name] = False
+
+    #         self.households.append(hh)
+
+    #         nr_res_for_hh = base + (1 if i < remainder else 0)
+    #         id_counter = hh.create_residents(nr_res_for_hh, id_counter)
+    #         self.residents.extend(hh.residents)
+        
+    #     for hh_obj in self.households:
+    #         for res_obj in hh_obj.residents:
+    #             for package in self.sustainability_packages:
+    #                 if package.name not in res_obj.package_subjective_norms:
+    #                      res_obj.package_subjective_norms[package.name] = self.config.get('subjective_norm', 0.0)
+
+    def generate_streets(self,):
         """
         Generate a list of streets, where each street is a list of households.
 
@@ -341,8 +392,9 @@ class Environment(Model):
 
             hh_data = {
                 "id": household.unique_id, # Assuming Household has unique_id from Mesa Agent
-                "address": f"Dorpsstraat {household.unique_id}",
-                "name": f"Household {household.unique_id}", # Or however you identify them
+                "address": f"{household.gis_attributes['WoonplaatsNaam']} | {household.gis_attributes['OpenbareRuimteNaam']}",
+                "name": f"Household  {household.gis_attributes['Huisnummer']}",
+                "GIS_attributes": household.gis_attributes, # Include all GIS attributes for reference
                 "residents": resident_details
             }
             for pkg_name in [p.name for p in self.sustainability_packages]:

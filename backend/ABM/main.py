@@ -88,7 +88,8 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
     graphics_data.clear()
     households_data.clear()
 
-    model = Environment(nr_households=nr_households, nr_residents=nr_residents)
+    # model = Environment(nr_households=nr_households, nr_residents=nr_residents) We will likely need to change this when we create households based on GIS data, and residents based on survey data.
+    model = Environment()
 
     if config['collect_data']:
         file_name = initialize_data_collection(model)
