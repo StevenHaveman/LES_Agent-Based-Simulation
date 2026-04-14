@@ -22,10 +22,12 @@
 
 import React, { useState } from 'react';
 import '../styles/ConfigForm.css';
-import configFormController from '../controller OUTDATED/ConfigController.js';
+import { useSimulation } from '../hooks/useSimulation.js';
 import { useNavigate } from '@tanstack/react-router';
 
 const ConfigForm = () => {
+    const { start } = useSimulation();
+
     // State to manage form data
     const [formData, setFormData] = useState({
         nr_households: 10, // Default number of households
@@ -55,22 +57,21 @@ const ConfigForm = () => {
      * @param {Object} e - The event object from the form submission.
      */
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Prevent default form submission behavior
-        await navigate({ to: '/overview' }); // Navigate to the overview page
+        e.preventDefault();
+        await navigate({ to: '/overview' });
 
         try {
-            // Prepare the payload for the simulation
             const payload = {
                 ...formData,
-                seed: formData.seed === '' ? 0 : Number(formData.seed) // Default seed to 0 if empty
+                seed: formData.seed === '' ? 0 : Number(formData.seed)
             };
-
-            // Start the simulation using the controller
-            await configFormController.startSimulation(payload);
+            
+            await start(payload);
         } catch (error) {
-            console.error('Simulation start failed', error); // Log any errors
+            console.error('Simulation start failed', error);
         }
     };
+    
 
     return (
         <div className="form-container">
