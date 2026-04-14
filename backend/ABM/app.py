@@ -21,7 +21,7 @@ import config
 
 # Initialize the Flask application
 app = Flask(__name__)
-config_id, chosen_config = utilities.choose_config()
+config_id, chosen_config = utilities.choose_config() # Configuration loading for the simulation, this is not used in the frontend defaults to config 1
 llm_handler = AgentLLMHandler("llama3.1:8b", chosen_config)
 # Configure CORS to allow connections from the frontend
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
