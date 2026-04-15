@@ -100,6 +100,11 @@ configs = {
         'behavioral_mod': None,
         'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
 
+        # Weights for RAA components in intention calculation (can be adjusted to test different influence scenarios)
+        'weight_attitude': 1.0,
+        'weight_norm': 1.0,
+        'weight_control': 1.0,
+
         # Data collection parameters
         'collect_data': True, # Whether to collect data for analysis
         'data_save_folder': 'data/' # Folder to save collected data
@@ -135,6 +140,11 @@ configs = {
         'attitude_mod': None,
         'subj_norm_mod': None,
         'behavioral_mod': None,
+
+        # Weights for RAA components in intention calculation (can be adjusted to test different influence scenarios)
+        'weight_attitude': 1.0,
+        'weight_norm': 1.0,
+        'weight_control': 1.0,
 
         # Data collection parameters
         'collect_data': True, # Whether to collect data for analysis

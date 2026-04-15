@@ -143,13 +143,24 @@ class Resident(Agent):
         for package in self.environment.sustainability_packages:
             if self.package_decisions.get(package.name, False):
                 continue
-            
-            MAX_MOD_SUM = 6
-            attitude_part = self.attitude * self.attitude_mod
-            norm_part = self.subj_norm[package.name] * package.subj_norm_mod * self.subj_norm_mod
-            control_part = self.behavioral_control[package.name] * self.behavioral_mod
 
-            intention = (attitude_part + norm_part + control_part) / MAX_MOD_SUM
+            # make the the attitude, subjective norm, and behavioral control components for the intention calculation
+            attitude_part = self.attitude * self.attitude_mod
+            norm_part = (self.subj_norm[package.name] * package.subj_norm_mod * self.subj_norm_mod)
+            control_part = (self.behavioral_control[package.name] * self.behavioral_mod)
+
+            # get the weights for each component from the config, or default to 1.0 if not specified
+            w_att = self.config.get("weight_attitude", 1.0)
+            w_norm = self.config.get("weight_norm", 1.0)
+            w_control = self.config.get("weight_control", 1.0)
+
+            # Calculate total weight for normalization
+            total_weight = w_att + w_norm + w_control
+
+            # Calculate intention as a weighted average of the three components
+            intention = (w_att * attitude_part + w_norm * norm_part + w_control * control_part) / total_weight
+
+            # update the intention for this package
             self.intentions[package.name] = intention
                 
 
