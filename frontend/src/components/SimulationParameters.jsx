@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/Parameters.css';
-import simulationParametersController from '../controller OUTDATED/SimulationParametersController.js';
+import { useSimulationParameters } from '../hooks/useSimulationParameters.js';
 
 /**
  * SimulationParameters component provides a user interface for managing simulation parameters.
@@ -29,7 +29,7 @@ const SimulationParameters = () => {
      */
     const fetchOptions = async () => {
         try {
-            const opts = await simulationParametersController.fetchParameters();
+            const opts = await useSimulationParameters().fetchParameters();
             setOptions(opts);
         } catch (error) {
             console.error('Fout bij ophalen parameters:', error);
@@ -44,7 +44,7 @@ const SimulationParameters = () => {
     const handleSubmit = async () => {
         try {
             const newValue = parseFloat(inputValue);
-            const result = await simulationParametersController.updateParameter(selectedKey, newValue);
+            const result = await useSimulationParameters().updateParameter(selectedKey, newValue);
 
             alert(`Parameter "${selectedKey}" is bijgewerkt naar waarde: ${newValue}`);
 

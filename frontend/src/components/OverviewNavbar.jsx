@@ -21,7 +21,7 @@ const OverviewNavbar = ({ title }) => {
      * Updates the paused state and displays an alert with the result message.
      */
     const togglePause = async () => {
-        const result = await simulationRunController.togglePause();
+        const result = await useSimulationRun().togglePause();
         if (result.status === 'ok') {
             alert(result.message);
             setPaused(result.paused);

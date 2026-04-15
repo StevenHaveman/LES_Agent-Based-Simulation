@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/AIChat.css';
-import aiChatController from '../controller OUTDATED/AIChatController.js';
+import { useAIChat } from '../hooks/useAIChat.js';
 
 /**
  * AIChat component provides a chat interface for interacting with an AI system.
@@ -47,7 +47,7 @@ const AIChat = ({ resident }) => {
             await new Promise((resolve) => setTimeout(resolve, 3000));
 
             // Send the prompt to the AI system and update the messages with the response.
-            const result = await aiChatController.sendPrompt(prompt, resident);
+            const result = await useAIChat(prompt, resident);
             setMessages((prev) => [
                 ...prev.slice(0, -1),
                 { role: 'ai', content: result.response },
