@@ -29,6 +29,7 @@ class Resident(Agent):
         self.environment = model
 
         salary = self.calc_salary()
+        self.decision_threshold = self.config['decision_threshold']
         self.income = max(round(salary, -2), 0)
         self.subj_norm = {package.name: None for package in self.environment.sustainability_packages}
         self.behavioral_control = {package.name: None for package in self.environment.sustainability_packages}
@@ -54,7 +55,6 @@ class Resident(Agent):
             self.package_decisions[package.name] = False
             self.package_subjective_norms[package.name] = self.config.get('subjective_norm', 0.0)
 
-        self.decision_threshold = self.config['decision_threshold']
         self.calc_subjective_norm()
         self.calc_behavioral_control()
 
@@ -100,33 +100,33 @@ class Resident(Agent):
             
             self.subj_norm[package.name] = self.package_subjective_norms.get(package.name, 0.0)
 
-    def calc_decision(self):
-        """
-        Calculates whether the resident decides to adopt available sustainability
-        packages based on attitude, subjective norm, and behavioral factors,
-        compared against a decision threshold.
+    # def calc_decision(self):
+    #     """
+    #     Calculates whether the resident decides to adopt available sustainability
+    #     packages based on attitude, subjective norm, and behavioral factors,
+    #     compared against a decision threshold.
 
-        If the decision score for a package exceeds the threshold, the resident's
-        decision for that package is set to True. This method iterates through
-        all sustainability packages not yet adopted by the resident.
-        """
-        for package in self.environment.sustainability_packages:
-            if self.package_decisions.get(package.name, False):
-                continue
+    #     If the decision score for a package exceeds the threshold, the resident's
+    #     decision for that package is set to True. This method iterates through
+    #     all sustainability packages not yet adopted by the resident.
+    #     """
+    #     for package in self.environment.sustainability_packages:
+    #         if self.package_decisions.get(package.name, False):
+    #             continue
             
-            MAX_MOD_SUM = 6 # 3 factoren * max modifier 2
-            attitude_part = self.attitude * self.attitude_mod
-            norm_part = self.subj_norm[package.name] * package.subj_norm_mod * self.subj_norm_mod
-            control_part = self.behavioral_control[package.name] * self.behavioral_mod
+    #         MAX_MOD_SUM = 6 # 3 factoren * max modifier 2
+    #         attitude_part = self.attitude * self.attitude_mod
+    #         norm_part = self.subj_norm[package.name] * package.subj_norm_mod * self.subj_norm_mod
+    #         control_part = self.behavioral_control[package.name] * self.behavioral_mod
 
-            decision_stat = (attitude_part + norm_part + control_part) / MAX_MOD_SUM
+    #         decision_stat = (attitude_part + norm_part + control_part) / MAX_MOD_SUM
 
-            if decision_stat > self.decision_threshold:
-                self.package_decisions[package.name] = True
-                self.environment.decided_residents_this_step_per_package[package.name] = \
-                    self.environment.decided_residents_this_step_per_package.get(package.name, 0) + 1
+    #         if decision_stat > self.decision_threshold:
+    #             self.package_decisions[package.name] = True
+    #             self.environment.decided_residents_this_step_per_package[package.name] = \
+    #                 self.environment.decided_residents_this_step_per_package.get(package.name, 0) + 1
                 
-    def calc_behavior_new(self): # New voor RAA model
+    def calc_behavior(self): # New voor RAA model
         for package in self.environment.sustainability_packages:
             if self.package_decisions.get(package.name, False):
                 continue
@@ -138,9 +138,8 @@ class Resident(Agent):
                     self.package_decisions[package.name] = True
                     self.environment.decided_residents_this_step_per_package[package.name] = \
                         self.environment.decided_residents_this_step_per_package.get(package.name, 0) + 1
-        pass
 
-    def calc_intention_new(self): # New voor RAA model
+    def calc_intention(self): # New voor RAA model
         for package in self.environment.sustainability_packages:
             if self.package_decisions.get(package.name, False):
                 continue
@@ -152,7 +151,6 @@ class Resident(Agent):
 
             intention = (attitude_part + norm_part + control_part) / MAX_MOD_SUM
             self.intentions[package.name] = intention
-        pass
                 
 
     def check_actual_control(self, package):
@@ -160,8 +158,7 @@ class Resident(Agent):
         Checks if the resident is actually able to adopt the package,
         based on real-world constraints.
         """
-        # return package.is_feasible(self.income, self.household, self.environment) Functie bestaat nog niet binnen package, dus voorlopig altijd True returnen
-        return True
+        return package.is_feasible(self.income, self.household, self.environment) #Function exists but wel need to be reworked with new packages in mind.
 
     def collect_resident_data(self):
         agent_data = {
@@ -180,18 +177,24 @@ class Resident(Agent):
 
         return agent_data
 
-    def step(self):
-        """
-        Step function for the resident.
+def step(self):
+    """
+    Step function for the resident.
 
-        The resident first attempts to make decisions on any sustainability packages
-        they haven't already decided on. After decision-making, their income is
-        updated with a random raise.
-        """
-        if not all(self.package_decisions.get(p.name, False) for p in self.environment.sustainability_packages):
-            self.calc_decision()
-        self.income = int(round(self.income * np.random.choice(self.config['raise_income']), -1))
+    The resident first forms intentions based on attitude, subjective norm,
+    and perceived behavioral control. Then, actual behavior is determined
+    based on intention and actual control.
 
-        # If all decisions are made, recalculate subjective norm and behavioral control
-        self.calc_subjective_norm()
-        self.calc_behavioral_control()
+    After decision-making, income is updated.
+    """
+
+    # Only calculate intentions and behavior if not all packages have been decided on
+    if not all(self.package_decisions.get(p.name, False) for p in self.environment.sustainability_packages):
+        self.calc_intention()
+        self.calc_behavior()
+
+    self.income = int(round(self.income * np.random.choice(self.config['raise_income']), -1))
+
+    # If all decisions are made, recalculate subjective norm and behavioral control
+    self.calc_subjective_norm()
+    self.calc_behavioral_control()
