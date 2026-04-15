@@ -32,6 +32,8 @@ class Resident(Agent):
         self.income = max(round(salary, -2), 0)
         self.subj_norm = {package.name: None for package in self.environment.sustainability_packages}
         self.behavioral_control = {package.name: None for package in self.environment.sustainability_packages}
+        self.intentions = {package.name: 0.0 for package in self.environment.sustainability_packages}
+        self.intention_threshold = self.config.get('intention_threshold', self.decision_threshold)
         
         if self.config_id in (0, 1):
             self.attitude = utilities.gen_random_value(0, 1)
@@ -43,6 +45,7 @@ class Resident(Agent):
             self.attitude_mod = self.config['attitude_mod']
             self.subj_norm_mod = self.config['subj_norm_mod']
             self.behavioral_mod = self.config['behavioral_mod']
+            
 
         self.package_decisions = {} # Stores True/False for each package.name
         self.package_subjective_norms = {}
@@ -123,6 +126,43 @@ class Resident(Agent):
                 self.environment.decided_residents_this_step_per_package[package.name] = \
                     self.environment.decided_residents_this_step_per_package.get(package.name, 0) + 1
                 
+    def calc_behavior_new(self): # New voor RAA model
+        for package in self.environment.sustainability_packages:
+            if self.package_decisions.get(package.name, False):
+                continue
+
+            intention = self.intentions[package.name]
+
+            if intention > self.intention_threshold:
+                if self.check_actual_control(package):
+                    self.package_decisions[package.name] = True
+                    self.environment.decided_residents_this_step_per_package[package.name] = \
+                        self.environment.decided_residents_this_step_per_package.get(package.name, 0) + 1
+        pass
+
+    def calc_intention_new(self): # New voor RAA model
+        for package in self.environment.sustainability_packages:
+            if self.package_decisions.get(package.name, False):
+                continue
+            
+            MAX_MOD_SUM = 6
+            attitude_part = self.attitude * self.attitude_mod
+            norm_part = self.subj_norm[package.name] * package.subj_norm_mod * self.subj_norm_mod
+            control_part = self.behavioral_control[package.name] * self.behavioral_mod
+
+            intention = (attitude_part + norm_part + control_part) / MAX_MOD_SUM
+            self.intentions[package.name] = intention
+        pass
+                
+
+    def check_actual_control(self, package):
+        """
+        Checks if the resident is actually able to adopt the package,
+        based on real-world constraints.
+        """
+        # return package.is_feasible(self.income, self.household, self.environment) Functie bestaat nog niet binnen package, dus voorlopig altijd True returnen
+        return True
+
     def collect_resident_data(self):
         agent_data = {
             "id": self.unique_id,

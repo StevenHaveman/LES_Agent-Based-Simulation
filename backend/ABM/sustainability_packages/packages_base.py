@@ -45,6 +45,22 @@ class SustainabilityPackage:
         """
         increase_range = self.config.get(self.price_increase_key, (0,0)) # Default to no increase if key missing
         self.price += round(random.randint(*increase_range))
+    
+    def is_feasible(self, income, household, environment):
+        """
+        Determines if the package is feasible for a resident based on their income,
+        household characteristics, and environmental factors.
+
+        This method should be implemented by subclasses to define specific
+        feasibility criteria for each package type.
+
+        Args:
+            income (float): The resident's annual income.
+            household (Household): The household considering the package.
+            environment (Model): The simulation environment.
+
+        """
+        raise NotImplementedError("Subclasses must implement this method.")
 
     def calculate_behavioral_influence(self, income, household):
         """

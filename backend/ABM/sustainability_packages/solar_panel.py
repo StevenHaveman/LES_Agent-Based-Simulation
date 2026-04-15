@@ -35,6 +35,22 @@ class SolarPanel(SustainabilityPackage):
         """
         self.price += round(random.randint(*self.config['solarpanel_price_increase']))
 
+    def is_feasible(self, income, household, environment):
+        """
+        Determines if the package is feasible for a resident based on their income,
+        household characteristics, and environmental factors.
+
+        This method should be implemented by subclasses to define specific
+        feasibility criteria for each package type.
+
+        Args:
+            income (float): The resident's annual income.
+            household (Household): The household considering the package.
+            environment (Model): The simulation environment.
+
+        """
+        return income > self.price # Place holder for when new packages get introduced, for now only income is considered for feasibility of solar panels
+
     def calculate_behavioral_influence(self, income, household):
         """
         Calculates the behavioral influence component for adopting solar panels.

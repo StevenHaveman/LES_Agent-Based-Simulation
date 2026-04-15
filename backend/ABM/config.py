@@ -47,6 +47,7 @@ configs = {
         'attitude_mod': None,
         'subj_norm_mod': None,
         'behavioral_mod': None,
+        'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
 
         # Data collection parameters
         'collect_data': True, # Whether to collect data for analysis
@@ -97,6 +98,7 @@ configs = {
         'attitude_mod': None,
         'subj_norm_mod': None,
         'behavioral_mod': None,
+        'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
 
         # Data collection parameters
         'collect_data': True, # Whether to collect data for analysis
