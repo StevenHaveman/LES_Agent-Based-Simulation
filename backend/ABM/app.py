@@ -12,6 +12,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from main import run_simulation, graphics_data, households_data
 import utilities
+import threading
 
 from AgentLLMHandler import AgentLLMHandler
 
@@ -25,11 +26,21 @@ config_id, chosen_config = utilities.choose_config() # Configuration loading for
 llm_handler = AgentLLMHandler("llama3.1:8b", chosen_config)
 # Configure CORS to allow connections from the frontend
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+simulation_thread = None
+simulation_running = False
 
 
 @app.route('/simulation', methods=['POST'])
 def start_simulation():
+    global simulation_thread, simulation_running
+
     data = request.get_json()
+
+    if simulation_thread and simulation_thread.is_alive():
+        return jsonify({
+            "status": "error",
+            "message": "Simulation already running. Please wait for it to finish or stop it before starting a new one."
+        }), 400
 
     try:
         nr_households = int(data.get("nr_households", chosen_config["nr_households"]))
@@ -37,17 +48,48 @@ def start_simulation():
         simulation_years = int(data.get("simulation_years", chosen_config["simulation_years"]))
         seed = int(data.get("seed", config.configs[config_id].get("seed", None)))
     except (ValueError, TypeError) as e:
-        return jsonify({"status": "error", "message": "Invalid input: " + str(e)}), 400
+        return jsonify({
+            "status": "error",
+            "message": "Invalid input: " + str(e)
+        }), 400
 
     config.configs[config_id]["nr_households"] = nr_households
     config.configs[config_id]["nr_residents"] = nr_residents
     config.configs[config_id]["simulation_years"] = simulation_years
     config.configs[config_id]["seed"] = seed
 
-    result = run_simulation(nr_households, nr_residents, simulation_years, seed=seed)
+    def run():
+        global simulation_running
+        simulation_running = True
 
-    return jsonify({"status": "ok", "result": result})
+        try:
+            print("=== Simulation started ===")
+            run_simulation(
+                nr_households,
+                nr_residents,
+                simulation_years,
+                seed=seed
+            )
+            print("=== Simulation finished ===")
+        except Exception as e:
+            print(f"Simulation error: {e}")
+        finally:
+            simulation_running = False
 
+    simulation_thread = threading.Thread(target=run)
+    simulation_thread.daemon = True  # stopt automatisch bij server shutdown
+    simulation_thread.start()
+
+    return jsonify({
+        "status": "ok",
+        "message": "Simulation started",
+        "parameters": {
+            "nr_households": nr_households,
+            "nr_residents": nr_residents,
+            "simulation_years": simulation_years,
+            "seed": seed
+        }
+    })
 
 @app.route("/graphics_data", methods=["GET"])
 def get_graphics_data():
@@ -210,4 +252,4 @@ def get_sim_config():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)
