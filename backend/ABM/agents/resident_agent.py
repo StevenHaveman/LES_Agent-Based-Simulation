@@ -99,32 +99,6 @@ class Resident(Agent):
                 continue
             
             self.subj_norm[package.name] = self.package_subjective_norms.get(package.name, 0.0)
-
-    # def calc_decision(self):
-    #     """
-    #     Calculates whether the resident decides to adopt available sustainability
-    #     packages based on attitude, subjective norm, and behavioral factors,
-    #     compared against a decision threshold.
-
-    #     If the decision score for a package exceeds the threshold, the resident's
-    #     decision for that package is set to True. This method iterates through
-    #     all sustainability packages not yet adopted by the resident.
-    #     """
-    #     for package in self.environment.sustainability_packages:
-    #         if self.package_decisions.get(package.name, False):
-    #             continue
-            
-    #         MAX_MOD_SUM = 6 # 3 factoren * max modifier 2
-    #         attitude_part = self.attitude * self.attitude_mod
-    #         norm_part = self.subj_norm[package.name] * package.subj_norm_mod * self.subj_norm_mod
-    #         control_part = self.behavioral_control[package.name] * self.behavioral_mod
-
-    #         decision_stat = (attitude_part + norm_part + control_part) / MAX_MOD_SUM
-
-    #         if decision_stat > self.decision_threshold:
-    #             self.package_decisions[package.name] = True
-    #             self.environment.decided_residents_this_step_per_package[package.name] = \
-    #                 self.environment.decided_residents_this_step_per_package.get(package.name, 0) + 1
                 
     def calc_behavior(self): # New voor RAA model
         for package in self.environment.sustainability_packages:
@@ -144,8 +118,11 @@ class Resident(Agent):
             if self.package_decisions.get(package.name, False):
                 continue
 
-            # make the the attitude, subjective norm, and behavioral control components for the intention calculation
+            # make the the attitude, subjective norm, and behavioral control components for the agent and package, applying the respective modifiers
             attitude_part = self.attitude * self.attitude_mod
+            # TODO:
+            # - self.subj_norm_mod hernoemen naar agent_sensitivity_to_subjective_norm
+            # - package.subj_norm_mod hernoemen naar package_social_influence_strength
             norm_part = (self.subj_norm[package.name] * package.subj_norm_mod * self.subj_norm_mod)
             control_part = (self.behavioral_control[package.name] * self.behavioral_mod)
 
