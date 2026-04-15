@@ -45,8 +45,8 @@ import {
 } from 'recharts';
 
 import '../styles/Graphic.css';
-import overviewController from '../controller OUTDATED/OverviewController.js';
-import simulationRunController from '../controller OUTDATED/SimulationRunController.js';
+import { useOverview } from '../hooks/useOverview.js';
+import { useSimulationRun } from '../hooks/useSimulationRun.js';
 
 const validKeys = [
     'solar_panel_price',
@@ -66,7 +66,7 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
 
         const fetchData = async () => {
             try {
-                const result = await overviewController.getSimulationGraphicResults();
+                const result = await useOverview().getSimulationGraphicResults();
                 setSimulationData(result);
                 setLoading(false);
             } catch (error) {
@@ -76,7 +76,7 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
         };
 
         const fetchInterval = async () => {
-            const res = await simulationRunController.getSimulationDelay();
+            const res = await useSimulationRun().getSimulationDelay();
             const delay = parseInt(res.delay || 3) * 1000;
 
             await fetchData(); // Initial fetch

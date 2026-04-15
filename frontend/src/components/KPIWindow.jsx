@@ -1,9 +1,7 @@
 import React from 'react';
-
-import overview_controller from '../controller OUTDATED/OverviewController.js';
-
 import '../styles/KPIWindow.css';
-import simulationRunController from '../controller OUTDATED/SimulationRunController.js';
+import { useOverview } from '../hooks/useOverview.js';
+import { useSimulationRun } from '../hooks/useSimulationRun.js';
 
 const KPIWindow = () => {
     /** @type {[Array<{
@@ -63,8 +61,8 @@ const KPIWindow = () => {
 
         async function fetch_data() {
             try {
-                set_house_hold_data(await overview_controller.fetch_households(undefined));
-                set_sim_config(await overview_controller.fetchSimulationConfig());
+                set_house_hold_data(await useOverview().fetchHouseholds(undefined));
+                set_sim_config(await useOverview().fetchSimulationConfig());
             } catch (error) {
                 console.error('error fetching household data:', error);
             }
@@ -74,7 +72,7 @@ const KPIWindow = () => {
 
         async function start_fetch_loop() {
             /** @type {{ delay: number }} */
-            const result = await simulationRunController.getSimulationDelay();
+            const result = await useSimulationRun().getSimulationDelay();
             const delay_in_ms = (parseInt(result?.delay) || 3) * 1000;
 
             await fetch_data();

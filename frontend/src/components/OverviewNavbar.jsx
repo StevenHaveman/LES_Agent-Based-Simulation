@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import simulationRunController from '../controller OUTDATED/SimulationRunController.js';
+import React, { use, useEffect, useState } from 'react';
+import { useSimulationRun } from '../hooks/useSimulationRun.js';
 import '../styles/OverviewNavbar.css';
 
 /**
@@ -38,7 +38,7 @@ const OverviewNavbar = ({ title }) => {
         const newDelay = parseInt(e.target.value);
         setDelay(newDelay);
 
-        await simulationRunController.setDelay(newDelay);
+        await useSimulationRun.setDelay(newDelay);
     };
 
     /**
@@ -47,10 +47,10 @@ const OverviewNavbar = ({ title }) => {
      */
     useEffect(() => {
         const fetchInitialData = async () => {
-            const status = await simulationRunController.getPauseStatus();
+            const status = await useSimulationRun().getPauseStatus();
             setPaused(status.paused);
 
-            const delayRes = await simulationRunController.getDelay();
+            const delayRes = await useSimulationRun().getSimulationDelay();
             setDelay(delayRes.delay);
         };
 

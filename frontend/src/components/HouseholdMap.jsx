@@ -36,7 +36,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import '../styles/HouseholdMap.css';
-import overviewController from '../controller OUTDATED/OverviewController.js';
+import { useOverview } from '../hooks/useOverview.js';
 
 const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdId }) => {
     const [households, setHouseholds] = useState([]);
@@ -48,7 +48,7 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
         const fetchHouseholds = async () => {
             try {
                 await new Promise(resolve => setTimeout(resolve, 100));
-                const data = await overviewController.fetch_households();
+                const data = await useOverview().fetchHouseholds();
                 setHouseholds(data);
             } catch (error) {
                 console.error('Error fetching households:', error);

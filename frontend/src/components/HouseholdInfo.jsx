@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/HouseholdInfo.css';
-import overviewController from '../controller OUTDATED/OverviewController.js';
+import { useOverview } from '../hooks/useOverview.js';
 
 /**
  * HouseholdInfo component displays detailed information about a selected household.
@@ -21,7 +21,7 @@ const HouseholdInfo = ({ selectedHouseholdId, visible }) => {
     useEffect(() => {
         const fetchHouseholds = async () => {
             try {
-                const data = await overviewController.fetch_households();
+                const data = await useOverview().fetchHouseholds();
                 setHouseholds(data);
             } catch (error) {
                 console.error('Error fetching households:', error);
