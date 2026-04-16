@@ -37,12 +37,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import '../styles/HouseholdMap.css';
 import { useOverview } from '../hooks/useOverview.js';
+import { useOverviewDispatch } from '../state/overviewState.jsx';
 
-const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdId }) => {
+const HouseholdMap = ({ selectedHouseholdId }) => {
     const [households, setHouseholds] = useState([]);
     const canvasRef = useRef(null);
     const householdPositions = useRef({});
     const iconRef = useRef(null);
+    const dispatch = useOverviewDispatch();
 
     useEffect(() => {
         const fetchHouseholds = async () => {
@@ -131,12 +133,18 @@ const HouseholdMap = ({ onSelectResidents, onSelectHousehold, selectedHouseholdI
             ) {
                 const selected = households.find(h => h.id.toString() === id);
                 if (selected) {
-                    onSelectResidents(selected.residents);
-                    onSelectHousehold(selected);
+                    selectHousehold(selected);
                 }
                 break;
             }
         }
+    };
+
+    const selectHousehold = (household) => {
+        dispatch({
+            type: 'SELECT_HOUSEHOLD',
+            payload: { id: household.id, residents: household.residents }
+        });
     };
 
     return (

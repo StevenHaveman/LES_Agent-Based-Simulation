@@ -1,31 +1,15 @@
 import '../styles/ResidentDropdown.css';
 import '../styles/SharedListStyles.css';
 import React, { useState } from 'react';
+import { useOverviewDispatch } from '../state/overviewState.jsx';
 
-/**
- * ResidentDropdown component provides a dropdown menu for selecting a resident
- * from a list. It displays the currently selected resident and allows toggling
- * the dropdown menu to choose another resident.
- *
- * @param {Object} props - The component props.
- * @param {Array<Object>} props.residents - The list of residents available for selection.
- * @param {number|null} props.selectedResidentIndex - The index of the currently selected resident.
- * @param {Function} props.onSelectResident - Callback function to handle resident selection.
- * @returns {JSX.Element} The rendered ResidentDropdown component.
- */
-const ResidentDropdown = ({ residents, selectedResidentIndex, onSelectResident }) => {
+const ResidentDropdown = ({ residents, selectedResidentIndex }) => {
     // State to track whether the dropdown menu is open or closed.
     const [isOpen, setIsOpen] = useState(false);
+    const dispatch = useOverviewDispatch();
 
-    /**
-     * Handles the click event for a resident in the dropdown menu.
-     * Updates the selected resident and closes the dropdown.
-     *
-     * @param {Object} resident - The resident object being clicked.
-     * @param {number} index - The index of the resident in the list.
-     */
-    const handleResidentClick = (resident, index) => {
-        onSelectResident(index);
+    const handleResidentClick = (index) => {
+        dispatch({ type: 'SELECT_RESIDENT', payload: index });
         setIsOpen(false);
     };
 
@@ -41,7 +25,7 @@ const ResidentDropdown = ({ residents, selectedResidentIndex, onSelectResident }
                     <ul className="dropdown-menu">
                         {residents && residents.length > 0 ? (
                             residents.map((resident, index) => (
-                                <li key={index} onClick={() => handleResidentClick(resident, index)}>
+                                <li key={index} onClick={() => handleResidentClick(index)}>
                                     {resident.name}
                                 </li>
                             ))
