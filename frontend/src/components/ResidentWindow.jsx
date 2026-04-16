@@ -1,7 +1,6 @@
 import React from 'react';
 
 import '../styles/ResidentWindow.css';
-import './ResidentInfo.jsx';
 import ResidentInfo from './ResidentInfo.jsx';
 import { useOverviewState } from '../state/overviewState.jsx';
 

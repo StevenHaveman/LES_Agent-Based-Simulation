@@ -5,7 +5,6 @@ export function useOverview() {
     const getSimulationGraphicResults = async () => {
         try {
             const result = await OverviewService.getSimulationGraphicResults();
-            console.log('Simulation overview fetched successfully');
             return result;
         } catch (error) {
             console.error('Simulation overview fetch failed:', error);

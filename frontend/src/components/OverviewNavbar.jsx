@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSimulationRun } from '../hooks/useSimulationRun.js';
 import '../styles/OverviewNavbar.css';
 
@@ -11,15 +11,12 @@ import '../styles/OverviewNavbar.css';
  * @returns {JSX.Element} The rendered OverviewNavbar component.
  */
 const OverviewNavbar = ({ title }) => {
+    const seconds = 3;
     // State to track whether the simulation is paused.
     const [paused, setPaused] = useState(false);
-    // State to track the delay between simulation steps in seconds.
-    const [delay, setDelay] = useState(3);
 
-    /**
-     * Toggles the pause state of the simulation by interacting with the controller.
-     * Updates the paused state and displays an alert with the result message.
-     */
+    const [delay, setDelay] = useState(seconds);
+
     const togglePause = async () => {
         const result = await useSimulationRun().togglePause();
         if (result.status === 'ok') {

@@ -46,10 +46,18 @@ const HouseholdMap = ({ selectedHouseholdId }) => {
     const iconRef = useRef(null);
     const dispatch = useOverviewDispatch();
 
+    const initialFetchDelayMs = 100;
+    const iconBoundaryPaddingPx = 40;
+    const iconSizePx = 32;
+    const iconHalfSizePx = 16;
+    const selectionRingRadiusPx = 20; 
+    const selectionRingStrokeWidthPx = 1;
+    const fullCircleRadians = 2;
+
     useEffect(() => {
         const fetchHouseholds = async () => {
             try {
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, initialFetchDelayMs));
                 const data = await useOverview().fetchHouseholds();
                 setHouseholds(data);
             } catch (error) {
@@ -76,9 +84,9 @@ const HouseholdMap = ({ selectedHouseholdId }) => {
 
             const newPositions = {};
             households.forEach(household => {
-                const x = Math.random() * (width - 40);
-                const y = Math.random() * (height - 40);
-                newPositions[household.id] = { x, y, width: 32, height: 32 };
+                const x = Math.random() * (width - iconBoundaryPaddingPx);
+                const y = Math.random() * (height - iconBoundaryPaddingPx);
+                newPositions[household.id] = { x, y, width: iconSizePx, height: iconSizePx };
             });
 
             householdPositions.current = newPositions;
@@ -109,13 +117,13 @@ const HouseholdMap = ({ selectedHouseholdId }) => {
             const pos = householdPositions.current[household.id];
             if (!pos) {return;}
 
-            ctx.drawImage(iconRef.current, pos.x, pos.y, 32, 32);
+            ctx.drawImage(iconRef.current, pos.x, pos.y, iconSizePx, iconSizePx);
 
             if (household.id === selectedHouseholdId) {
                 ctx.beginPath();
                 ctx.strokeStyle = 'black';
-                ctx.lineWidth = 1;
-                ctx.arc(pos.x + 16, pos.y + 16, 20, 0, 2 * Math.PI);
+                ctx.lineWidth = selectionRingStrokeWidthPx;
+                ctx.arc(pos.x + iconHalfSizePx, pos.y + iconHalfSizePx, selectionRingRadiusPx, 0, fullCircleRadians * Math.PI);
                 ctx.stroke();
             }
         });

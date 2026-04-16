@@ -55,6 +55,9 @@ const validKeys = [
     'solar_panel_positive_decisions'
 ];
 
+const delayMs = 1000;
+const defaultSimulationDelaySeconds = 3;
+
 const Graphic = ({ title = '', yAxisKey = '' }) => {
     const [simulationData, setSimulationData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -77,9 +80,9 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
 
         const fetchInterval = async () => {
             const res = await useSimulationRun().getSimulationDelay();
-            const delay = parseInt(res.delay || 3) * 1000;
+            const delay = parseInt(res.delay || defaultSimulationDelaySeconds) * delayMs;
 
-            await fetchData(); // Initial fetch
+            await fetchData();
 
             intervalId = setInterval(fetchData, delay);
         };

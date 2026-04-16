@@ -71,9 +71,11 @@ const KPIWindow = () => {
         }
 
         async function start_fetch_loop() {
-            /** @type {{ delay: number }} */
+            const delayTime = 3;
+            const delayMs = 1000;
+
             const result = await useSimulationRun().getSimulationDelay();
-            const delay_in_ms = (parseInt(result?.delay) || 3) * 1000;
+            const delay_in_ms = (parseInt(result?.delay) || delayTime) * delayMs;
 
             await fetch_data();
 
@@ -96,11 +98,13 @@ const KPIWindow = () => {
     const counted_full_data_hh = house_hold_data.reduce((prev, cur) => cur['Heat Pump_installed'] && cur['Solar Panel_installed'] ? prev + 1 : prev, 0);
     const counted_income_total_hh = house_hold_data.reduce((prev, cur) => prev + (cur.residents.reduce((p, c) => p + c.income, 0) / cur.residents.length), 0);
 
+    const percentFactor = 100;
+
     return (
         <>
-            <h3>Solar Panels: {Math.round((counted_solar_data_hh / house_hold_data.length) * 100)}%</h3>
-            <h3>Heat Pumps: {Math.round((counted_heat_pump_data_hh / house_hold_data.length) * 100)}%</h3>
-            <h3>Fully Converted: {Math.round((counted_full_data_hh / house_hold_data.length) * 100)}%</h3>
+            <h3>Solar Panels: {Math.round((counted_solar_data_hh / house_hold_data.length) * percentFactor)}%</h3>
+            <h3>Heat Pumps: {Math.round((counted_heat_pump_data_hh / house_hold_data.length) * percentFactor)}%</h3>
+            <h3>Fully Converted: {Math.round((counted_full_data_hh / house_hold_data.length) * percentFactor)}%</h3>
             <h3>Average Income: {Math.round((counted_income_total_hh / house_hold_data.length))}€</h3>
             <h3>Subjective Norm ({sim_config.subj_norm_level}): {sim_config.subjective_norm}</h3>
         </>

@@ -25,7 +25,6 @@ export function useSimulationRun() {
     const getSimulationDelay = async () => {
         try {
             const result = await SimulationRunService.getSimulationDelay();
-            console.log('Simulation delay fetched successfully');
             return result;
         } catch (error) {
             console.error('Simulation delay fetch failed:', error);
