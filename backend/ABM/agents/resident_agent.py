@@ -38,14 +38,14 @@ class Resident(Agent):
         
         if self.config_id in (0, 1):
             self.attitude = utilities.gen_random_value(0, 1)
-            self.attitude_mod = utilities.gen_random_value(0, 2)
-            self.subj_norm_mod = utilities.gen_random_value(0, 2)
-            self.behavioral_mod = utilities.gen_random_value(0, 2)
+            self.attitude_sensitivity = utilities.gen_random_value(0, 2)
+            self.subj_norm_sensitivity = utilities.gen_random_value(0, 2)
+            self.control_sensitivity = utilities.gen_random_value(0, 2)
         else:
             self.attitude = self.config['attitude']
-            self.attitude_mod = self.config['attitude_mod']
-            self.subj_norm_mod = self.config['subj_norm_mod']
-            self.behavioral_mod = self.config['behavioral_mod']
+            self.attitude_sensitivity = self.config['attitude_sensitivity']
+            self.subj_norm_sensitivity = self.config['subj_norm_sensitivity']
+            self.control_sensitivity = self.config['control_sensitivity']
             
 
         self.package_decisions = {} # Stores True/False for each package.name
@@ -119,12 +119,9 @@ class Resident(Agent):
                 continue
 
             # make the the attitude, subjective norm, and behavioral control components for the agent and package, applying the respective modifiers
-            attitude_part = self.attitude * self.attitude_mod
-            # TODO:
-            # - self.subj_norm_mod hernoemen naar agent_sensitivity_to_subjective_norm
-            # - package.subj_norm_mod hernoemen naar package_social_influence_strength
-            norm_part = (self.subj_norm[package.name] * package.subj_norm_mod * self.subj_norm_mod)
-            control_part = (self.behavioral_control[package.name] * self.behavioral_mod)
+            attitude_part = self.attitude * self.attitude_sensitivity
+            norm_part = (self.subj_norm[package.name] * package.subj_norm_mod * self.subj_norm_sensitivity)
+            control_part = (self.behavioral_control[package.name] * self.control_sensitivity)
 
             # get the weights for each component from the config, or default to 1.0 if not specified
             w_att = self.config.get("weight_attitude", 1.0)
@@ -154,11 +151,11 @@ class Resident(Agent):
             "household_id": self.household.unique_id,
             "income": self.income,
             "attitude": self.attitude,
-            "attitude_mod": self.attitude_mod,
+            "attitude_mod": self.attitude_sensitivity,
             "subj_norm": self.subj_norm,
-            "subj_norm_mod": self.subj_norm_mod,
+            "subj_norm_mod": self.subj_norm_sensitivity,
             "behavioral_control": self.behavioral_control,
-            "behavioral_mod": self.behavioral_mod,
+            "behavioral_mod": self.control_sensitivity,
         }
         for package in self.environment.sustainability_packages:
             agent_data[package.name] = self.package_decisions[package.name]

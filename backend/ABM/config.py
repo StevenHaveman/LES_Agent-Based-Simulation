@@ -44,9 +44,9 @@ configs = {
         'raise_income': [1.00, 1.01, 1.02, 1.03, 1.04, 1.05], # Random increase in income per year
         'decision_threshold': 0.5, # Decision threshold for investing in sustainable energy
         'attitude': None,
-        'attitude_mod': None,
-        'subj_norm_mod': None,
-        'behavioral_mod': None,
+        'attitude_sensitivity': None,
+        'subj_norm_sensitivity': None,
+        'control_sensitivity': None,
         'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
 
         # Data collection parameters
@@ -95,11 +95,11 @@ configs = {
         'raise_income': [1.00, 1.01, 1.02, 1.03, 1.04, 1.05], # Random increase in income per year
         'decision_threshold': 0.5, # Decision threshold for investing in sustainable energy
         'attitude': None,
-        'attitude_mod': None,
-        'subj_norm_mod': None,
-        'behavioral_mod': None,
+        'attitude_sensitivity': None,
+        'subj_norm_sensitivity': None,
+        'control_sensitivity': None,
         'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
-
+        
         # Weights for RAA components in intention calculation (can be adjusted to test different influence scenarios)
         'weight_attitude': 1.0,
         'weight_norm': 1.0,
@@ -137,9 +137,10 @@ configs = {
         'raise_income': [1.00, 1.01, 1.02, 1.03, 1.04, 1.05],
         'decision_threshold': 0.5,
         'attitude': None,
-        'attitude_mod': None,
-        'subj_norm_mod': None,
-        'behavioral_mod': None,
+        'attitude_sensitivity': None,
+        'subj_norm_sensitivity': None,
+        'control_sensitivity': None,
+        'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy 
 
         # Weights for RAA components in intention calculation (can be adjusted to test different influence scenarios)
         'weight_attitude': 1.0,
