@@ -120,7 +120,7 @@ class Resident(Agent):
 
             # make the the attitude, subjective norm, and behavioral control components for the agent and package, applying the respective modifiers
             attitude_part = self.attitude * self.attitude_sensitivity
-            norm_part = (self.subj_norm[package.name] * package.subj_norm_mod * self.subj_norm_sensitivity)
+            norm_part = (self.subj_norm[package.name] * package.norm_influence_strength * self.subj_norm_sensitivity)
             control_part = (self.behavioral_control[package.name] * self.control_sensitivity)
 
             # get the weights for each component from the config, or default to 1.0 if not specified
@@ -151,11 +151,11 @@ class Resident(Agent):
             "household_id": self.household.unique_id,
             "income": self.income,
             "attitude": self.attitude,
-            "attitude_mod": self.attitude_sensitivity,
+            "attitude_sensitivity": self.attitude_sensitivity,
             "subj_norm": self.subj_norm,
-            "subj_norm_mod": self.subj_norm_sensitivity,
+            "subj_norm_sensitivity": self.subj_norm_sensitivity,
             "behavioral_control": self.behavioral_control,
-            "behavioral_mod": self.control_sensitivity,
+            "control_sensitivity": self.control_sensitivity,
         }
         for package in self.environment.sustainability_packages:
             agent_data[package.name] = self.package_decisions[package.name]

@@ -29,6 +29,8 @@ configs = {
         "initial_heatpump_chance": 0.07, # https://longreads.cbs.nl/klimaatverandering-en-energietransitie-2023/duurzaam-wonen/#:~:text=Ruim%201%20op%20de%2014%20huishoudens%20heeft%20een%20warmtepomp&text=Het%20gaat%20in%20totaal%20om,Ligthart%20en%20Blijie%2C%202022).
         "solarpanel_price_increase": (0, 20), # Random increase in solar panel price per year (in euros)
         "heatpump_price_increase": (0, 300),
+        "solar_panel_norm_influence_strength": 1.0, # Multiplier for how strongly subjective norms influence decisions about solar panels (can be adjusted to test different influence scenarios)
+        "heat_pump_norm_influence_strength": 1.0, # Multiplier for how strongly subjective norms influence decisions about heat pumps (can be adjusted to test different influence scenarios)
         "min_nr_houses": 20,
         "max_nr_houses": 60,
         "subj_norm_level": "Street", # District, Street, Direct
@@ -80,6 +82,8 @@ configs = {
         "initial_heatpump_chance": 0.07, # https://longreads.cbs.nl/klimaatverandering-en-energietransitie-2023/duurzaam-wonen/#:~:text=Ruim%201%20op%20de%2014%20huishoudens%20heeft%20een%20warmtepomp&text=Het%20gaat%20in%20totaal%20om,Ligthart%20en%20Blijie%2C%202022).
         "solarpanel_price_increase": (0, 20), # Random increase in solar panel price per year (in euros)
         "heatpump_price_increase": (0, 300),
+        "solar_panel_norm_influence_strength": 1.0, # Multiplier for how strongly subjective norms influence decisions about solar panels (can be adjusted to test different influence scenarios)
+        "heat_pump_norm_influence_strength": 1.0, # Multiplier for how strongly subjective norms influence decisions about heat pumps (can be adjusted to test different influence scenarios)
         "min_nr_houses": 20,
         "max_nr_houses": 60,
         "subj_norm_level": "Street", # District, Street, Direct
