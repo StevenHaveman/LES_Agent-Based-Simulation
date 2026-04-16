@@ -5,7 +5,6 @@ import './ResidentInfo.jsx';
 import ResidentInfo from './ResidentInfo.jsx';
 import { useOverviewState } from '../state/overviewState.jsx';
 
-
 const ResidentWindow = ({ residents, selectedResidentIndex }) => {
     const state = useOverviewState();
 

@@ -71,7 +71,6 @@ const ConfigForm = () => {
             console.error('Simulation start failed', error);
         }
     };
-    
 
     return (
         <div className="form-container">

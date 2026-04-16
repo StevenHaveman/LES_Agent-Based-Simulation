@@ -19,63 +19,63 @@ import KPIWindow from '../components/KPIWindow.jsx';
 import SimulationParameters from '../components/SimulationParameters.jsx';
 
 function OverviewContent() {
-  const state = useOverviewState();
+    const state = useOverviewState();
 
-  return (
-    <>
-      <OverviewNavbar title="Overview"> </OverviewNavbar>
-      <div className="overview-container">
-        <div className="map-container">
-          {state.chatWindow === 'ai' ? (
-            <AIChatWindow
-              residents={state.selectedResidents}
-              selectedResidentIndex={state.selectedResidentIndex}
-            />
-          ) : (
-            <HouseholdMap
-              selectedHouseholdId={state.selectedHouseholdId}
-            />
-          )}
-        </div>
-        <div className="graphics-container">
-          <GraphicsView> </GraphicsView>
-        </div>
-        <div className="household-container">
-          <HouseholdNavbar />
-          <HouseholdWindow
-            selectedHouseholdId={state.selectedHouseholdId}
-          />
-        </div>
-        <div className="resident-container">
-          <ResidentNavbar />
-          <ResidentDropdown
-            residents={state.selectedResidents}
-            selectedResidentIndex={state.selectedResidentIndex}
-          />
-          <ResidentWindow
-            residents={state.selectedResidents}
-            selectedResidentIndex={state.selectedResidentIndex}
-          />
-        </div>
-        <div className="parameters-container">
-          <SimulationParameters> </SimulationParameters>
-        </div>
-        <div className="KPI-container">
-          <KPIWindow />
-        </div>
-      </div>
-    </>
-  );
+    return (
+        <>
+            <OverviewNavbar title="Overview"> </OverviewNavbar>
+            <div className="overview-container">
+                <div className="map-container">
+                    {state.chatWindow === 'ai' ? (
+                        <AIChatWindow
+                            residents={state.selectedResidents}
+                            selectedResidentIndex={state.selectedResidentIndex}
+                        />
+                    ) : (
+                        <HouseholdMap
+                            selectedHouseholdId={state.selectedHouseholdId}
+                        />
+                    )}
+                </div>
+                <div className="graphics-container">
+                    <GraphicsView> </GraphicsView>
+                </div>
+                <div className="household-container">
+                    <HouseholdNavbar />
+                    <HouseholdWindow
+                        selectedHouseholdId={state.selectedHouseholdId}
+                    />
+                </div>
+                <div className="resident-container">
+                    <ResidentNavbar />
+                    <ResidentDropdown
+                        residents={state.selectedResidents}
+                        selectedResidentIndex={state.selectedResidentIndex}
+                    />
+                    <ResidentWindow
+                        residents={state.selectedResidents}
+                        selectedResidentIndex={state.selectedResidentIndex}
+                    />
+                </div>
+                <div className="parameters-container">
+                    <SimulationParameters> </SimulationParameters>
+                </div>
+                <div className="KPI-container">
+                    <KPIWindow />
+                </div>
+            </div>
+        </>
+    );
 }
 
 export const overviewRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/overview',
     component: function Overview() {
-      return (
-        <OverviewProvider>
-          <OverviewContent />
-        </OverviewProvider>
-      );
+        return (
+            <OverviewProvider>
+                <OverviewContent />
+            </OverviewProvider>
+        );
     },
 });
