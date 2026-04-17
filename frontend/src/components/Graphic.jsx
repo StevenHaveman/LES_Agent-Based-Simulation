@@ -43,6 +43,7 @@ import {
     ResponsiveContainer,
     Legend
 } from 'recharts';
+import PropTypes from 'prop-types';
 
 import '../styles/Graphic.css';
 import { useOverview } from '../hooks/useOverview.js';
@@ -100,7 +101,7 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
 
     const flattenedData = simulationData.flatMap(d => {
         const entries = [];
-        const { year, start_state_per_package, end_state_per_package } = d;
+        const { year, end_state_per_package } = d;
 
         const extract = (key, stateObj, stateLabel) => {
             let value = null;
@@ -182,6 +183,11 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
             </div>
         </div>
     );
+};
+
+Graphic.propTypes = {
+    title: PropTypes.string,
+    yAxisKey: PropTypes.string
 };
 
 export default Graphic;

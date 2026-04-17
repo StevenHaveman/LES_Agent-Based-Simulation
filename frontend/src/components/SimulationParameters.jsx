@@ -44,8 +44,7 @@ const SimulationParameters = () => {
     const handleSubmit = async () => {
         try {
             const newValue = parseFloat(inputValue);
-            const result = await useSimulationParameters().updateParameter(selectedKey, newValue);
-
+            await useSimulationParameters().updateParameter(selectedKey, newValue);
             alert(`Parameter "${selectedKey}" is bijgewerkt naar waarde: ${newValue}`);
 
             await fetchOptions();

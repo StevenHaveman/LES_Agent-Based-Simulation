@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import '../styles/HouseholdDecisions.css';
 import { useOverview } from '../hooks/useOverview.js';
 
@@ -75,6 +76,11 @@ const HouseholdDecisions = ({ selectedHouseholdId, visible }) => {
             </div>
         </div>
     );
+};
+
+HouseholdDecisions.propTypes = {
+    selectedHouseholdId: PropTypes.number.isRequired,
+    visible: PropTypes.bool.isRequired,
 };
 
 export default HouseholdDecisions;

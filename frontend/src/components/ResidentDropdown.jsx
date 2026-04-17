@@ -1,6 +1,7 @@
 import '../styles/ResidentDropdown.css';
 import '../styles/SharedListStyles.css';
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { useOverviewDispatch } from '../state/overviewState.jsx';
 
 const ResidentDropdown = ({ residents, selectedResidentIndex }) => {
@@ -37,6 +38,16 @@ const ResidentDropdown = ({ residents, selectedResidentIndex }) => {
             </div>
         </div>
     );
+};
+
+ResidentDropdown.propTypes = {
+    residents: PropTypes.arrayOf(
+        PropTypes.shape({
+            name: PropTypes.string.isRequired,
+            income: PropTypes.number.isRequired,
+        })
+    ).isRequired,
+    selectedResidentIndex: PropTypes.number,
 };
 
 export default ResidentDropdown;

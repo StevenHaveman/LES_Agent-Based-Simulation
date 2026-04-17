@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer } from 'react';
+import PropTypes from 'prop-types';
 
 const OverviewStateContext = createContext(null);
 const OverviewDispatchContext = createContext(null);
@@ -68,3 +69,7 @@ export function useOverview() {
         dispatch: useOverviewDispatch(),
     };
 }
+
+OverviewProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+};

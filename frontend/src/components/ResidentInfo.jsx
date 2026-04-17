@@ -1,3 +1,5 @@
+import React from 'react';
+import PropTypes from 'prop-types';
 import '../styles/ResidentInfo.css';
 
 /**
@@ -25,6 +27,13 @@ const ResidentInfo = ({ resident }) => {
             </div>
         </div>
     );
+};
+
+ResidentInfo.propTypes = {
+    resident: PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        income: PropTypes.number.isRequired,
+    }),
 };
 
 export default ResidentInfo;

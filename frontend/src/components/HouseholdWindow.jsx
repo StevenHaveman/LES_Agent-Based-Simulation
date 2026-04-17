@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import HouseholdDecisions from './HouseholdDecisions';
 import '../styles/HouseholdWindow.css';
 import HouseholdInfo from './HouseholdInfo.jsx';
@@ -60,6 +61,10 @@ const HouseholdWindow = ({ selectedHouseholdId }) => {
     };
 
     return renderContent();
+};
+
+HouseholdWindow.propTypes = {
+    selectedHouseholdId: PropTypes.number,
 };
 
 export default HouseholdWindow;

@@ -19,6 +19,7 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import '../styles/ConfigNavbar.css';
 
 const ConfigNavbar = ({ title }) => {
@@ -36,6 +37,10 @@ const ConfigNavbar = ({ title }) => {
             <img className="logo" src="LES_logo2.png" alt="Logo rechts" />
         </div>
     );
+};
+
+ConfigNavbar.propTypes = {
+    title: PropTypes.string.isRequired,
 };
 
 export default ConfigNavbar;

@@ -35,6 +35,7 @@
  */
 
 import React, { useEffect, useRef, useState } from 'react';
+import PropTypes from 'prop-types';
 import '../styles/HouseholdMap.css';
 import { useOverview } from '../hooks/useOverview.js';
 import { useOverviewDispatch } from '../state/overviewState.jsx';
@@ -162,6 +163,10 @@ const HouseholdMap = ({ selectedHouseholdId }) => {
             onClick={handleCanvasClick}
         />
     );
+};
+
+HouseholdMap.propTypes = {
+    selectedHouseholdId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default HouseholdMap;

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { useSimulationRun } from '../hooks/useSimulationRun.js';
 import '../styles/OverviewNavbar.css';
 
@@ -85,6 +86,10 @@ const OverviewNavbar = ({ title }) => {
             </div>
         </>
     );
+};
+
+OverviewNavbar.propTypes = {
+    title: PropTypes.string.isRequired,
 };
 
 export default OverviewNavbar;

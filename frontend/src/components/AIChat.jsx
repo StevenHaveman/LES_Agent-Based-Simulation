@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import '../styles/AIChat.css';
 import { useAIChat } from '../hooks/useAIChat.js';
 
@@ -54,7 +55,7 @@ const AIChat = ({ resident }) => {
                 ...prev.slice(0, -1),
                 { role: 'ai', content: result.response },
             ]);
-        } catch (error) {
+        } catch {
             // Handle errors by displaying an error message in the chat.
             setMessages((prev) => [
                 ...prev.slice(0, -1),
@@ -116,6 +117,10 @@ const AIChat = ({ resident }) => {
             </div>
         </div>
     );
+};
+
+AIChat.propTypes = {
+    resident: PropTypes.object,
 };
 
 export default AIChat;
