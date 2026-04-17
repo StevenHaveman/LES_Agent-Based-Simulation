@@ -48,6 +48,7 @@ import PropTypes from 'prop-types';
 import '../styles/Graphic.css';
 import { useOverview } from '../hooks/useOverview.js';
 import { useSimulationRun } from '../hooks/useSimulationRun.js';
+import { flattenSimulationData } from '../utils/flattenSimulationData.js';
 
 const validKeys = [
     'solar_panel_price',
@@ -99,37 +100,7 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
         return <div>Loading...</div>;
     }
 
-    const flattenedData = simulationData.flatMap(d => {
-        const entries = [];
-        const { year, end_state_per_package } = d;
-
-        const extract = (key, stateObj, stateLabel) => {
-            let value = null;
-            switch (key) {
-                case 'solar_panel_price':
-                    value = stateObj?.['Solar Panel']?.price;
-                    break;
-                case 'heat_pump_price':
-                    value = stateObj?.['Heat Pump']?.price;
-                    break;
-                case 'solar_panel_households':
-                    value = stateObj?.['Solar Panel']?.households_with_package;
-                    break;
-                case 'solar_panel_positive_decisions':
-                    value = stateObj?.['Solar Panel']?.residents_positive_decision;
-                    break;
-            }
-
-            if (value !== undefined && value !== null) {
-                entries.push({ year, state: stateLabel, value });
-            }
-        };
-
-        // extract(yKey, start_state_per_package, "Start");
-        extract(yKey, end_state_per_package, 'End');
-
-        return entries;
-    });
+    const flattenedData = flattenSimulationData(simulationData, yKey);
 
     const yValues = flattenedData.map(d => d.value);
     const yMin = Math.floor(Math.min(...yValues));
