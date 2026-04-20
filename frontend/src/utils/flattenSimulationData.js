@@ -19,6 +19,7 @@ export function flattenSimulationData(simulationData, yKey) {
                     value = stateObj?.['Solar Panel']?.residents_positive_decision;
                     break;
             }
+            
             if (value !== undefined && value !== null) {
                 entries.push({ year, state: stateLabel, value });
             }
