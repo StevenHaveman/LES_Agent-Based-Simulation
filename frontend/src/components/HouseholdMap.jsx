@@ -1,0 +1,172 @@
+/**
+ * HouseholdMap Component
+ *
+ * This React component renders a canvas that displays a map of households.
+ * Each household is represented by an icon, and clicking on a household triggers
+ * selection callbacks for residents and the household itself.
+ *
+ * Props:
+ * - `onSelectResidents` (function): Callback function triggered when a household is selected.
+ *   Receives the residents of the selected household as an argument.
+ * - `onSelectHousehold` (function): Callback function triggered when a household is selected.
+ *   Receives the selected household object as an argument.
+ * - `selectedHouseholdId` (string | number): ID of the currently selected household.
+ *
+ * State:
+ * - `households` (Array): List of household objects fetched from the backend.
+ *
+ * Refs:
+ * - `canvasRef`: Reference to the canvas element used for rendering the map.
+ * - `householdPositions`: Stores the positions of households on the canvas.
+ * - `iconRef`: Reference to the household icon image used for rendering.
+ *
+ * Effects:
+ * - Fetches household data once on component mount.
+ * - Loads the household icon image and triggers canvas rendering.
+ * - Updates household positions and redraws the canvas when household data changes.
+ * - Redraws the canvas when the selected household changes.
+ *
+ * Methods:
+ * - `drawCanvas()`: Draws the canvas with household icons and highlights the selected household.
+ * - `handleCanvasClick(event)`: Handles click events on the canvas to detect and select a household.
+ *
+ * Returns:
+ * - A canvas element that displays the household map.
+ */
+
+import React, { useEffect, useRef, useState } from 'react';
+import PropTypes from 'prop-types';
+import '../styles/HouseholdMap.css';
+import { useOverview } from '../hooks/useOverview.js';
+import { useOverviewDispatch } from '../state/overviewState.jsx';
+
+const HouseholdMap = ({ selectedHouseholdId }) => {
+    const [households, setHouseholds] = useState([]);
+    const canvasRef = useRef(null);
+    const householdPositions = useRef({});
+    const iconRef = useRef(null);
+    const dispatch = useOverviewDispatch();
+
+    const initialFetchDelayMs = 100;
+    const iconBoundaryPaddingPx = 40;
+    const iconSizePx = 32;
+    const iconHalfSizePx = 16;
+    const selectionRingRadiusPx = 20; 
+    const selectionRingStrokeWidthPx = 1;
+    const fullCircleRadians = 2;
+
+    useEffect(() => {
+        const fetchHouseholds = async () => {
+            try {
+                await new Promise(resolve => setTimeout(resolve, initialFetchDelayMs));
+                const data = await useOverview().fetchHouseholds();
+                setHouseholds(data);
+            } catch (error) {
+                console.error('Error fetching households:', error);
+            }
+        };
+        fetchHouseholds();
+    }, []);
+
+    useEffect(() => {
+        const icon = new Image();
+        icon.src = '/INNO/Household_icon.png';
+        icon.onload = () => {
+            iconRef.current = icon;
+            drawCanvas();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (households.length > 0 && canvasRef.current) {
+            const canvas = canvasRef.current;
+            const width = canvas.offsetWidth;
+            const height = canvas.offsetHeight;
+
+            const newPositions = {};
+            households.forEach(household => {
+                const x = Math.random() * (width - iconBoundaryPaddingPx);
+                const y = Math.random() * (height - iconBoundaryPaddingPx);
+                newPositions[household.id] = { x, y, width: iconSizePx, height: iconSizePx };
+            });
+
+            householdPositions.current = newPositions;
+
+            if (iconRef.current) {
+                drawCanvas();
+            }
+        }
+    }, [households]);
+
+    useEffect(() => {
+        if (iconRef.current) {
+            drawCanvas();
+        }
+    }, [selectedHouseholdId]);
+
+    const drawCanvas = () => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+
+        ctx.fillStyle = '#b0f5a0';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        households.forEach((household) => {
+            const pos = householdPositions.current[household.id];
+            if (!pos) {return;}
+
+            ctx.drawImage(iconRef.current, pos.x, pos.y, iconSizePx, iconSizePx);
+
+            if (household.id === selectedHouseholdId) {
+                ctx.beginPath();
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = selectionRingStrokeWidthPx;
+                ctx.arc(pos.x + iconHalfSizePx, pos.y + iconHalfSizePx, selectionRingRadiusPx, 0, fullCircleRadians * Math.PI);
+                ctx.stroke();
+            }
+        });
+    };
+
+    const handleCanvasClick = (event) => {
+        const rect = canvasRef.current.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        for (const [id, pos] of Object.entries(householdPositions.current)) {
+            if (
+                x >= pos.x && x <= pos.x + pos.width &&
+                y >= pos.y && y <= pos.y + pos.height
+            ) {
+                const selected = households.find(h => h.id.toString() === id);
+                if (selected) {
+                    selectHousehold(selected);
+                }
+                break;
+            }
+        }
+    };
+
+    const selectHousehold = (household) => {
+        dispatch({
+            type: 'SELECT_HOUSEHOLD',
+            payload: { id: household.id, residents: household.residents }
+        });
+    };
+
+    return (
+        <canvas
+            ref={canvasRef}
+            className="household-canvas"
+            onClick={handleCanvasClick}
+        />
+    );
+};
+
+HouseholdMap.propTypes = {
+    selectedHouseholdId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};
+
+export default HouseholdMap;
