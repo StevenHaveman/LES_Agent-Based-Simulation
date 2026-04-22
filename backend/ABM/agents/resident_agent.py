@@ -38,12 +38,13 @@ class Resident(Agent):
         self.perceived_norm = {p.name: 0.0 for p in self.environment.sustainability_packages}
 
         # BEHAVIORAL CONTROL (PBC)
-        self.behavioral_control = {p.name: None for p in self.environment.sustainability_packages}
+        self.behavioral_control = {p.name: 0.0 for p in self.environment.sustainability_packages}
 
         # INTENTION SYSTEM
         self.intentions = {p.name: 0.0 for p in self.environment.sustainability_packages}
 
-        self.intention_threshold = self.config.get('intention_threshold',self.decision_threshold)
+        # self.intention_threshold = self.config.get('intention_threshold',self.decision_threshold)
+        self.intention_threshold = 0.7 # This is a new parameter that determines how high the intention needs to be for the resident to decide to adopt a package. We can experiment with different values for this to see how it affects adoption rates.
 
         # ATTITUDE AND SENSITIVITY
         if self.config_id in (0, 1):
@@ -128,11 +129,14 @@ class Resident(Agent):
                         self.environment.decided_residents_this_step_per_package.get(package.name, 0) + 1
 
     def calc_intention(self): # New voor RAA model
+        """
+        Calculates the intention to adopt each sustainability package based on attitude,
+        subjective norm, and perceived behavioral control, applying the respective sensitivities and weights from the configuration.
+        """
         for package in self.environment.sustainability_packages:
             if self.package_decisions.get(package.name, False):
                 continue
 
-            
 
 
             # make the the attitude, subjective norm, and behavioral control components for the agent and package, applying the respective modifiers
@@ -160,7 +164,8 @@ class Resident(Agent):
         Checks if the resident is actually able to adopt the package,
         based on real-world constraints.
         """
-        return package.is_feasible(self.income, self.household, self.environment) #Function exists but wel need to be reworked with new packages in mind.
+        # return package.is_feasible(self.income, self.household, self.environment) #Function exists but wel need to be reworked with new packages in mind.
+        return True # For now, we will assume that if the resident has the intention and meets the behavioral control threshold, they can adopt the package. We can implement more complex feasibility checks later.
 
     def collect_resident_data(self):
         agent_data = {
@@ -169,8 +174,8 @@ class Resident(Agent):
             "income": self.income,
             "attitude": self.attitude,
             "attitude_sensitivity": self.attitude_sensitivity,
-            "subj_norm": self.subj_norm,
-            "subj_norm_sensitivity": self.subj_norm_sensitivity,
+            "perceived_norm": self.perceived_norm,
+            "norm_sensitivity": self.norm_sensitivity,
             "behavioral_control": self.behavioral_control,
             "control_sensitivity": self.control_sensitivity,
         }
@@ -179,24 +184,24 @@ class Resident(Agent):
 
         return agent_data
 
-def step(self):
-    """
-    Step function for the resident.
+    def step(self):
+        """
+        Step function for the resident.
 
-    The resident first forms intentions based on attitude, subjective norm,
-    and perceived behavioral control. Then, actual behavior is determined
-    based on intention and actual control.
+        The resident first forms intentions based on attitude, subjective norm,
+        and perceived behavioral control. Then, actual behavior is determined
+        based on intention and actual control.
 
-    After decision-making, income is updated.
-    """
+        After decision-making, income is updated.
+        """
 
-    # Only calculate intentions and behavior if not all packages have been decided on
-    if not all(self.package_decisions.get(p.name, False) for p in self.environment.sustainability_packages):
-        self.calc_intention()
-        self.calc_behavior()
+        # Only calculate intentions and behavior if not all packages have been decided on
+        if not all(self.package_decisions.get(p.name, False) for p in self.environment.sustainability_packages):
+            self.calc_intention()
+            self.calc_behavior()
 
-    self.income = int(round(self.income * np.random.choice(self.config['raise_income']), -1))
+        self.income = int(round(self.income * np.random.choice(self.config['raise_income']), -1))
 
-    # If all decisions are made, recalculate subjective norm and behavioral control
-    self.calc_subjective_norm()
-    self.calc_behavioral_control()
+        # If all decisions are made, recalculate subjective norm and behavioral control
+        # self.calc_perceived_norm() # is done in update_social_norms in environment, which is called at the beginning of each step, so should be updated for all agents before they make their decisions
+        self.calc_behavioral_control()
