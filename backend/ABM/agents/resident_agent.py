@@ -31,31 +31,38 @@ class Resident(Agent):
         salary = self.calc_salary()
         self.decision_threshold = self.config['decision_threshold']
         self.income = max(round(salary, -2), 0)
-        self.subj_norm = {package.name: None for package in self.environment.sustainability_packages}
-        self.behavioral_control = {package.name: None for package in self.environment.sustainability_packages}
-        self.intentions = {package.name: 0.0 for package in self.environment.sustainability_packages}
-        self.intention_threshold = self.config.get('intention_threshold', self.decision_threshold)
-        
+
+        # RAA NORM STRUCTURE
+        self.injunctive_norm = {p.name: 0.0 for p in self.environment.sustainability_packages}
+        self.descriptive_norm = {p.name: 0.0 for p in self.environment.sustainability_packages}
+        self.perceived_norm = {p.name: 0.0 for p in self.environment.sustainability_packages}
+
+        # BEHAVIORAL CONTROL (PBC)
+        self.behavioral_control = {p.name: None for p in self.environment.sustainability_packages}
+
+        # INTENTION SYSTEM
+        self.intentions = {p.name: 0.0 for p in self.environment.sustainability_packages}
+
+        self.intention_threshold = self.config.get('intention_threshold',self.decision_threshold)
+
+        # ATTITUDE AND SENSITIVITY
         if self.config_id in (0, 1):
             self.attitude = utilities.gen_random_value(0, 1)
             self.attitude_sensitivity = utilities.gen_random_value(0, 2)
-            self.subj_norm_sensitivity = utilities.gen_random_value(0, 2)
+            self.norm_sensitivity = utilities.gen_random_value(0, 2)
             self.control_sensitivity = utilities.gen_random_value(0, 2)
         else:
             self.attitude = self.config['attitude']
             self.attitude_sensitivity = self.config['attitude_sensitivity']
-            self.subj_norm_sensitivity = self.config['subj_norm_sensitivity']
+            self.norm_sensitivity = self.config['subj_norm_sensitivity']
             self.control_sensitivity = self.config['control_sensitivity']
-            
 
-        self.package_decisions = {} # Stores True/False for each package.name
-        self.package_subjective_norms = {}
+        # DECISIONS STATE
+        self.package_decisions = {
+            p.name: False for p in self.environment.sustainability_packages
+        }
 
-        for package in self.environment.sustainability_packages:
-            self.package_decisions[package.name] = False
-            self.package_subjective_norms[package.name] = self.config.get('subjective_norm', 0.0)
-
-        self.calc_subjective_norm()
+        self.calc_perceived_norm()
         self.calc_behavioral_control()
 
     def calc_salary(self):
@@ -86,19 +93,26 @@ class Resident(Agent):
 
             self.behavioral_control[package.name] = package.calculate_behavioral_influence(self.income, self.household)
 
-    def calc_subjective_norm(self):
-        """
-        Calculates the subjective norm for each sustainability package based on the
-        resident's attitude and the environmental influence.
-
-        Returns:
-            None: Updates the `subj_norm` attribute in place.
-        """
+    def calc_perceived_norm(self):
         for package in self.environment.sustainability_packages:
-            if self.package_decisions.get(package.name, False):
-                continue
+            self.perceived_norm[package.name] = (
+                0.5 * self.injunctive_norm[package.name]
+                + 0.5 * self.descriptive_norm[package.name]
+            )
+
+    # def calc_subjective_norm(self):
+    #     """
+    #     Calculates the subjective norm for each sustainability package based on the
+    #     resident's attitude and the environmental influence.
+
+    #     Returns:
+    #         None: Updates the `subj_norm` attribute in place.
+    #     """
+    #     for package in self.environment.sustainability_packages:
+    #         if self.package_decisions.get(package.name, False):
+    #             continue
             
-            self.subj_norm[package.name] = self.package_subjective_norms.get(package.name, 0.0)
+    #         self.subj_norm[package.name] = self.package_subjective_norms.get(package.name, 0.0)
                 
     def calc_behavior(self): # New voor RAA model
         for package in self.environment.sustainability_packages:
@@ -118,9 +132,12 @@ class Resident(Agent):
             if self.package_decisions.get(package.name, False):
                 continue
 
+            
+
+
             # make the the attitude, subjective norm, and behavioral control components for the agent and package, applying the respective modifiers
             attitude_part = self.attitude * self.attitude_sensitivity
-            norm_part = (self.subj_norm[package.name] * package.norm_influence_strength * self.subj_norm_sensitivity)
+            norm_part = (self.perceived_norm[package.name] * package.norm_influence_strength * self.norm_sensitivity)
             control_part = (self.behavioral_control[package.name] * self.control_sensitivity)
 
             # get the weights for each component from the config, or default to 1.0 if not specified

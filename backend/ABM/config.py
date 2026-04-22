@@ -100,7 +100,7 @@ configs = {
         'decision_threshold': 0.5, # Decision threshold for investing in sustainable energy
         'attitude': None,
         'attitude_sensitivity': None,
-        'subj_norm_sensitivity': None,
+        'norm_sensitivity': None,
         'control_sensitivity': None,
         'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
         
@@ -142,7 +142,7 @@ configs = {
         'decision_threshold': 0.5,
         'attitude': None,
         'attitude_sensitivity': None,
-        'subj_norm_sensitivity': None,
+        'norm_sensitivity': None,
         'control_sensitivity': None,
         'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy 
 
