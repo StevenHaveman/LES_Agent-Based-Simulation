@@ -94,26 +94,12 @@ class Resident(Agent):
 
             self.behavioral_control[package.name] = package.calculate_behavioral_influence(self.income, self.household)
 
-    def calc_perceived_norm(self):
+    def calc_perceived_norm(self): # currently done within the environment's update_social_norms function.
         for package in self.environment.sustainability_packages:
             self.perceived_norm[package.name] = (
                 0.5 * self.injunctive_norm[package.name]
                 + 0.5 * self.descriptive_norm[package.name]
             )
-
-    # def calc_subjective_norm(self):
-    #     """
-    #     Calculates the subjective norm for each sustainability package based on the
-    #     resident's attitude and the environmental influence.
-
-    #     Returns:
-    #         None: Updates the `subj_norm` attribute in place.
-    #     """
-    #     for package in self.environment.sustainability_packages:
-    #         if self.package_decisions.get(package.name, False):
-    #             continue
-            
-    #         self.subj_norm[package.name] = self.package_subjective_norms.get(package.name, 0.0)
                 
     def calc_behavior(self): # New voor RAA model
         for package in self.environment.sustainability_packages:

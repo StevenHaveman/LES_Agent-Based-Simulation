@@ -149,31 +149,28 @@ class Environment(Model):
         Updates injunctive, descriptive, and perceived norms
         for all residents in the system.
         """
-
-    def update_social_norms(self):
-
         n_households = max(len(self.households), 1)
         n_residents = max(len(self.residents), 1)
 
         for package in self.sustainability_packages:
 
-            # DESCRIPTIVE NORM (behavior)
+            # DESCRIPTIVE NORM (behavior) 
             installed_ratio = sum(
                 hh.package_installations.get(package.name, False)
                 for hh in self.households
             ) / n_households
 
-            # INJUNCTIVE NORM (social approval proxy)
+            # INJUNCTIVE NORM (social approval proxy) # TODO This is currently a very simplified proxy for social approval, based on average attitude. This could be made more complex by considering package-specific attitudes, or by incorporating other social factors.
             avg_attitude = sum(
                 r.attitude for r in self.residents
-            ) / n_residents
+            ) / n_residents # TODO Attitude is currently randomly assigned, will need to update when we have survey data to determine resident attitudes.
 
             # ASSIGN ONCE
             for res in self.residents:
-                res.descriptive_norm[package.name] = installed_ratio
-                res.injunctive_norm[package.name] = avg_attitude
-
-                # PERCEIVED NORM
+                res.descriptive_norm[package.name] = installed_ratio # TODO This is currently based on household installations, but could be updated to be based on resident decisions instead if that is more appropriate for the model.
+                res.injunctive_norm[package.name] = avg_attitude # TODO this is currently based on average attitude, maybe package specific attitudes with install popularity could be used.
+                
+                # PERCEIVED NORM # This is currently a simple average of descriptive and injunctive norms, but could be made more complex by weighting them differently or by incorporating other factors.
                 res.perceived_norm[package.name] = (
                     0.5 * res.injunctive_norm[package.name]
                     + 0.5 * res.descriptive_norm[package.name]
