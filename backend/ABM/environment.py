@@ -88,31 +88,19 @@ class Environment(Model):
     def create_household_agents(self): # TODO: This is a new version of the create_agents function that will use GIS data to create households with more realistic attributes and distributions. This will likely involve parsing the GIS data to determine household locations, sizes, and other relevant attributes, and then creating Household agents accordingly.
         
         for i, row in self.gis_data.iterrows():
-            hh = Household(i, self,gis_attributes=row.to_dict()) # Assuming the Household class can accept GIS attributes as a dictionary, adjust as needed based on actual implementation.
+            hh = Household(i, self, gis_attributes=row.to_dict())
 
-            hh_emissions = hh.calc_co2_emissions()
-            self.total_co2 += hh_emissions
-            self.current_co2 += hh_emissions
+            # init emissions
+            initial_savings = package.calc_co2_savings(hh)
+            hh.co2_saved_yearly += initial_savings
+            self.current_co2 -= initial_savings
+
+            # flags (kunnen blijven)
             for package in self.sustainability_packages:
-                chance_key = f"initial_{package.name.lower().replace(' ', '')}_chance"
-                initial_chance = self.config.get(chance_key, 0.0) # Default to 0% if not in config
-                
-                ###############################################################
-                # TODO Should be changed since there are 15 package options now.
-                ###############################################################
-                hh.package_installations[package.name] = (random.random() < initial_chance)
-
-                if hh.package_installations.get(package.name, False):
-                    initial_savings = package.calc_co2_savings(hh)
-                    hh.co2_saved_yearly += initial_savings
-                    self.current_co2 -= initial_savings
-                
                 hh.skip_prev_flags[package.name] = False
                 hh.skip_next_flags[package.name] = False
 
             self.households.append(hh)
-
-        pass
 
     def create_resident_agents(self, nr_residents=1): # TODO: This function will create Resident agents for a given Household agent, using attributes from the GIS data to assign realistic characteristics to the residents (e.g., income, attitudes). The number of residents created will be based on the household size determined from the GIS data.
 

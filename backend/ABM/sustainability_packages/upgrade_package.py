@@ -40,7 +40,7 @@ class UpgradePackage:
     def is_feasible(self, income, household, environment):
         """Determines if the upgrade package is feasible for a given household based on affordability and whether it represents a non-regressive step in terms of KPI level."""
 
-        affordable = income > self.investment_cost
+        affordable = income > self.price
 
         current_rank = household.LEVEL_RANK[household.current_kpi_level]
         target_rank = household.LEVEL_RANK[self.target_level]

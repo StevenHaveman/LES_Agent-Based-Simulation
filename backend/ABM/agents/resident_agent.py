@@ -151,7 +151,10 @@ class Resident(Agent):
         based on real-world constraints.
         """
         # return package.is_feasible(self.income, self.household, self.environment) #Function exists but wel need to be reworked with new packages in mind.
-        return True # For now, we will assume that if the resident has the intention and meets the behavioral control threshold, they can adopt the package. We can implement more complex feasibility checks later.
+        # return True # For now, we will assume that if the resident has the intention and meets the behavioral control threshold, they can adopt the package. We can implement more complex feasibility checks later.
+
+        return package.is_feasible(self.income, self.household, self.environment)
+
 
     def collect_resident_data(self):
         agent_data = {
