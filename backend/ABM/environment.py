@@ -90,10 +90,10 @@ class Environment(Model):
         for i, row in self.gis_data.iterrows():
             hh = Household(i, self, gis_attributes=row.to_dict())
 
-            # init emissions
-            initial_savings = package.calc_co2_savings(hh)
-            hh.co2_saved_yearly += initial_savings
-            self.current_co2 -= initial_savings
+            # init emissions #TODO make a emmision based on kpi level since we went away from solar and heatpump.
+            # initial_savings = package.calc_co2_savings(hh)
+            # hh.co2_saved_yearly += initial_savings
+            # self.current_co2 -= initial_savings
 
             # flags (kunnen blijven)
             for package in self.sustainability_packages:
@@ -132,9 +132,12 @@ class Environment(Model):
         within configured limits, with occasional larger streets.
         """
         pointer = 0
-        remaining = self.config['nr_households']
-        min_households = min(self.config['min_nr_houses'], self.config['nr_households'])
+        remaining = len(self.households)
+        print (f"Generating streets with {remaining} households...")
+        min_households = min(self.config['min_nr_houses'], remaining)
         max_households = self.config['max_nr_houses']
+
+        print(f"Min households per street: {min_households}, Max households per street: {max_households}")
 
         while remaining >= min_households:
             # 20% chance to pick a large household count (closer to max)
@@ -184,6 +187,43 @@ class Environment(Model):
                     0.5 * res.injunctive_norm[package.name]
                     + 0.5 * res.descriptive_norm[package.name]
                 )
+
+
+    # def update_social_norms_Street_level(self):
+    #     """
+    #     Updates injunctive, descriptive, and perceived norms
+    #     for all residents in the system.
+    #     """
+    #     n_residents = max(len(self.residents), 1)
+
+    #     for package in self.sustainability_packages:
+
+    #         # INJUNCTIVE NORM (social approval proxy) # TODO This is currently a very simplified proxy for social approval, based on average attitude. This could be made more complex by considering package-specific attitudes, or by incorporating other social factors.
+    #         avg_attitude = sum(
+    #             r.attitude for r in self.residents
+    #         ) / n_residents  # TODO Attitude is currently randomly assigned, will need to update when we have survey data to determine resident attitudes.
+
+    #         # DESCRIPTIVE + ASSIGN PER STREET
+    #         for street in self.streets:
+
+    #             n_households = max(len(street), 1)
+
+    #             installed_ratio = sum(
+    #                 hh.package_installations.get(package.name, False)
+    #                 for hh in street
+    #             ) / n_households
+
+    #             for hh in street:
+    #                 for res in hh.residents:
+
+    #                     res.descriptive_norm[package.name] = installed_ratio  # street-level behavior
+    #                     res.injunctive_norm[package.name] = avg_attitude  # global social approval proxy
+
+    #                     # PERCEIVED NORM # This is currently a simple average of descriptive and injunctive norms, but could be made more complex by weighting them differently or by incorporating other factors.
+    #                     res.perceived_norm[package.name] = (
+    #                         0.5 * res.injunctive_norm[package.name]
+    #                         + 0.5 * res.descriptive_norm[package.name]
+                        )                
 
     def step(self):
         """
