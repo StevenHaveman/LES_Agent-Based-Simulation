@@ -69,22 +69,21 @@ def load_gis_data(gis_data_path: str):
 def load_package_data(package_data_path: str):
     """
     Loads package data from a specified file path.
-
-    This function is a placeholder for the actual implementation of package data loading.
-    In a real implementation, this would read from a file (e.g., CSV, JSON) and
-    parse the package data into a usable format for the simulation.
-
+    This function reads an Excel file containing package data, cleans it by removing rows with missing critical attributes, and returns a DataFrame with the relevant columns for the simulation.
     Args:
         package_data_path (str): The file path to the package data.
     Returns:
+        pd.DataFrame: A DataFrame containing the cleaned package data with relevant columns.
     """
     df = pd.DataFrame(pd.read_excel(package_data_path))
 
     # Remove leading/trailing whitespace from column names to ensure they match expected names in the code.
     df.columns = df.columns.str.strip()
 
+    print("test print package data:")
     # Clean the data by dropping rows with missing critical package attributes (e.g., 'package_id', 'from_level', 'to_level', 'investment_cost').
-    df_clean = df.dropna(subset=["package_step_id", "baseline_level", "kpi_level", "total_price_mid", "savings", "break_even_years"])
+    df_clean = df.dropna(subset=["package_step_id", "baseline_level", "kpi_level", "total_price_mid", "savings", "break_even_in_years"])
     #Example	baseline_level	 op_cost_B 	op_co2_B	 total_price_mid 	 Savings 	 Break even in years 	kpi_score	kpi_level
 
-    return df_clean[["package_step_id", "baseline_level", "kpi_level", "total_price_mid", "savings", "break_even_years"]]
+    print("test komt het hier?") ## Test print to check if the function is reached, adjust as needed for the actual data file.
+    return df_clean[["package_step_id", "baseline_level", "kpi_level", "total_price_mid", "savings", "break_even_in_years"]]

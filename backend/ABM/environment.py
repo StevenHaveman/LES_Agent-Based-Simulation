@@ -6,6 +6,7 @@ from agents.resident_agent import Resident
 import utilities
 from sustainability_packages.solar_panel import SolarPanel
 from sustainability_packages.heat_pump import HeatPump
+from sustainability_packages.upgrade_package import UpgradePackage
 import json
 import os
 
@@ -44,14 +45,29 @@ class Environment(Model):
         super().__init__()
         self.config_id, self.config = utilities.choose_config() # Load the chosen configuration This is not used in the frontend defaults to config 1
 
-        self.solar_panel = SolarPanel(self)
-        self.heat_pump = HeatPump(self)
-        self.sustainability_packages = [self.solar_panel, self.heat_pump]
+        # TODO logic should be in its own function, and be a bit more dynamic.
+        self.package_data = utilities.load_package_data("data/15_package_steps.xlsx")
+        self.sustainability_packages = []
+        for _, row in self.package_data.iterrows():
+
+            package = UpgradePackage(
+                package_step_id=row["package_step_id"],
+                baseline_level=row["baseline_level"],
+                target_level=row["kpi_level"],
+                investment_cost=row["total_price_mid"],
+                yearly_savings=row["savings"],
+                break_even_in_years=row["break_even_in_years"],
+                co2_reduction=0,
+                kpi_score=0
+            )
+
+            print(package)
+            self.sustainability_packages.append(package)
 
         self.decided_residents_this_step_per_package = {
-                    pkg.name: 0 for pkg in self.sustainability_packages
-                }
-        
+            pkg.name: 0 for pkg in self.sustainability_packages
+        }
+    
         self.energy_price = self.config['energy_price'] 
         self.households = []  # gewone Python-lijst voor filteren/gemak
         self.residents = []  # gewone Python-lijst voor filteren/gemak
@@ -60,6 +76,7 @@ class Environment(Model):
         self.total_co2 = 0
         self.current_co2 = 0
         self.gis_data = utilities.load_gis_data("data/AmstelHeuvelWijk2_TableToExcel.xlsx")
+
 
         # self.create_agents(nr_households, nr_residents)
         self.create_household_agents()
