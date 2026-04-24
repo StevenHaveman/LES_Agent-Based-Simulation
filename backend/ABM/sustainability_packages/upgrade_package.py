@@ -1,4 +1,5 @@
 import numpy as np
+from torch import name
 
 
 class UpgradePackage:
@@ -10,7 +11,8 @@ class UpgradePackage:
     Poor -> Good
     """
 
-    def __init__(self,package_step_id,baseline_level,target_level,investment_cost,yearly_savings,break_even_in_years,co2_reduction,kpi_score):
+    def __init__(self,config,package_step_id,baseline_level,target_level,price,yearly_savings,break_even_in_years,co2_reduction,kpi_score):
+        self.config = config
         self.package_step_id = package_step_id
         # Upgrade path
         self.baseline_level = baseline_level
@@ -18,12 +20,15 @@ class UpgradePackage:
         # Name shown in simulation
         self.name = f"{baseline_level}->{target_level}"
         # Financial properties
-        self.investment_cost = investment_cost
+        self.price = price
         self.yearly_savings = yearly_savings
         self.break_even_in_years = break_even_in_years
         # Sustainability properties
         self.co2_reduction = co2_reduction
         self.kpi_score = kpi_score
+
+        # Package-specific subjective norm modifier, defaults to 1.0 if not in config. This allows for certain packages to have a stronger or weaker influence from social norms, which can be calibrated based on real-world data or expert judgment.
+        self.norm_influence_strength = self.config.get(f"{self.name.lower().replace(' ', '_')}_norm_influence_strength", 1.0)
 
 
     def step(self):
@@ -33,20 +38,18 @@ class UpgradePackage:
         pass
 
     def is_feasible(self, income, household, environment):
-        """
-        Checks whether this upgrade is possible.
+        """Determines if the upgrade package is feasible for a given household based on affordability and whether it represents a non-regressive step in terms of KPI level."""
 
-        Conditions:
-        - household must currently be at baseline level
-        - resident must roughly afford it
-        """
-
-        correct_level = (household.current_kpi_level == self.baseline_level)
         affordable = income > self.investment_cost
 
-        return correct_level and affordable
+        current_rank = household.LEVEL_RANK[household.current_kpi_level]
+        target_rank = household.LEVEL_RANK[self.target_level]
 
-    def calculate_behavioral_influence(self, income):
+        no_backwards_step = target_rank >= current_rank
+
+        return affordable and no_backwards_step
+
+    def calculate_behavioral_influence(self, income, household):
         """
         Calculates perceived behavioral control (PBC).
 
@@ -55,22 +58,39 @@ class UpgradePackage:
         - break-even attractiveness
         """
 
+        # Avoid divide by zero
+        if self.price is None or self.price <= 0:
+            return 0
+
         # --- AFFORDABILITY ---
-        max_diff = self.investment_cost / 3
-        min_diff = -(self.investment_cost / 3)
+        max_diff = self.price / 3
+        min_diff = -(self.price / 3)
 
-        difference = income - self.investment_cost
+        difference = income - self.price
 
-        normalized_diff = ((difference - min_diff) / (max_diff - min_diff))
+        denominator = (max_diff - min_diff)
 
-        # --- BREAK EVEN INFLUENCE ---
-        if self.break_even_in_years is None:
+        if denominator == 0:
+            normalized_diff = 0
+        else:
+            normalized_diff = ((difference - min_diff)/ denominator)
+        # --- BREAK EVEN ---
+        if (self.break_even_in_years is None or self.break_even_in_years <= 0):
             influence_roi = 0
         else:
-            influence_roi = max(0, 0.25 - (0.25 *(self.break_even_in_years / 30))) # Assuming 30 years is the max break-even time considered attractive, with a linear decrease in attractiveness.
+            influence_roi = max(0, 0.25 - (0.25 *(self.break_even_in_years / 30)))
 
-        # --- FINAL PBC ---
+        # formula to combine affordability and break-even influence, ensuring the result is between 0 and 1
         return np.clip(normalized_diff + influence_roi, 0, 1)
+    
+
+    def calc_co2_savings(self, household):
+        """
+        Calculates annual CO2 savings by displacing grid electricity.
+        """
+
+        # to be implemented based on the specific upgrade package.
+        return self.co2_reduction
     
     def __str__(self):
         """String representation of the UpgradePackage for easy debugging and visualization."""
@@ -78,7 +98,7 @@ class UpgradePackage:
             f"UpgradePackage("
             f"id={self.package_step_id}, "
             f"name={self.name}, "
-            f"cost={self.investment_cost}, "
+            f"cost={self.price}, "
             f"break_even={self.break_even_in_years}, "
             f"co2_reduction={self.co2_reduction}, "
             f"kpi_score={self.kpi_score}"

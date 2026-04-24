@@ -33,11 +33,21 @@ class Household(Agent):
         gas_usage (int): Annual gas usage of the household (kWh).
         heatpump_usage (int): Annual electricity usage by a heat pump if installed (kWh).
     """
+    # Define a ranking for KPI levels to facilitate comparisons (e.g., for feasibility checks).
+    LEVEL_RANK = {
+        "Bad": 1,
+        "Poor": 2,
+        "Medium": 3,
+        "OK": 4,
+        "Good": 5
+    }
+
     def __init__(self, id, model,gis_attributes=None):
         super().__init__(model)
         self.config_id, self.config = utilities.choose_config()
         self.unique_id = id
         self.gis_attributes = gis_attributes or {}
+        self.current_kpi_level = self.convert_energy_label()
         self.residents = []
         self.package_installations = {
             package.name: False
@@ -55,26 +65,18 @@ class Household(Agent):
         self.heatpump_usage = random.randint(*self.config['yearly_heatpump_usage'])
         self.co2_saved_yearly = 0
 
-    # def create_residents(self, nr_residents: int, id_counter: int) -> int: #TODO Veranderen in verband met survey data.
-    #     """
-    #     Create and add Resident agents to the household.
+    def convert_energy_label(self):
 
-    #     Newly created residents inherit the household's current package installation
-    #     status as their initial decision state for those packages.
+        label = self.gis_attributes.get("energy_label")
+        mapping = {
+            "G": "Bad","F": "Bad",
+            "E": "Poor","D": "Poor",
+            "C": "Medium",
+            "B": "OK",
+            "A": "Good"
+        }
 
-    #     Args:
-    #         nr_residents (int): Number of residents to create for this household.
-    #     """
-    #     for _ in range(nr_residents):
-    #         resident = Resident(id_counter,self.model,self)
-    #         id_counter += 1
-
-    #         for package_name, is_installed in self.package_installations.items():
-    #             if is_installed:
-    #                 resident.package_decisions[package_name] = True
-    #         self.residents.append(resident)
-
-    #     return id_counter
+        return mapping.get(label, "Poor")
 
     def calc_avg_decision(self, package): #TODO Naam veranderen hij doet meer dan alleen calculeren
         """
@@ -102,6 +104,8 @@ class Household(Agent):
 
         if avg_score >= self.config['household_decision_threshold']:
             self.package_installations[package.name] = True
+
+            self.current_kpi_level = package.target_level
 
             self.model.current_co2 -= package.calc_co2_savings(self)
 

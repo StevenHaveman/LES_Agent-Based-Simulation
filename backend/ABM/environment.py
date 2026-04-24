@@ -51,13 +51,14 @@ class Environment(Model):
         for _, row in self.package_data.iterrows():
 
             package = UpgradePackage(
+                config=self.config,
                 package_step_id=row["package_step_id"],
                 baseline_level=row["baseline_level"],
                 target_level=row["kpi_level"],
-                investment_cost=row["total_price_mid"],
+                price=row["total_price_mid"],
                 yearly_savings=row["savings"],
                 break_even_in_years=row["break_even_in_years"],
-                co2_reduction=0,
+                co2_reduction=row["op_co2_B"],
                 kpi_score=0
             )
 
@@ -96,6 +97,9 @@ class Environment(Model):
                 chance_key = f"initial_{package.name.lower().replace(' ', '')}_chance"
                 initial_chance = self.config.get(chance_key, 0.0) # Default to 0% if not in config
                 
+                ###############################################################
+                # TODO Should be changed since there are 15 package options now.
+                ###############################################################
                 hh.package_installations[package.name] = (random.random() < initial_chance)
 
                 if hh.package_installations.get(package.name, False):
