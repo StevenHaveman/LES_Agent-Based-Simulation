@@ -4,6 +4,7 @@ Utility functions for the agent-based model.
 This module provides helper functions, such as generating random values
 and loading configurations.
 """
+from doctest import Example
 import random
 import config
 import pandas as pd
@@ -62,4 +63,28 @@ def load_gis_data(gis_data_path: str):
 
     # print(df[["OBJECTID","Oppervlakte","Huisnummer","Postcode","OpenbareRuimteNaam","WoonplaatsNaam","Energielabel","Bouwjaar","Latitude","Longitude", "Woning type"]].head())
 
+    # TODO Remove the tail 100 for testing purposes, in the final version this should be removed to include all data.
     return df_clean[["OBJECTID","Oppervlakte","Huisnummer","Postcode","OpenbareRuimteNaam","WoonplaatsNaam","Energielabel","Bouwjaar","Latitude","Longitude", "Woning type"]].tail(100)
+
+def load_package_data(package_data_path: str):
+    """
+    Loads package data from a specified file path.
+
+    This function is a placeholder for the actual implementation of package data loading.
+    In a real implementation, this would read from a file (e.g., CSV, JSON) and
+    parse the package data into a usable format for the simulation.
+
+    Args:
+        package_data_path (str): The file path to the package data.
+    Returns:
+    """
+    df = pd.DataFrame(pd.read_excel(package_data_path))
+
+    # Remove leading/trailing whitespace from column names to ensure they match expected names in the code.
+    df.columns = df.columns.str.strip()
+
+    # Clean the data by dropping rows with missing critical package attributes (e.g., 'package_id', 'from_level', 'to_level', 'investment_cost').
+    df_clean = df.dropna(subset=["package_step_id", "baseline_level", "kpi_level", "total_price_mid", "savings", "break_even_years"])
+    #Example	baseline_level	 op_cost_B 	op_co2_B	 total_price_mid 	 Savings 	 Break even in years 	kpi_score	kpi_level
+
+    return df_clean[["package_step_id", "baseline_level", "kpi_level", "total_price_mid", "savings", "break_even_years"]]
