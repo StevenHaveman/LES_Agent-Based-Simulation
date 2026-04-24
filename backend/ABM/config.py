@@ -29,6 +29,8 @@ configs = {
         "initial_heatpump_chance": 0.07, # https://longreads.cbs.nl/klimaatverandering-en-energietransitie-2023/duurzaam-wonen/#:~:text=Ruim%201%20op%20de%2014%20huishoudens%20heeft%20een%20warmtepomp&text=Het%20gaat%20in%20totaal%20om,Ligthart%20en%20Blijie%2C%202022).
         "solarpanel_price_increase": (0, 20), # Random increase in solar panel price per year (in euros)
         "heatpump_price_increase": (0, 300),
+        "solar_panel_norm_influence_strength": 1.0, # Multiplier for how strongly subjective norms influence decisions about solar panels (can be adjusted to test different influence scenarios)
+        "heat_pump_norm_influence_strength": 1.0, # Multiplier for how strongly subjective norms influence decisions about heat pumps (can be adjusted to test different influence scenarios)
         "min_nr_houses": 20,
         "max_nr_houses": 60,
         "subj_norm_level": "Street", # District, Street, Direct
@@ -44,9 +46,10 @@ configs = {
         'raise_income': [1.00, 1.01, 1.02, 1.03, 1.04, 1.05], # Random increase in income per year
         'decision_threshold': 0.5, # Decision threshold for investing in sustainable energy
         'attitude': None,
-        'attitude_mod': None,
-        'subj_norm_mod': None,
-        'behavioral_mod': None,
+        'attitude_sensitivity': None,
+        'subj_norm_sensitivity': None,
+        'control_sensitivity': None,
+        'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
 
         # Data collection parameters
         'collect_data': True, # Whether to collect data for analysis
@@ -79,6 +82,8 @@ configs = {
         "initial_heatpump_chance": 0.07, # https://longreads.cbs.nl/klimaatverandering-en-energietransitie-2023/duurzaam-wonen/#:~:text=Ruim%201%20op%20de%2014%20huishoudens%20heeft%20een%20warmtepomp&text=Het%20gaat%20in%20totaal%20om,Ligthart%20en%20Blijie%2C%202022).
         "solarpanel_price_increase": (0, 20), # Random increase in solar panel price per year (in euros)
         "heatpump_price_increase": (0, 300),
+        "solar_panel_norm_influence_strength": 1.0, # Multiplier for how strongly subjective norms influence decisions about solar panels (can be adjusted to test different influence scenarios)
+        "heat_pump_norm_influence_strength": 1.0, # Multiplier for how strongly subjective norms influence decisions about heat pumps (can be adjusted to test different influence scenarios)
         "min_nr_houses": 20,
         "max_nr_houses": 60,
         "subj_norm_level": "Street", # District, Street, Direct
@@ -94,9 +99,15 @@ configs = {
         'raise_income': [1.00, 1.01, 1.02, 1.03, 1.04, 1.05], # Random increase in income per year
         'decision_threshold': 0.5, # Decision threshold for investing in sustainable energy
         'attitude': None,
-        'attitude_mod': None,
-        'subj_norm_mod': None,
-        'behavioral_mod': None,
+        'attitude_sensitivity': None,
+        'norm_sensitivity': None,
+        'control_sensitivity': None,
+        'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
+        
+        # Weights for RAA components in intention calculation (can be adjusted to test different influence scenarios)
+        'weight_attitude': 1.0,
+        'weight_norm': 1.0,
+        'weight_control': 1.0,
 
         # Data collection parameters
         'collect_data': True, # Whether to collect data for analysis
@@ -130,9 +141,15 @@ configs = {
         'raise_income': [1.00, 1.01, 1.02, 1.03, 1.04, 1.05],
         'decision_threshold': 0.5,
         'attitude': None,
-        'attitude_mod': None,
-        'subj_norm_mod': None,
-        'behavioral_mod': None,
+        'attitude_sensitivity': None,
+        'norm_sensitivity': None,
+        'control_sensitivity': None,
+        'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy 
+
+        # Weights for RAA components in intention calculation (can be adjusted to test different influence scenarios)
+        'weight_attitude': 1.0,
+        'weight_norm': 1.0,
+        'weight_control': 1.0,
 
         # Data collection parameters
         'collect_data': True, # Whether to collect data for analysis

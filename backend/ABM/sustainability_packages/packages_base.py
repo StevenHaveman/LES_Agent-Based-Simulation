@@ -16,7 +16,7 @@ class SustainabilityPackage:
         config (dict): The configuration dictionary.
         price (float): Current price of the package.
         price_increase_key (str): Configuration key for the package's price increase range.
-        subj_norm_mod (float): Package-specific modifier for subjective norm influence.
+        norm_influence_strength (float): Package-specific modifier for subjective norm influence.
     """
     def __init__(self, name, environment, price_config_key, price_increase_config_key):
         """
@@ -35,7 +35,7 @@ class SustainabilityPackage:
         self.price_increase_key = price_increase_config_key
         
         # Package-specific subjective norm modifier, defaults to 1.0 if not in config.
-        self.subj_norm_mod = self.config.get(f"{name.lower().replace(' ', '_')}_subj_norm_mod", 1.0)
+        self.norm_influence_strength = self.config.get(f"{name.lower().replace(' ', '_')}_norm_influence_strength", 1.0)
 
 
     def step(self):
@@ -45,6 +45,22 @@ class SustainabilityPackage:
         """
         increase_range = self.config.get(self.price_increase_key, (0,0)) # Default to no increase if key missing
         self.price += round(random.randint(*increase_range))
+    
+    def is_feasible(self, income, household, environment):
+        """
+        Determines if the package is feasible for a resident based on their income,
+        household characteristics, and environmental factors.
+
+        This method should be implemented by subclasses to define specific
+        feasibility criteria for each package type.
+
+        Args:
+            income (float): The resident's annual income.
+            household (Household): The household considering the package.
+            environment (Model): The simulation environment.
+
+        """
+        raise NotImplementedError("Subclasses must implement this method.")
 
     def calculate_behavioral_influence(self, income, household):
         """

@@ -65,7 +65,7 @@ class Environment(Model):
         self.create_household_agents()
         self.create_resident_agents(nr_residents=1) #TODO This is currently set to create 1 resident per household for testing, will need to update when we have survey data to determine household sizes and resident attributes.
         self.generate_streets() 
-        self.update_subjective_norm()
+        self.update_social_norms()
 
     def create_household_agents(self): # TODO: This is a new version of the create_agents function that will use GIS data to create households with more realistic attributes and distributions. This will likely involve parsing the GIS data to determine household locations, sizes, and other relevant attributes, and then creating Household agents accordingly.
         
@@ -112,56 +112,7 @@ class Environment(Model):
     # def create_resdent_agents_survey(self, survey_data): # TODO: This function will create Resident agents for a given Household agent, using attributes from the survey data to assign realistic characteristics to the residents (e.g., income, attitudes). The number of residents created will be based on the household size determined from the GIS data.
 
     #     pass
-    
-    # def create_agents(self, nr_households: int, nr_residents: int):
-    #     """
-    #     Creates a specified number of Household agents and distributes residents among them.
 
-    #     Initializes households with a chance to have pre-installed sustainability packages
-    #     based on configuration. Residents are then created within these households.
-
-    #     Args:
-    #         nr_households (int): The number of household agents to create.
-    #         nr_residents (int): The total number of resident agents to create and
-    #                             distribute among the households.
-    #     """
-    #     base = nr_residents // nr_households
-    #     remainder = nr_residents % nr_households
-
-    #     # Initialize the agent ID counter
-    #     id_counter = 0
-
-    #     for i in range(nr_households):
-        
-    #         hh = Household(i, self)
-    #         hh_emissions = hh.calc_co2_emissions()
-    #         self.total_co2 += hh_emissions
-    #         self.current_co2 += hh_emissions
-    #         for package in self.sustainability_packages:
-    #             chance_key = f"initial_{package.name.lower().replace(' ', '')}_chance"
-    #             initial_chance = self.config.get(chance_key, 0.0) # Default to 0% if not in config
-                
-    #             hh.package_installations[package.name] = (random.random() < initial_chance)
-
-    #             if hh.package_installations.get(package.name, False):
-    #                 initial_savings = package.calc_co2_savings(hh)
-    #                 hh.co2_saved_yearly += initial_savings
-    #                 self.current_co2 -= initial_savings
-                
-    #             hh.skip_prev_flags[package.name] = False
-    #             hh.skip_next_flags[package.name] = False
-
-    #         self.households.append(hh)
-
-    #         nr_res_for_hh = base + (1 if i < remainder else 0)
-    #         id_counter = hh.create_residents(nr_res_for_hh, id_counter)
-    #         self.residents.extend(hh.residents)
-        
-    #     for hh_obj in self.households:
-    #         for res_obj in hh_obj.residents:
-    #             for package in self.sustainability_packages:
-    #                 if package.name not in res_obj.package_subjective_norms:
-    #                      res_obj.package_subjective_norms[package.name] = self.config.get('subjective_norm', 0.0)
 
     def generate_streets(self,):
         """
@@ -193,20 +144,37 @@ class Environment(Model):
                 chosen_list = random.randint(0, len(self.streets) - 1)
                 self.streets[chosen_list].append(self.households[i])
 
-    def update_subjective_norm(self):
+    def update_social_norms(self):
         """
-        Updates the subjective norm for all residents regarding each sustainability package.
+        Updates injunctive, descriptive, and perceived norms
+        for all residents in the system.
+        """
+        n_households = max(len(self.households), 1)
+        n_residents = max(len(self.residents), 1)
 
-        This involves resetting flags for "Direct" norm calculation (if applicable)
-        and then invoking the package-specific subjective norm update logic.
-        """
-        for hh in self.households:
-            for package in self.sustainability_packages:
-                hh.skip_prev_flags[package.name] = False
-                hh.skip_next_flags[package.name] = False
-        
         for package in self.sustainability_packages:
-            package.update_package_subjective_norm(self)
+
+            # DESCRIPTIVE NORM (behavior) 
+            installed_ratio = sum(
+                hh.package_installations.get(package.name, False)
+                for hh in self.households
+            ) / n_households
+
+            # INJUNCTIVE NORM (social approval proxy) # TODO This is currently a very simplified proxy for social approval, based on average attitude. This could be made more complex by considering package-specific attitudes, or by incorporating other social factors.
+            avg_attitude = sum(
+                r.attitude for r in self.residents
+            ) / n_residents # TODO Attitude is currently randomly assigned, will need to update when we have survey data to determine resident attitudes.
+
+            # ASSIGN ONCE
+            for res in self.residents:
+                res.descriptive_norm[package.name] = installed_ratio # TODO This is currently based on household installations, but could be updated to be based on resident decisions instead if that is more appropriate for the model.
+                res.injunctive_norm[package.name] = avg_attitude # TODO this is currently based on average attitude, maybe package specific attitudes with install popularity could be used.
+                
+                # PERCEIVED NORM # This is currently a simple average of descriptive and injunctive norms, but could be made more complex by weighting them differently or by incorporating other factors.
+                res.perceived_norm[package.name] = (
+                    0.5 * res.injunctive_norm[package.name]
+                    + 0.5 * res.descriptive_norm[package.name]
+                )
 
     def step(self):
         """
@@ -224,7 +192,11 @@ class Environment(Model):
         for hh in self.households:
              hh.step()
 
-        self.update_subjective_norm()
+        print("Updating social norms in environment step...")
+        print(f"Before update: Resident 0 descriptive norm for {self.sustainability_packages[0].name}: {self.residents[0].descriptive_norm[self.sustainability_packages[0].name]} perceived norm: {self.residents[0].perceived_norm[self.sustainability_packages[0].name]} injunctive norm: {self.residents[0].injunctive_norm[self.sustainability_packages[0].name]} attitude: {self.residents[0].attitude}")
+        # print(f"Before update: Resident 0 descriptive norm for {self.sustainability_packages[0].name}: {self.residents[0].descriptive_norm[self.sustainability_packages[0].name]} perceived norm: {self.residents[0].perceived_norm[self.sustainability_packages[0].name]} injunctive norm: {self.residents[0].injunctive_norm[self.sustainability_packages[0].name]} attitude: {self.residents[0].attitude}")
+        self.update_social_norms()
+        print(f"After update: Resident 0 descriptive norm for {self.sustainability_packages[0].name}: {self.residents[0].descriptive_norm[self.sustainability_packages[0].name]} perceived norm: {self.residents[0].perceived_norm[self.sustainability_packages[0].name]} injunctive norm: {self.residents[0].injunctive_norm[self.sustainability_packages[0].name]} attitude: {self.residents[0].attitude}")
 
         for package in self.sustainability_packages:
             package.step()
@@ -236,8 +208,8 @@ class Environment(Model):
             "nr_agents_with_heat_pump": "nog doen", # TODO: ...
             "average_income": np.mean([resident.income for resident in self.residents]),
             "average_attitude": np.mean([resident.attitude for resident in self.residents]),
-            "average_subjective_norm": {
-                package.name: np.mean([resident.subj_norm[package.name] for resident in self.residents])
+            "average_perceived_norm": {
+                package.name: np.mean([resident.perceived_norm[package.name] for resident in self.residents])
                 for package in self.sustainability_packages
             },
             "average_behavioral_control": {
