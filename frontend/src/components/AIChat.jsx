@@ -18,6 +18,8 @@ const AIChat = ({ resident }) => {
     // State to manage the list of chat messages.
     const [messages, setMessages] = useState([]);
 
+    const { sendPrompt } = useAIChat();
+
     const initialFetchDelayMs = 3000;
 
     /**
@@ -50,7 +52,7 @@ const AIChat = ({ resident }) => {
             await new Promise((resolve) => setTimeout(resolve, initialFetchDelayMs));
 
             // Send the prompt to the AI system and update the messages with the response.
-            const result = await useAIChat(prompt, resident);
+            const result = await sendPrompt(prompt, resident);
             setMessages((prev) => [
                 ...prev.slice(0, -1),
                 { role: 'ai', content: result.response },
