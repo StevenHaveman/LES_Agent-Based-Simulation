@@ -100,7 +100,7 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
 
         print(f"=== Year {year + 1} ===")
         print("Current Environment State (begin):")
-        # print(model)  # Uncomment this to print the full environment state at the beginning of each year, can be useful for debugging but will create a lot of output.
+        print(model)  # Uncomment this to print the full environment state at the beginning of each year, can be useful for debugging but will create a lot of output.
 
         data = model.collect_start_of_year_data(year + 1)
         model.step()
@@ -110,7 +110,7 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
             print(f"  Decisions this year for {package_name}: {count}")
 
         print("  Current Environment State (end):")
-        # print(model)  # Uncomment this to print the full environment state at the end of each year, can be useful for debugging but will create a lot of output.
+        print(model)
         print("-" * 40)
 
         model.collect_end_of_year_data(data)

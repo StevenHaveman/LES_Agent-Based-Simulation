@@ -95,7 +95,7 @@ class Environment(Model):
             # hh.co2_saved_yearly += initial_savings
             # self.current_co2 -= initial_savings
 
-            # flags (kunnen blijven)
+            # flags
             for package in self.sustainability_packages:
                 hh.skip_prev_flags[package.name] = False
                 hh.skip_next_flags[package.name] = False
@@ -223,7 +223,7 @@ class Environment(Model):
     #                     res.perceived_norm[package.name] = (
     #                         0.5 * res.injunctive_norm[package.name]
     #                         + 0.5 * res.descriptive_norm[package.name]
-                        )                
+                        # )                
 
     def step(self):
         """
@@ -242,10 +242,7 @@ class Environment(Model):
              hh.step()
 
         print("Updating social norms in environment step...")
-        print(f"Before update: Resident 0 descriptive norm for {self.sustainability_packages[0].name}: {self.residents[0].descriptive_norm[self.sustainability_packages[0].name]} perceived norm: {self.residents[0].perceived_norm[self.sustainability_packages[0].name]} injunctive norm: {self.residents[0].injunctive_norm[self.sustainability_packages[0].name]} attitude: {self.residents[0].attitude}")
-        # print(f"Before update: Resident 0 descriptive norm for {self.sustainability_packages[0].name}: {self.residents[0].descriptive_norm[self.sustainability_packages[0].name]} perceived norm: {self.residents[0].perceived_norm[self.sustainability_packages[0].name]} injunctive norm: {self.residents[0].injunctive_norm[self.sustainability_packages[0].name]} attitude: {self.residents[0].attitude}")
         self.update_social_norms()
-        print(f"After update: Resident 0 descriptive norm for {self.sustainability_packages[0].name}: {self.residents[0].descriptive_norm[self.sustainability_packages[0].name]} perceived norm: {self.residents[0].perceived_norm[self.sustainability_packages[0].name]} injunctive norm: {self.residents[0].injunctive_norm[self.sustainability_packages[0].name]} attitude: {self.residents[0].attitude}")
 
         for package in self.sustainability_packages:
             package.step()
@@ -450,7 +447,9 @@ class Environment(Model):
             output += f"    Current {pkg_name} Price: {package.price}\n"
         output += f"  --- MISC INFO ---\n"
         output += f"    Total CO2 saved so far: {total_yearly_co2_saved / 1000:.1f} tons\n"
-        output += f"    % of CO2 emission relative to district total: {self.current_co2 / self.total_co2 * 100:.1f}"
+        percentage = (self.current_co2 / self.total_co2 * 100 if self.total_co2 != 0 else 0)
+        output += f"    % of CO2 emission relative to district total: {percentage:.1f}"
+        output += f"    % of CO2 emission relative to district total: {(self.current_co2 / self.total_co2 * 100 if self.total_co2 != 0 else 0):.1f}"
         return output
         
         
