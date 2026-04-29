@@ -6,9 +6,7 @@ import '../styles/globalPageStyles.css';
 import { OverviewProvider, useOverviewState } from '../state/overviewState.jsx';
 
 import GraphicsView from '../components/GraphicsView.jsx';
-import HouseholdMap from '../components/HouseholdMap.jsx';
-import HouseholdWindow from '../components/HouseholdWindow.jsx';
-import HouseholdNavbar from '../components/HouseholdNavbar.jsx';
+import MapView from '../components/MapView.jsx';
 import ResidentNavbar from '../components/ResidentNavbar.jsx';
 import ResidentWindow from '../components/ResidentWindow.jsx';
 import ResidentDropdown from '../components/ResidentDropdown.jsx';
@@ -17,6 +15,7 @@ import OverviewNavbar from '../components/OverviewNavbar.jsx';
 
 import KPIWindow from '../components/KPIWindow.jsx';
 import SimulationParameters from '../components/SimulationParameters.jsx';
+import { useMapData } from '../hooks/useMapData.js';
 
 function OverviewContent() {
     const state = useOverviewState();
@@ -32,19 +31,11 @@ function OverviewContent() {
                             selectedResidentIndex={state.selectedResidentIndex}
                         />
                     ) : (
-                        <HouseholdMap
-                            selectedHouseholdId={state.selectedHouseholdId}
-                        />
+                        <MapView houses={useMapData()} />
                     )}
                 </div>
                 <div className="graphics-container">
                     <GraphicsView> </GraphicsView>
-                </div>
-                <div className="household-container">
-                    <HouseholdNavbar />
-                    <HouseholdWindow
-                        selectedHouseholdId={state.selectedHouseholdId}
-                    />
                 </div>
                 <div className="resident-container">
                     <ResidentNavbar />
