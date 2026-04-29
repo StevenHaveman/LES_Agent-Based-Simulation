@@ -34,25 +34,20 @@ class Household(Agent):
         heatpump_usage (int): Annual electricity usage by a heat pump if installed (kWh).
     """
     # Define a ranking for KPI levels to facilitate comparisons (e.g., for feasibility checks).
-    LEVEL_RANK = {
-        "Bad": 1,
-        "Poor": 2,
-        "Medium": 3,
-        "OK": 4,
-        "Good": 5
-    }
+    LEVEL_RANK = {"Bad": 1, "Poor": 2, "Medium": 3, "OK": 4, "Good": 5}
 
-    def __init__(self, id, model,gis_attributes=None):
+
+    def __init__(self, id, model, gis_attributes=None):
         super().__init__(model)
         self.config_id, self.config = utilities.choose_config()
         self.unique_id = id
+        self.KPI_TO_ENERGY_LABEL = {"Bad": "F","Poor": "D","Medium": "C", "OK": "B","Good": "A"}
+        self.ENERGY_LABEL_TO_KPI = {"G": "Bad","F": "Bad", "E": "Poor","D": "Poor", "C": "Medium", "B": "OK", "A": "Good"}
         self.gis_attributes = gis_attributes or {}
-        self.current_kpi_level = self.convert_energy_label()
+        self.current_kpi_level = self.convert_energy_label_to_kpi_level()
         self.residents = []
-        self.package_installations = {
-            package.name: False
-            for package in self.model.sustainability_packages
-            }
+        self.package_installations = {package.name: False for package in self.model.sustainability_packages}
+        self.active_package = None  # Track the currently active package for this household, if any.
 
         # Flags for "Direct" subjective norm, per package
         self.skip_prev_flags = {} # {package_name: False/True}
@@ -65,18 +60,12 @@ class Household(Agent):
         self.heatpump_usage = random.randint(*self.config['yearly_heatpump_usage'])
         self.co2_saved_yearly = 0
 
-    def convert_energy_label(self):
-
-        label = self.gis_attributes.get("energy_label")
-        mapping = {
-            "G": "Bad","F": "Bad",
-            "E": "Poor","D": "Poor",
-            "C": "Medium",
-            "B": "OK",
-            "A": "Good"
-        }
-
-        return mapping.get(label, "Poor")
+    def convert_energy_label_to_kpi_level(self):
+        label = self.gis_attributes.get("Energielabel")
+        return self.ENERGY_LABEL_TO_KPI.get(label)
+    
+    def convert_kpi_level_to_energy_label(self, kpi_level):
+        return self.KPI_TO_ENERGY_LABEL.get(kpi_level)
 
     def calc_avg_decision(self, package): #TODO Naam veranderen hij doet meer dan alleen calculeren
         """
@@ -93,20 +82,27 @@ class Household(Agent):
         """
         if not self.residents:
             return
-
+        
         if self.package_installations.get(package.name, False):
             return
 
-        num_positive_decisions = sum(
-            1 for res in self.residents if res.package_decisions.get(package.name, False)
-        )
+        num_positive_decisions = sum(1 for res in self.residents if res.package_decisions.get(package.name, False))
         avg_score = num_positive_decisions / len(self.residents)
 
         if avg_score >= self.config['household_decision_threshold']:
+            # turn off the currently active package if there is one.
+            if self.active_package is not None:
+                self.package_installations[self.active_package.name] = False
+
+            # turn on the new package
             self.package_installations[package.name] = True
+            self.active_package = package
 
+            # KPI + energy label
             self.current_kpi_level = package.target_level
+            self.gis_attributes["Energielabel"] = self.convert_kpi_level_to_energy_label(self.current_kpi_level)
 
+            # CO2 update
             self.model.current_co2 -= package.calc_co2_savings(self)
 
     def calc_co2_emissions(self,):
