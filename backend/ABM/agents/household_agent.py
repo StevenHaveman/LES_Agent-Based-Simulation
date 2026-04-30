@@ -67,43 +67,96 @@ class Household(Agent):
     def convert_kpi_level_to_energy_label(self, kpi_level):
         return self.KPI_TO_ENERGY_LABEL.get(kpi_level)
 
-    def calc_avg_decision(self, package): #TODO Naam veranderen hij doet meer dan alleen calculeren
-        """
-        Determines if the household installs a given sustainability package based
-        on the average decision of its residents.
+    # This function is now replaced by the choose_household_package function, 
+    # which looks at all packages and chooses the one with the highest support that meets the decision threshold.
+    # def calc_avg_decision(self, package): 
+    #     """
+    #     Determines if the household installs a given sustainability package based
+    #     on the average decision of its residents.
 
-        If the proportion of residents who have decided in favor of the package
-        meets or exceeds the household's decision threshold, the household
-        installs the package. This check is skipped if the package is already
-        installed or if the household has no residents.
+    #     If the proportion of residents who have decided in favor of the package
+    #     meets or exceeds the household's decision threshold, the household
+    #     installs the package. This check is skipped if the package is already
+    #     installed or if the household has no residents.
 
-        Args:
-            package (SustainabilityPackage): The sustainability package being considered.
+    #     Args:
+    #         package (SustainabilityPackage): The sustainability package being considered.
+    #     """
+    #     if not self.residents:
+    #         return
+        
+    #     if self.package_installations.get(package.name, False):
+    #         return
+
+    #     num_positive_decisions = sum(1 for res in self.residents if res.package_decisions.get(package.name, False))
+    #     avg_score = num_positive_decisions / len(self.residents)
+
+    #     if avg_score >= self.config['household_decision_threshold']:
+    #         # turn off the currently active package if there is one.
+    #         if self.active_package is not None:
+    #             self.package_installations[self.active_package.name] = False
+
+    #         # turn on the new package
+    #         self.package_installations[package.name] = True
+    #         self.active_package = package
+
+    #         # KPI + energy label
+    #         self.current_kpi_level = package.target_level
+    #         self.gis_attributes["Energielabel"] = self.convert_kpi_level_to_energy_label(self.current_kpi_level)
+
+    #         # CO2 update
+    #         self.model.current_co2 -= package.calc_co2_savings(self)
+
+    def choose_household_package(self):
         """
+        Determines which sustainability package to install based on the support of residents and the household's decision threshold.
+        """
+
         if not self.residents:
             return
-        
-        if self.package_installations.get(package.name, False):
-            return
 
-        num_positive_decisions = sum(1 for res in self.residents if res.package_decisions.get(package.name, False))
-        avg_score = num_positive_decisions / len(self.residents)
+        best_package = None
+        best_score = 0
+        best_rank = 0
 
-        if avg_score >= self.config['household_decision_threshold']:
+        for package in self.model.sustainability_packages:
+
+            supporters = sum(
+                1 for res in self.residents
+                if res.package_decisions.get(package.name, False)
+            )
+
+            score = supporters / len(self.residents)
+            target_rank = self.LEVEL_RANK[package.target_level]
+            
+            # choose the package with:
+            # 1. highest support
+            # 2. if support is equal, the one with the highest target level
+            if (
+                score > best_score or
+                (score == best_score and target_rank > best_rank)
+            ):
+                best_score = score
+                best_rank = target_rank
+                best_package = package
+
+        # Install the best package if it meets the household decision threshold
+        if (best_package and best_score >= self.config['household_decision_threshold']):
             # turn off the currently active package if there is one.
             if self.active_package is not None:
                 self.package_installations[self.active_package.name] = False
 
-            # turn on the new package
-            self.package_installations[package.name] = True
-            self.active_package = package
+            # install new package
+            self.package_installations[best_package.name] = True
+            self.active_package = best_package
 
-            # KPI + energy label
-            self.current_kpi_level = package.target_level
-            self.gis_attributes["Energielabel"] = self.convert_kpi_level_to_energy_label(self.current_kpi_level)
+            # KPI + label update
+            self.current_kpi_level = best_package.target_level
 
-            # CO2 update
-            self.model.current_co2 -= package.calc_co2_savings(self)
+            self.gis_attributes["Energielabel"] = (self.convert_kpi_level_to_energy_label(self.current_kpi_level))
+
+            # CO2
+            self.model.current_co2 -= (best_package.calc_co2_savings(self))
 
     def calc_co2_emissions(self,):
         co2_electricity = self.energy_usage * self.config['CO2_electricity']
@@ -123,11 +176,12 @@ class Household(Agent):
         for resident in self.residents:
             resident.step()
         
-        for package in self.model.sustainability_packages:
-            self.calc_avg_decision(package)
-            if self.package_installations[package.name]: # TODO Inprincipe bespaar je elk jaar het zelfde hoeveelheid co2 Dus hoeft dit maar een keer opgeteld te worden
-                self.co2_saved_yearly += package.calc_co2_savings(self)
-            # self.co2_saved_yearly += package.calc_co2_savings(self) # TODO Nagaan of dit nog goed werkt? aangezien de step per maand is.
+        # After all residents have made their decisions, determine which package the household installs based on the support of its residents and the decision threshold.
+        self.choose_household_package()
+
+        # yearly CO2 savings calculation for the active package, if any.
+        if self.active_package is not None:
+            self.co2_saved_yearly += (self.active_package.calc_co2_savings(self))
 
 
 
