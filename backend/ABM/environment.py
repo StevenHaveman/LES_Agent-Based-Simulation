@@ -61,8 +61,6 @@ class Environment(Model):
                 co2_reduction=row["op_co2_B"],
                 kpi_score=0
             )
-
-            print(package)
             self.sustainability_packages.append(package)
 
         self.decided_residents_this_step_per_package = {
@@ -186,44 +184,7 @@ class Environment(Model):
                 res.perceived_norm[package.name] = (
                     0.5 * res.injunctive_norm[package.name]
                     + 0.5 * res.descriptive_norm[package.name]
-                )
-
-
-    # def update_social_norms_Street_level(self):
-    #     """
-    #     Updates injunctive, descriptive, and perceived norms
-    #     for all residents in the system.
-    #     """
-    #     n_residents = max(len(self.residents), 1)
-
-    #     for package in self.sustainability_packages:
-
-    #         # INJUNCTIVE NORM (social approval proxy) # TODO This is currently a very simplified proxy for social approval, based on average attitude. This could be made more complex by considering package-specific attitudes, or by incorporating other social factors.
-    #         avg_attitude = sum(
-    #             r.attitude for r in self.residents
-    #         ) / n_residents  # TODO Attitude is currently randomly assigned, will need to update when we have survey data to determine resident attitudes.
-
-    #         # DESCRIPTIVE + ASSIGN PER STREET
-    #         for street in self.streets:
-
-    #             n_households = max(len(street), 1)
-
-    #             installed_ratio = sum(
-    #                 hh.package_installations.get(package.name, False)
-    #                 for hh in street
-    #             ) / n_households
-
-    #             for hh in street:
-    #                 for res in hh.residents:
-
-    #                     res.descriptive_norm[package.name] = installed_ratio  # street-level behavior
-    #                     res.injunctive_norm[package.name] = avg_attitude  # global social approval proxy
-
-    #                     # PERCEIVED NORM # This is currently a simple average of descriptive and injunctive norms, but could be made more complex by weighting them differently or by incorporating other factors.
-    #                     res.perceived_norm[package.name] = (
-    #                         0.5 * res.injunctive_norm[package.name]
-    #                         + 0.5 * res.descriptive_norm[package.name]
-                        # )                
+                )          
 
     def step(self):
         """
@@ -413,10 +374,12 @@ class Environment(Model):
                 "address": f"{household.gis_attributes['WoonplaatsNaam']} | {household.gis_attributes['OpenbareRuimteNaam']}",
                 "name": f"Household  {household.gis_attributes['Huisnummer']}",
                 "GIS_attributes": household.gis_attributes, # Include all GIS attributes for reference
-                "residents": resident_details
+                "residents": resident_details,
+                "package_installations": {
+                    pkg.name: household.package_installations.get(pkg.name, False)
+                    for pkg in self.sustainability_packages
+                }
             }
-            for pkg_name in [p.name for p in self.sustainability_packages]:
-                 hh_data[f"{pkg_name}_installed"] = household.package_installations.get(pkg_name, False)
             households_data.append(hh_data)
         return households_data
 

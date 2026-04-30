@@ -124,6 +124,10 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
         households_data.clear()
         households_data.extend(model.collect_household_information())
 
+        print(f"Household data collected for year {year + 1}: {len(households_data)} households")
+
+        print(households_data[:2])  # Print the first 2 households for a quick check, can be removed later.
+
         # Wait before next simulation year
         time.sleep(get_delay())
 
