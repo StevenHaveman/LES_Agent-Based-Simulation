@@ -70,7 +70,7 @@ class Environment(Model):
         self.energy_price = self.config['energy_price'] 
         self.households = []  # gewone Python-lijst voor filteren/gemak
         self.residents = []  # gewone Python-lijst voor filteren/gemak
-        self.streets = [] # Needed for the GIS MAP Maybe? Or all the households will have actual cordinates.
+        self.streets = []
         self.yearly_stats = []
         self.total_co2 = 0
         self.current_co2 = 0
@@ -79,7 +79,7 @@ class Environment(Model):
 
         # self.create_agents(nr_households, nr_residents)
         self.create_household_agents()
-        self.create_resident_agents(nr_residents=1) #TODO This is currently set to create 1 resident per household for testing, will need to update when we have survey data to determine household sizes and resident attributes.
+        self.create_resident_agents(nr_residents=5)
         self.generate_streets() 
         self.update_social_norms()
 

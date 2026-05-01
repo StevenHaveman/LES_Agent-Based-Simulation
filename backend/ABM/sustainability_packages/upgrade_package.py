@@ -59,29 +59,15 @@ class UpgradePackage:
         """
 
         # Avoid divide by zero
-        if self.price is None or self.price <= 0:
+        if not self.price or self.price <= 0:
             return 0
 
-        # --- AFFORDABILITY ---
-        max_diff = self.price / 3
-        min_diff = -(self.price / 3)
+        affordability = income / self.price
+        roi = 1 / self.break_even_in_years if self.break_even_in_years else 0
 
-        difference = income - self.price
+        score = 0.7 * affordability + 0.3 * roi
 
-        denominator = (max_diff - min_diff)
-
-        if denominator == 0:
-            normalized_diff = 0
-        else:
-            normalized_diff = ((difference - min_diff)/ denominator)
-        # --- BREAK EVEN ---
-        if (self.break_even_in_years is None or self.break_even_in_years <= 0):
-            influence_roi = 0
-        else:
-            influence_roi = max(0, 0.25 - (0.25 *(self.break_even_in_years / 30)))
-
-        # formula to combine affordability and break-even influence, ensuring the result is between 0 and 1
-        return np.clip(normalized_diff + influence_roi, 0, 1)
+        return min(max(score, 0), 1)
     
 
     def calc_co2_savings(self, household):
