@@ -74,8 +74,9 @@ function OverviewContent() {
                     <ResidentWindow
                         residents={selectedResidents}
                         selectedResidentIndex={selectedResidentIndex}
-                    />
-                    <ResidentInfo resident={selectedResident} />
+                        home={selectedHouse}
+                        />
+                    <ResidentInfo resident={selectedResident} home={selectedHouse} />
                 </div>
                 {/* <div className="parameters-container"> // TODO: CHANGE LOCATION
                     <SimulationParameters> </SimulationParameters>

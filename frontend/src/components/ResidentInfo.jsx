@@ -12,7 +12,7 @@ import '../styles/ResidentInfo.css';
  * @param {number} props.resident.income - The income of the resident.
  * @returns {JSX.Element} The rendered ResidentInfo component.
  */
-const ResidentInfo = ({ resident }) => {
+const ResidentInfo = ({ resident, home }) => {
     // If no resident is selected, render a hint message.
     if (!resident) {return <div className="select-resident-hint">
         <h3> Click on a Resident</h3>
@@ -22,6 +22,11 @@ const ResidentInfo = ({ resident }) => {
     return (
         <div className="resident_info-container">
             <div className="info">
+                <h3>Address: {home.address}</h3>
+                <h3>Energy label: {home.energyLabel}</h3>
+                <h3>Total residents: {home.residents.length}</h3>
+                <h3>Type home: {home.houseType}</h3>
+                <img src="/INNO/blankUser.png" alt="" width="100" height="100" />
                 <h3>Naam: {resident.name}</h3>
                 <h3>Inkomen: €{resident.income + ',-'}</h3>
             </div>

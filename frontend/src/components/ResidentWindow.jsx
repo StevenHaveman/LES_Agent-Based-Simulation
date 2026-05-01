@@ -4,7 +4,7 @@ import '../styles/ResidentWindow.css';
 import ResidentInfo from './ResidentInfo.jsx';
 import { useOverviewState } from '../state/overviewState.jsx';
 
-const ResidentWindow = ({ residents, selectedResidentIndex }) => {
+const ResidentWindow = ({ residents, selectedResidentIndex, home }) => {
     const state = useOverviewState();
 
     const renderContent = () => {
@@ -13,6 +13,7 @@ const ResidentWindow = ({ residents, selectedResidentIndex }) => {
                 return (
                     <ResidentInfo
                         resident={residents && selectedResidentIndex !== null ? residents[selectedResidentIndex] : null}
+                        home={home}
                         visible={true}
                     />
                 );
