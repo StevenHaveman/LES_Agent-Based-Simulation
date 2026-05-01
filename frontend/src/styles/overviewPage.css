@@ -19,7 +19,7 @@ body {
 
 .map-container{
     grid-column: 1 / 11;
-    grid-row: 1 / 7;
+    grid-row: 1 / 2;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -47,8 +47,8 @@ body {
 }
 
 .resident-container{
-    grid-column: 6 / 11;
-    grid-row: 7 / 11;
+    grid-column: 11 / 14;
+    grid-row: 0 / 20;
     display: grid;
     grid-template:  repeat(20, 1fr) / repeat(10, 1fr);
     background-color: #f8f7f2

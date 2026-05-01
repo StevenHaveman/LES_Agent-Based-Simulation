@@ -13,6 +13,7 @@ import ResidentWindow from '../components/ResidentWindow.jsx';
 import ResidentDropdown from '../components/ResidentDropdown.jsx';
 import AIChatWindow from '../components/AIChatWindow.jsx';
 import OverviewNavbar from '../components/OverviewNavbar.jsx';
+import ResidentInfo from '../components/ResidentInfo.jsx';
 
 import KPIWindow from '../components/KPIWindow.jsx';
 import SimulationParameters from '../components/SimulationParameters.jsx';
@@ -36,6 +37,7 @@ function OverviewContent() {
 
     const selectedResidents = selectedHouse ? selectedHouse.residents : [];
     const selectedResident = selectedResidents[selectedResidentIndex] || null;
+    console.log('Selected Resident:', selectedResident);
 
     return (
         <>
@@ -60,9 +62,9 @@ function OverviewContent() {
                         </>
                     )}
                 </div>
-                <div className="graphics-container">
+                {/* <div className="graphics-container"> // TODO: CHANGE LOCATION
                     <GraphicsView> </GraphicsView>
-                </div>
+                </div> */}
                 <div className="resident-container">
                     <ResidentNavbar />
                     <ResidentDropdown
@@ -73,10 +75,11 @@ function OverviewContent() {
                         residents={selectedResidents}
                         selectedResidentIndex={selectedResidentIndex}
                     />
+                    <ResidentInfo resident={selectedResident} />
                 </div>
-                <div className="parameters-container">
+                {/* <div className="parameters-container"> // TODO: CHANGE LOCATION
                     <SimulationParameters> </SimulationParameters>
-                </div>
+                </div> */}
                 <div className="KPI-container">
                     <KPIWindow />
                 </div>

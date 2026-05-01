@@ -33,6 +33,7 @@ ResidentInfo.propTypes = {
     resident: PropTypes.shape({
         name: PropTypes.string.isRequired,
         income: PropTypes.number.isRequired,
+        address: PropTypes.string.isRequired,
     }),
 };
 
