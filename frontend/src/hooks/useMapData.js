@@ -12,10 +12,10 @@ export const useMapData = () => {
                 const mapped = data.map(h => ({
                     lat: h.GIS_attributes?.Latitude,
                     lng: h.GIS_attributes?.Longitude,
-
                     address: `${h.GIS_attributes?.WoonplaatsNaam} ${h.GIS_attributes?.OpenbareRuimteNaam} ${h.GIS_attributes?.Huisnummer}`,
-
                     energieLabel: h.GIS_attributes?.Energielabel,
+                    residents: h.residents || [],
+                    id: h.id || h.GIS_attributes?.id
                 }));
 
                 setHouses(mapped);

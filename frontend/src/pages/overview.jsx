@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createRoute } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import '../styles/overviewpage.css';
@@ -7,6 +7,7 @@ import { OverviewProvider, useOverviewState } from '../state/overviewState.jsx';
 
 import GraphicsView from '../components/GraphicsView.jsx';
 import MapView from '../components/MapView.jsx';
+import ResidentSelector from '../components/ResidentSelector.jsx';
 import ResidentNavbar from '../components/ResidentNavbar.jsx';
 import ResidentWindow from '../components/ResidentWindow.jsx';
 import ResidentDropdown from '../components/ResidentDropdown.jsx';
@@ -17,8 +18,24 @@ import KPIWindow from '../components/KPIWindow.jsx';
 import SimulationParameters from '../components/SimulationParameters.jsx';
 import { useMapData } from '../hooks/useMapData.js';
 
+
 function OverviewContent() {
     const state = useOverviewState();
+    const [selectedHouse, setSelectedHouse] = useState(null);
+    const [selectedResidentIndex, setSelectedResidentIndex] = useState(0);
+    const houses = useMapData();
+
+    const handleHouseClick = (house) => {
+        setSelectedHouse(house);
+        setSelectedResidentIndex(0);
+    };
+
+    const handleResidentSelect = (idx) => {
+        setSelectedResidentIndex(idx);
+    };
+
+    const selectedResidents = selectedHouse ? selectedHouse.residents : [];
+    const selectedResident = selectedResidents[selectedResidentIndex] || null;
 
     return (
         <>
@@ -27,11 +44,20 @@ function OverviewContent() {
                 <div className="map-container">
                     {state.chatWindow === 'ai' ? (
                         <AIChatWindow
-                            residents={state.selectedResidents}
-                            selectedResidentIndex={state.selectedResidentIndex}
+                            residents={selectedResidents}
+                            selectedResidentIndex={selectedResidentIndex}
                         />
                     ) : (
-                        <MapView houses={useMapData()} />
+                        <>
+                            <MapView houses={houses} onHouseClick={handleHouseClick} />
+                            {selectedHouse && (
+                                <ResidentSelector
+                                    residents={selectedResidents}
+                                    selectedResidentIndex={selectedResidentIndex}
+                                    onSelect={handleResidentSelect}
+                                />
+                            )}
+                        </>
                     )}
                 </div>
                 <div className="graphics-container">
@@ -40,12 +66,12 @@ function OverviewContent() {
                 <div className="resident-container">
                     <ResidentNavbar />
                     <ResidentDropdown
-                        residents={state.selectedResidents}
-                        selectedResidentIndex={state.selectedResidentIndex}
+                        residents={selectedResidents}
+                        selectedResidentIndex={selectedResidentIndex}
                     />
                     <ResidentWindow
-                        residents={state.selectedResidents}
-                        selectedResidentIndex={state.selectedResidentIndex}
+                        residents={selectedResidents}
+                        selectedResidentIndex={selectedResidentIndex}
                     />
                 </div>
                 <div className="parameters-container">
