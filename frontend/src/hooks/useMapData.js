@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import overviewService from "../services/OverviewService";
+import { useEffect, useState } from 'react';
+import overviewService from '../services/OverviewService';
 
 export const useMapData = () => {
     const [houses, setHouses] = useState([]);
@@ -20,7 +20,7 @@ export const useMapData = () => {
 
                 setHouses(mapped);
             } catch (err) {
-                console.error("Failed to load houses", err);
+                console.error('Failed to load houses', err);
             }
         };
 
