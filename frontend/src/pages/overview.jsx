@@ -7,6 +7,8 @@ import { OverviewProvider, useOverviewState } from '../state/overviewState.jsx';
 
 import GraphicsView from '../components/GraphicsView.jsx';
 import MapView from '../components/MapView.jsx';
+import MapFilterMenu from '../components/MapFilterMenu.jsx';
+import SidebarToggle from '../components/SidebarToggle.jsx';
 import ResidentSelector from '../components/ResidentSelector.jsx';
 import ResidentNavbar from '../components/ResidentNavbar.jsx';
 import ResidentWindow from '../components/ResidentWindow.jsx';
@@ -19,11 +21,12 @@ import KPIWindow from '../components/KPIWindow.jsx';
 import SimulationParameters from '../components/SimulationParameters.jsx';
 import { useMapData } from '../hooks/useMapData.js';
 
-
 function OverviewContent() {
     const state = useOverviewState();
     const [selectedHouse, setSelectedHouse] = useState(null);
     const [selectedResidentIndex, setSelectedResidentIndex] = useState(0);
+    const [selectedLabels, setSelectedLabels] = useState(["A", "B", "C", "D", "E", "F", "G"]);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
     const houses = useMapData();
 
     const handleHouseClick = (house) => {
@@ -35,6 +38,16 @@ function OverviewContent() {
         setSelectedResidentIndex(idx);
     };
 
+    const handleToggleLabel = (label) => {
+        setSelectedLabels(prev =>
+            prev.includes(label)
+                ? prev.filter(l => l !== label)
+                : [...prev, label]
+        );
+    };
+
+    const filteredHouses = houses.filter(h => selectedLabels.includes(h.energyLabel));
+
     const selectedResidents = selectedHouse ? selectedHouse.residents : [];
     const selectedResident = selectedResidents[selectedResidentIndex] || null;
     console.log('Selected Resident:', selectedResident);
@@ -42,7 +55,13 @@ function OverviewContent() {
     return (
         <>
             <OverviewNavbar title="Overview"> </OverviewNavbar>
-            <div className="overview-container">
+            <div className={`overview-container${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
+                <div className={`sidebar-container${sidebarCollapsed ? ' collapsed' : ''}`}>
+                    <SidebarToggle collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(v => !v)} />
+                    {!sidebarCollapsed && (
+                        <MapFilterMenu selectedLabels={selectedLabels} onToggleLabel={handleToggleLabel} />
+                    )}
+                </div>
                 <div className="map-container">
                     {state.chatWindow === 'ai' ? (
                         <AIChatWindow
@@ -51,7 +70,7 @@ function OverviewContent() {
                         />
                     ) : (
                         <>
-                            <MapView houses={houses} onHouseClick={handleHouseClick} />
+                            <MapView houses={filteredHouses} onHouseClick={handleHouseClick} />
                             {selectedHouse && (
                                 <ResidentSelector
                                     residents={selectedResidents}

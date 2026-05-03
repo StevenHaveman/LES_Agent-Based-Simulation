@@ -1,3 +1,9 @@
+.resident-info-divider {
+    border: none;
+    border-top: 2px solid #222;
+    width: 100%;
+    margin: 16px auto;
+}
 .resident_info-container {
     grid-row: 3 / 21;
     grid-column: 1 / 11;
