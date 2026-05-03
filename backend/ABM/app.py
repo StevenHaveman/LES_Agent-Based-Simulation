@@ -13,6 +13,7 @@ from flask_cors import CORS
 from main import run_simulation, graphics_data, households_data
 import utilities
 import threading
+import traceback
 
 from AgentLLMHandler import AgentLLMHandler
 
@@ -73,6 +74,7 @@ def start_simulation():
             print("=== Simulation finished ===")
         except Exception as e:
             print(f"Simulation error: {e}")
+            traceback.print_exc()
         finally:
             simulation_running = False
 

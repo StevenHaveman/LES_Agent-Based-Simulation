@@ -4,6 +4,7 @@ Utility functions for the agent-based model.
 This module provides helper functions, such as generating random values
 and loading configurations.
 """
+from doctest import Example
 import random
 import config
 import pandas as pd
@@ -57,9 +58,30 @@ def load_gis_data(gis_data_path: str):
     df.columns = df.columns.str.strip()
 
     # Clean the data by dropping rows with missing critical GIS attributes (e.g., 'bouwjaar', 'woning type', 'WoonplaatsNaam').
-    df_clean = df.dropna(subset=['Bouwjaar', 'Woning type', 'WoonplaatsNaam'])
-    # print(df.columns) ## Test print to check column names and formatting, adjust as needed for the actual data file.
+    df_clean = df.dropna(subset=['Bouwjaar', 'Woning type', 'WoonplaatsNaam', 'Energielabel'])
 
-    # print(df[["OBJECTID","Oppervlakte","Huisnummer","Postcode","OpenbareRuimteNaam","WoonplaatsNaam","Energielabel","Bouwjaar","Latitude","Longitude", "Woning type"]].head())
+    # Standardize energy label formatting (e.g., remove whitespace, convert to uppercase, and unify A+ levels to A).
+    df["Energielabel"] = (df["Energielabel"].astype(str).str.strip().str.upper().replace({"A+": "A","A++": "A", "A+++": "A"}))
 
-    return df_clean[["OBJECTID","Oppervlakte","Huisnummer","Postcode","OpenbareRuimteNaam","WoonplaatsNaam","Energielabel","Bouwjaar","Latitude","Longitude", "Woning type"]].tail(100)
+    # TODO Remove the tail 100 for testing purposes, in the final version this should be removed to include all data.
+    return df_clean[["OBJECTID","Oppervlakte","Huisnummer","Postcode","OpenbareRuimteNaam","WoonplaatsNaam","Energielabel","Bouwjaar","Latitude","Longitude", "Woning type", "Energielabel"]].tail(100)
+
+def load_package_data(package_data_path: str):
+    """
+    Loads package data from a specified file path.
+    This function reads an Excel file containing package data, cleans it by removing rows with missing critical attributes, and returns a DataFrame with the relevant columns for the simulation.
+    Args:
+        package_data_path (str): The file path to the package data.
+    Returns:
+        pd.DataFrame: A DataFrame containing the cleaned package data with relevant columns.
+    """
+    df = pd.DataFrame(pd.read_excel(package_data_path))
+
+    # Remove leading/trailing whitespace from column names to ensure they match expected names in the code.
+    df.columns = df.columns.str.strip()
+
+    # Clean the data by dropping rows with missing critical package attributes (e.g., 'package_id', 'from_level', 'to_level', 'investment_cost').
+    df_clean = df.dropna(subset=["package_step_id", "baseline_level", "kpi_level", "total_price_mid", "savings", "op_co2_B", "break_even_in_years"])
+    #Example	baseline_level	 op_cost_B 	op_co2_B	 total_price_mid 	 Savings 	 Break even in years 	kpi_score	kpi_level
+
+    return df_clean[["package_step_id", "baseline_level", "kpi_level", "total_price_mid", "savings", "op_co2_B", "break_even_in_years"]]

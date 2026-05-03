@@ -63,7 +63,6 @@ class Resident(Agent):
             p.name: False for p in self.environment.sustainability_packages
         }
 
-        self.calc_perceived_norm()
         self.calc_behavioral_control()
 
     def calc_salary(self):
@@ -93,13 +92,6 @@ class Resident(Agent):
                 continue
 
             self.behavioral_control[package.name] = package.calculate_behavioral_influence(self.income, self.household)
-
-    def calc_perceived_norm(self): # currently done within the environment's update_social_norms function.
-        for package in self.environment.sustainability_packages:
-            self.perceived_norm[package.name] = (
-                0.5 * self.injunctive_norm[package.name]
-                + 0.5 * self.descriptive_norm[package.name]
-            )
                 
     def calc_behavior(self): # New voor RAA model
         for package in self.environment.sustainability_packages:
@@ -151,7 +143,10 @@ class Resident(Agent):
         based on real-world constraints.
         """
         # return package.is_feasible(self.income, self.household, self.environment) #Function exists but wel need to be reworked with new packages in mind.
-        return True # For now, we will assume that if the resident has the intention and meets the behavioral control threshold, they can adopt the package. We can implement more complex feasibility checks later.
+        # return True # For now, we will assume that if the resident has the intention and meets the behavioral control threshold, they can adopt the package. We can implement more complex feasibility checks later.
+
+        return package.is_feasible(self.income, self.household, self.environment)
+
 
     def collect_resident_data(self):
         agent_data = {

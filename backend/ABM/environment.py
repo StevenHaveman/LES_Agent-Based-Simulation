@@ -6,6 +6,7 @@ from agents.resident_agent import Resident
 import utilities
 from sustainability_packages.solar_panel import SolarPanel
 from sustainability_packages.heat_pump import HeatPump
+from sustainability_packages.upgrade_package import UpgradePackage
 import json
 import os
 
@@ -44,54 +45,60 @@ class Environment(Model):
         super().__init__()
         self.config_id, self.config = utilities.choose_config() # Load the chosen configuration This is not used in the frontend defaults to config 1
 
-        self.solar_panel = SolarPanel(self)
-        self.heat_pump = HeatPump(self)
-        self.sustainability_packages = [self.solar_panel, self.heat_pump]
+        # TODO logic should be in its own function, and be a bit more dynamic.
+        self.package_data = utilities.load_package_data("data/15_package_steps.xlsx")
+        self.sustainability_packages = []
+        for _, row in self.package_data.iterrows():
+
+            package = UpgradePackage(
+                config=self.config,
+                package_step_id=row["package_step_id"],
+                baseline_level=row["baseline_level"],
+                target_level=row["kpi_level"],
+                price=row["total_price_mid"],
+                yearly_savings=row["savings"],
+                break_even_in_years=row["break_even_in_years"],
+                co2_reduction=row["op_co2_B"],
+                kpi_score=0
+            )
+            self.sustainability_packages.append(package)
 
         self.decided_residents_this_step_per_package = {
-                    pkg.name: 0 for pkg in self.sustainability_packages
-                }
-        
+            pkg.name: 0 for pkg in self.sustainability_packages
+        }
+    
         self.energy_price = self.config['energy_price'] 
         self.households = []  # gewone Python-lijst voor filteren/gemak
         self.residents = []  # gewone Python-lijst voor filteren/gemak
-        self.streets = [] # Needed for the GIS MAP Maybe? Or all the households will have actual cordinates.
+        self.streets = []
         self.yearly_stats = []
         self.total_co2 = 0
         self.current_co2 = 0
         self.gis_data = utilities.load_gis_data("data/AmstelHeuvelWijk2_TableToExcel.xlsx")
 
+
         # self.create_agents(nr_households, nr_residents)
         self.create_household_agents()
-        self.create_resident_agents(nr_residents=1) #TODO This is currently set to create 1 resident per household for testing, will need to update when we have survey data to determine household sizes and resident attributes.
+        self.create_resident_agents(nr_residents=5)
         self.generate_streets() 
         self.update_social_norms()
 
     def create_household_agents(self): # TODO: This is a new version of the create_agents function that will use GIS data to create households with more realistic attributes and distributions. This will likely involve parsing the GIS data to determine household locations, sizes, and other relevant attributes, and then creating Household agents accordingly.
         
         for i, row in self.gis_data.iterrows():
-            hh = Household(i, self,gis_attributes=row.to_dict()) # Assuming the Household class can accept GIS attributes as a dictionary, adjust as needed based on actual implementation.
+            hh = Household(i, self, gis_attributes=row.to_dict())
 
-            hh_emissions = hh.calc_co2_emissions()
-            self.total_co2 += hh_emissions
-            self.current_co2 += hh_emissions
+            # init emissions #TODO make a emmision based on kpi level since we went away from solar and heatpump.
+            # initial_savings = package.calc_co2_savings(hh)
+            # hh.co2_saved_yearly += initial_savings
+            # self.current_co2 -= initial_savings
+
+            # flags
             for package in self.sustainability_packages:
-                chance_key = f"initial_{package.name.lower().replace(' ', '')}_chance"
-                initial_chance = self.config.get(chance_key, 0.0) # Default to 0% if not in config
-                
-                hh.package_installations[package.name] = (random.random() < initial_chance)
-
-                if hh.package_installations.get(package.name, False):
-                    initial_savings = package.calc_co2_savings(hh)
-                    hh.co2_saved_yearly += initial_savings
-                    self.current_co2 -= initial_savings
-                
                 hh.skip_prev_flags[package.name] = False
                 hh.skip_next_flags[package.name] = False
 
             self.households.append(hh)
-
-        pass
 
     def create_resident_agents(self, nr_residents=1): # TODO: This function will create Resident agents for a given Household agent, using attributes from the GIS data to assign realistic characteristics to the residents (e.g., income, attitudes). The number of residents created will be based on the household size determined from the GIS data.
 
@@ -123,9 +130,12 @@ class Environment(Model):
         within configured limits, with occasional larger streets.
         """
         pointer = 0
-        remaining = self.config['nr_households']
-        min_households = min(self.config['min_nr_houses'], self.config['nr_households'])
+        remaining = len(self.households)
+        print (f"Generating streets with {remaining} households...")
+        min_households = min(self.config['min_nr_houses'], remaining)
         max_households = self.config['max_nr_houses']
+
+        print(f"Min households per street: {min_households}, Max households per street: {max_households}")
 
         while remaining >= min_households:
             # 20% chance to pick a large household count (closer to max)
@@ -174,7 +184,7 @@ class Environment(Model):
                 res.perceived_norm[package.name] = (
                     0.5 * res.injunctive_norm[package.name]
                     + 0.5 * res.descriptive_norm[package.name]
-                )
+                )          
 
     def step(self):
         """
@@ -193,10 +203,7 @@ class Environment(Model):
              hh.step()
 
         print("Updating social norms in environment step...")
-        print(f"Before update: Resident 0 descriptive norm for {self.sustainability_packages[0].name}: {self.residents[0].descriptive_norm[self.sustainability_packages[0].name]} perceived norm: {self.residents[0].perceived_norm[self.sustainability_packages[0].name]} injunctive norm: {self.residents[0].injunctive_norm[self.sustainability_packages[0].name]} attitude: {self.residents[0].attitude}")
-        # print(f"Before update: Resident 0 descriptive norm for {self.sustainability_packages[0].name}: {self.residents[0].descriptive_norm[self.sustainability_packages[0].name]} perceived norm: {self.residents[0].perceived_norm[self.sustainability_packages[0].name]} injunctive norm: {self.residents[0].injunctive_norm[self.sustainability_packages[0].name]} attitude: {self.residents[0].attitude}")
         self.update_social_norms()
-        print(f"After update: Resident 0 descriptive norm for {self.sustainability_packages[0].name}: {self.residents[0].descriptive_norm[self.sustainability_packages[0].name]} perceived norm: {self.residents[0].perceived_norm[self.sustainability_packages[0].name]} injunctive norm: {self.residents[0].injunctive_norm[self.sustainability_packages[0].name]} attitude: {self.residents[0].attitude}")
 
         for package in self.sustainability_packages:
             package.step()
@@ -367,10 +374,12 @@ class Environment(Model):
                 "address": f"{household.gis_attributes['WoonplaatsNaam']} | {household.gis_attributes['OpenbareRuimteNaam']}",
                 "name": f"Household  {household.gis_attributes['Huisnummer']}",
                 "GIS_attributes": household.gis_attributes, # Include all GIS attributes for reference
-                "residents": resident_details
+                "residents": resident_details,
+                "package_installations": {
+                    pkg.name: household.package_installations.get(pkg.name, False)
+                    for pkg in self.sustainability_packages
+                }
             }
-            for pkg_name in [p.name for p in self.sustainability_packages]:
-                 hh_data[f"{pkg_name}_installed"] = household.package_installations.get(pkg_name, False)
             households_data.append(hh_data)
         return households_data
 
@@ -401,7 +410,9 @@ class Environment(Model):
             output += f"    Current {pkg_name} Price: {package.price}\n"
         output += f"  --- MISC INFO ---\n"
         output += f"    Total CO2 saved so far: {total_yearly_co2_saved / 1000:.1f} tons\n"
-        output += f"    % of CO2 emission relative to district total: {self.current_co2 / self.total_co2 * 100:.1f}"
+        percentage = (self.current_co2 / self.total_co2 * 100 if self.total_co2 != 0 else 0)
+        output += f"    % of CO2 emission relative to district total: {percentage:.1f}"
+        output += f"    % of CO2 emission relative to district total: {(self.current_co2 / self.total_co2 * 100 if self.total_co2 != 0 else 0):.1f}"
         return output
         
         
