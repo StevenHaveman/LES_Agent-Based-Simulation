@@ -45,7 +45,6 @@ class Environment(Model):
         super().__init__()
         self.config_id, self.config = utilities.choose_config() # Load the chosen configuration This is not used in the frontend defaults to config 1
 
-        # TODO logic should be in its own function, and be a bit more dynamic.
         self.package_data = utilities.load_package_data("data/15_package_steps.xlsx")
         self.sustainability_packages = []
         for _, row in self.package_data.iterrows():
@@ -69,12 +68,15 @@ class Environment(Model):
     
         self.energy_price = self.config['energy_price'] 
         self.households = []  # gewone Python-lijst voor filteren/gemak
+        self.gis_data = utilities.load_gis_data("data/AmstelHeuvelWijk2_TableToExcel.xlsx")
         self.residents = []  # gewone Python-lijst voor filteren/gemak
+        self.survey_data = utilities.load_survey_data("data/survey_data.xlsx")
+        self.income_distribution = (utilities.calculate_income_distribution(self.survey_data))
         self.streets = []
         self.yearly_stats = []
         self.total_co2 = 0
         self.current_co2 = 0
-        self.gis_data = utilities.load_gis_data("data/AmstelHeuvelWijk2_TableToExcel.xlsx")
+
 
 
         # self.create_agents(nr_households, nr_residents)
@@ -107,6 +109,7 @@ class Environment(Model):
         for hh in self.households:
             for _ in range(nr_residents):
                 resident = Resident(id_counter, self, hh)
+                resident.income = utilities.generate_income(self.income_distribution) # Generate income based on distribution from survey data
 
                 for package_name, installed in hh.package_installations.items():
                     if installed:
@@ -270,8 +273,7 @@ class Environment(Model):
 
         # Save to file
         with open(file_name, 'w') as file:
-            json.dump(data, file, indent=4)
-        
+            json.dump(data, file, indent=4)       
 
     def collect_start_of_year_data(self, year):
         """

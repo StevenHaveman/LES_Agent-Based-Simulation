@@ -28,9 +28,9 @@ class Resident(Agent):
         self.household = household
         self.environment = model
 
-        salary = self.calc_salary()
+        # salary = self.calc_salary()
         self.decision_threshold = self.config['decision_threshold']
-        self.income = max(round(salary, -2), 0)
+        self.income = 0
 
         # RAA NORM STRUCTURE
         self.injunctive_norm = {p.name: 0.0 for p in self.environment.sustainability_packages}
@@ -64,20 +64,6 @@ class Resident(Agent):
         }
 
         self.calc_behavioral_control()
-
-    def calc_salary(self):
-        """
-        Calculates a resident's salary based on a log-normal distribution
-        approximating Dutch income distribution from the configuration.
-
-        Returns:
-            float: A randomly generated salary value.
-        """
-        median = self.config['median_income']
-        sigma_normal = self.config['sigma_normal']
-        mu = np.log(median)
-        sigma_lognormal = np.sqrt(np.log(1 + (sigma_normal / median) ** 2))
-        return np.random.lognormal(mu, sigma_lognormal)
     
     def calc_behavioral_control(self):
         """
@@ -181,6 +167,7 @@ class Resident(Agent):
             self.calc_intention()
             self.calc_behavior()
 
+        # TODO Should we still increase income every step?
         self.income = int(round(self.income * np.random.choice(self.config['raise_income']), -1))
 
         # If all decisions are made, recalculate subjective norm and behavioral control

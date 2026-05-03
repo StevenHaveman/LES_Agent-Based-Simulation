@@ -6,6 +6,8 @@ and loading configurations.
 """
 from doctest import Example
 import random
+
+from pandas import test
 import config
 import pandas as pd
 
@@ -85,3 +87,50 @@ def load_package_data(package_data_path: str):
     #Example	baseline_level	 op_cost_B 	op_co2_B	 total_price_mid 	 Savings 	 Break even in years 	kpi_score	kpi_level
 
     return df_clean[["package_step_id", "baseline_level", "kpi_level", "total_price_mid", "savings", "op_co2_B", "break_even_in_years"]]
+
+
+def load_survey_data(survey_data_path: str):
+    """Loads survey data from a specified file path."""
+
+    df = pd.DataFrame(pd.read_excel(survey_data_path))
+
+    df.columns = df.columns.str.strip()
+
+    return df
+
+def calculate_income_distribution(df):
+    """Calculates the income distribution from the survey data."""
+
+    income_column = "Wat is ongeveer uw gezamenlijk maandelijks netto-inkomen?"
+
+    valid_answers = df[
+        df[income_column] != "Weet ik niet of zeg ik liever niet"
+    ]
+
+    distribution = (valid_answers[income_column].value_counts(normalize=True).to_dict())
+    print(test)
+    print("Income distribution calculated from survey data:")
+    for income_range, proportion in distribution.items():
+        print(f"  {income_range}: {proportion:.2%}")
+
+    return distribution
+
+
+def generate_income(income_distribution):
+    """Generates a random income value based on the provided income distribution."""
+
+    groups = list(income_distribution.keys())
+    weights = list(income_distribution.values())
+
+    selected_group = random.choices(groups,weights=weights,k=1)[0]
+    
+    income_ranges = {
+        "0-2.000 euro": (1000, 2000),
+        "2.000-4.000 euro": (2000, 4000),
+        "4.000-6.000 euro": (4000, 6000),
+        "6.000 euro of meer": (6000, 9000),
+    }
+
+    min_income, max_income = income_ranges[selected_group]
+
+    return random.randint(min_income, max_income)
