@@ -10,11 +10,10 @@
   height: 24px;
   font-size: 1.2rem;
   cursor: pointer;
-  transition: background 0.2s;
 }
 
 .sidebar-toggle-btn:hover {
-  background: #ccc;
+  background: #14ec26;
 }
 
 .sidebar-container {
