@@ -9,7 +9,7 @@ import GraphicsView from '../components/GraphicsView.jsx';
 import MapView from '../components/MapView.jsx';
 import MapFilterMenu from '../components/MapFilterMenu.jsx';
 import SidebarToggle from '../components/SidebarToggle.jsx';
-import ResidentSelector from '../components/ResidentSelector.jsx';
+
 import ResidentNavbar from '../components/ResidentNavbar.jsx';
 import ResidentWindow from '../components/ResidentWindow.jsx';
 import ResidentDropdown from '../components/ResidentDropdown.jsx';
@@ -71,13 +71,6 @@ function OverviewContent() {
                     ) : (
                         <>
                             <MapView houses={filteredHouses} onHouseClick={handleHouseClick} />
-                            {selectedHouse && (
-                                <ResidentSelector
-                                    residents={selectedResidents}
-                                    selectedResidentIndex={selectedResidentIndex}
-                                    onSelect={handleResidentSelect}
-                                />
-                            )}
                         </>
                     )}
                 </div>
