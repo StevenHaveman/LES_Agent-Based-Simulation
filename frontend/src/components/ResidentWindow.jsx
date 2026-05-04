@@ -17,12 +17,6 @@ const ResidentWindow = ({ residents, selectedResidentIndex, home }) => {
                         visible={true}
                     />
                 );
-            default:
-                return (
-                    <div className="select-household-hint">
-                        <h3> Click on a Resident or Window</h3>
-                    </div>
-                );
         }
     };
 

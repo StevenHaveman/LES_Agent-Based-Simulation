@@ -26,6 +26,13 @@ function OverviewContent() {
     const [selectedHouse, setSelectedHouse] = useState(null);
     const [selectedResidentIndex, setSelectedResidentIndex] = useState(0);
     const [selectedLabels, setSelectedLabels] = useState(["A", "B", "C", "D", "E", "F", "G"]);
+    const [selectedWoningTypes, setSelectedWoningTypes] = useState([
+        'Twee-onder-een-kap / rijwoning hoek',
+        'Rijwoning tussen',
+        'Flatwoning (overig)',
+        'Appartement',
+        'Maisonnette',
+    ]);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
     const houses = useMapData();
 
@@ -46,7 +53,18 @@ function OverviewContent() {
         );
     };
 
-    const filteredHouses = houses.filter(h => selectedLabels.includes(h.energyLabel));
+    const handleToggleWoningType = (type) => {
+        setSelectedWoningTypes(prev =>
+            prev.includes(type)
+                ? prev.filter(t => t !== type)
+                : [...prev, type]
+        );
+    };
+
+    const filteredHouses = houses.filter(h =>
+        selectedLabels.includes(h.energyLabel) &&
+        (selectedWoningTypes.length === 0 || selectedWoningTypes.includes(h.houseType))
+    );
 
     const selectedResidents = selectedHouse ? selectedHouse.residents : [];
     const selectedResident = selectedResidents[selectedResidentIndex] || null;
@@ -59,7 +77,12 @@ function OverviewContent() {
                 <div className={`sidebar-container${sidebarCollapsed ? ' collapsed' : ''}`}>
                     <SidebarToggle collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(v => !v)} />
                     {!sidebarCollapsed && (
-                        <MapFilterMenu selectedLabels={selectedLabels} onToggleLabel={handleToggleLabel} />
+                        <MapFilterMenu
+                            selectedLabels={selectedLabels}
+                            onToggleLabel={handleToggleLabel}
+                            selectedWoningTypes={selectedWoningTypes}
+                            onToggleWoningType={handleToggleWoningType}
+                        />
                     )}
                 </div>
                 <div className="map-container">

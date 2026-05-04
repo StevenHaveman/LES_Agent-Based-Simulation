@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -27,7 +27,24 @@ const MapView = ({ houses, onHouseClick }) => {
         };
     }, []);
 
-    // Update markers when houses change
+    const streetIncomeMap = useMemo(() => {
+        const map = {};
+        houses.forEach(house => {
+            const address = house.address || '';
+            const street = address.split(/\s\d/)[0].trim();
+            if (!street) return;
+            if (!map[street]) map[street] = { residents: [] };
+            if (Array.isArray(house.residents)) {
+                map[street].residents.push(...house.residents);
+            }
+        });
+        Object.keys(map).forEach(street => {
+            const res = map[street].residents;
+            map[street].avgIncome = res.length > 0 ? (res.reduce((sum, r) => sum + (r.income || 0), 0) / res.length).toFixed(0) : null;
+        });
+        return map;
+    }, [houses]);
+
     useEffect(() => {
         if (!mapRef.current) return;
         markersRef.current.forEach(marker => marker.remove());
@@ -35,12 +52,20 @@ const MapView = ({ houses, onHouseClick }) => {
         houses.forEach(house => {
             const icon = getLabelIcon(house.energyLabel);
             const marker = L.marker([house.lat, house.lng], { icon }).addTo(mapRef.current);
+            const address = house.address || '';
+            const street = address.split(/\s\d/)[0].trim();
+            const streetInfo = streetIncomeMap[street];
+            if (streetInfo && streetInfo.avgIncome) {
+                marker.bindTooltip(`Street: ${street}<br/>Avg. income: €${streetInfo.avgIncome}`, {direction: 'top'});
+            } else {
+                marker.bindTooltip('No residents');
+            }
             if (onHouseClick) {
                 marker.on('click', () => onHouseClick(house));
             }
             markersRef.current.push(marker);
         });
-    }, [houses, onHouseClick]);
+    }, [houses, onHouseClick, streetIncomeMap]);
 
     return <div id="map" style={{ height: '100%', width: '100%' }} />;
 };
