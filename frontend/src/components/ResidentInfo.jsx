@@ -28,8 +28,8 @@ const ResidentInfo = ({ resident, home }) => {
                 <h3>Type home: {home.houseType}</h3>
                 <hr className="resident-info-divider" />
                 <img src="/INNO/blankUser.png" alt="" width="100" height="100" />
-                <h3>Naam: {resident.name}</h3>
-                <h3>Inkomen: €{resident.income + ',-'}</h3>
+                <h3>Name: {resident.name}</h3>
+                <h3>Income: €{resident.income + ',-'}</h3>
             </div>
         </div>
     );
