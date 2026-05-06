@@ -1,0 +1,21 @@
+.sidebar-toggle-btn {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  z-index: 10;
+  background: #e0e0e0;
+  border: none;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.sidebar-toggle-btn:hover {
+  background: #14ec26;
+}
+
+.sidebar-container {
+  position: relative;
+}
