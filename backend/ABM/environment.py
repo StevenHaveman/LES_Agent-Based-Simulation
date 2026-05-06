@@ -119,9 +119,6 @@ class Environment(Model):
                 self.residents.append(resident)
 
                 id_counter += 1
-    # def create_resdent_agents_survey(self, survey_data): # TODO: This function will create Resident agents for a given Household agent, using attributes from the survey data to assign realistic characteristics to the residents (e.g., income, attitudes). The number of residents created will be based on the household size determined from the GIS data.
-
-    #     pass
 
 
     def generate_streets(self,):
