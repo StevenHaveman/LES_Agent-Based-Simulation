@@ -60,7 +60,7 @@ def load_gis_data(gis_data_path: str):
     df.columns = df.columns.str.strip()
 
     # Standardize energy label formatting (e.g., remove whitespace, convert to uppercase, and unify A+ levels to A).
-    df["Energielabel"] = (df["Energielabel"].astype(str).str.strip().str.upper().replace({"A+": "A","A++": "A", "A+++": "A"}))
+    df["Energielabel"] = (df["Energielabel"].astype(str).str.replace(r"\s+", "", regex=True).str.upper().replace({"A+": "A", "A++": "A", "A+++": "A"}))
 
     # Clean the data by dropping rows with missing critical GIS attributes (e.g., 'bouwjaar', 'woning type', 'WoonplaatsNaam').
     df_clean = df.dropna(subset=['Bouwjaar', 'Woning type', 'WoonplaatsNaam', 'Energielabel'])
