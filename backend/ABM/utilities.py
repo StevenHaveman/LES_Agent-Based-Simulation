@@ -59,14 +59,14 @@ def load_gis_data(gis_data_path: str):
     # Remove leading/trailing whitespace from column names to ensure they match expected names in the code.
     df.columns = df.columns.str.strip()
 
-    # Clean the data by dropping rows with missing critical GIS attributes (e.g., 'bouwjaar', 'woning type', 'WoonplaatsNaam').
-    df_clean = df.dropna(subset=['Bouwjaar', 'Woning type', 'WoonplaatsNaam', 'Energielabel'])
-
     # Standardize energy label formatting (e.g., remove whitespace, convert to uppercase, and unify A+ levels to A).
     df["Energielabel"] = (df["Energielabel"].astype(str).str.strip().str.upper().replace({"A+": "A","A++": "A", "A+++": "A"}))
 
+    # Clean the data by dropping rows with missing critical GIS attributes (e.g., 'bouwjaar', 'woning type', 'WoonplaatsNaam').
+    df_clean = df.dropna(subset=['Bouwjaar', 'Woning type', 'WoonplaatsNaam', 'Energielabel'])
+
     # TODO Remove the tail 100 for testing purposes, in the final version this should be removed to include all data.
-    return df_clean[["OBJECTID","Oppervlakte","Huisnummer","Postcode","OpenbareRuimteNaam","WoonplaatsNaam","Energielabel","Bouwjaar","Latitude","Longitude", "Woning type", "Energielabel"]].tail(100)
+    return df_clean[["OBJECTID","Oppervlakte","Huisnummer","Postcode","OpenbareRuimteNaam","WoonplaatsNaam","Energielabel","Bouwjaar","Latitude","Longitude", "Woning type"]]
 
 def load_package_data(package_data_path: str):
     """
