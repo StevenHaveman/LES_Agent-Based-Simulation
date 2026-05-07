@@ -133,5 +133,38 @@ body {
 
 }
 
+.municipality-container {
+    grid-column: 2 / 11;
+    grid-row: 2 / 7;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid black;
+    padding: 20px;
+    box-sizing: border-box;
+}
 
+.kpi-container {
+    grid-column: 11 / 15;
+    grid-row: 2 / 7;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid black;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.charts-container {
+    grid-column: 15 / 21;
+    grid-row: 1 / 7;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid black;
+    padding: 20px;
+    box-sizing: border-box;
+}
 

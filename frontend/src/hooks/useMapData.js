@@ -3,9 +3,10 @@ import overviewService from '../services/OverviewService';
 
 export const useMapData = () => {
     const [houses, setHouses] = useState([]);
+    const [currentYear, setCurrentYear] = useState(null);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchHouseholds = async () => {
             try {
                 const data = await overviewService.fetchHouseholds();
 
@@ -27,8 +28,27 @@ export const useMapData = () => {
             }
         };
 
-        fetchData();
-    }, []);
+        const checkForYearChange = async () => {
+            try {
+                const graphicsData = await overviewService.getSimulationGraphicResults();
+                if (graphicsData && graphicsData.length > 0) {
+                    const latestYear = graphicsData[graphicsData.length - 1]?.year;
+                    
+                    if (latestYear && latestYear !== currentYear) {
+                        setCurrentYear(latestYear);
+                        await fetchHouseholds();
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to check for year change', err);
+            }
+        };
+
+        fetchHouseholds();
+        const interval = setInterval(checkForYearChange, 1000);
+        
+        return () => clearInterval(interval);
+    }, [currentYear]);
 
     return houses;
 };

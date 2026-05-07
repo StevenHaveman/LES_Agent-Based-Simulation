@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createRoute } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import '../styles/overviewpage.css';
@@ -35,6 +35,15 @@ function OverviewContent() {
     ]);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
     const houses = useMapData();
+
+    useEffect(() => {
+        if (selectedHouse && houses.length > 0) {
+            const updatedHouse = houses.find(h => h.id === selectedHouse.id);
+            if (updatedHouse) {
+                setSelectedHouse(updatedHouse);
+            }
+        }
+    }, [houses]);
 
     const handleHouseClick = (house) => {
         setSelectedHouse(house);
@@ -116,9 +125,18 @@ function OverviewContent() {
                 {/* <div className="parameters-container"> // TODO: CHANGE LOCATION
                     <SimulationParameters> </SimulationParameters>
                 </div> */}
-                <div className="KPI-container">
-                    <KPIWindow />
+                <div className="municipality-container">
+                    Municipality View (coming soon)
                 </div>
+                <div className="kpi-container">
+                    KPI's (coming soon)
+                </div>
+                <div className="charts-container">
+                    Chart (coming soon)
+                </div>
+                {/* <div className="KPI-container">
+                    <KPIWindow />
+                </div> */}
             </div>
         </>
     );
