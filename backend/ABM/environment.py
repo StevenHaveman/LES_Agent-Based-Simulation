@@ -382,6 +382,22 @@ class Environment(Model):
             households_data.append(hh_data)
         return households_data
 
+    def collect_kpi_data(self): # TODO This function will need to be updated to collect the relevant data for the KPIs we want to track, which may include things like total CO2 saved, average attitude changes, or other metrics based on the agents' attributes and decisions.
+        """Collects key performance indicator (KPI) data from the current state of the environment."""
+        ##% of houses ready for heat network: Energy label B or higher​
+        # Etc. Tbd​
+        # Total CO2 emitted in simulation, total CO2 reduced during simulation.​
+        # Total spending on renovation by households
+
+        kpi_data = {
+            "total_co2_emitted": self.current_co2,
+            "total_co2_reduced": self.total_co2 - self.current_co2,
+            "total_spending_on_renovation": round(sum(hh.renovation_costs_spend for hh in self.households), 2),
+            "percentage_houses_ready_for_heat_network": round(sum(1 for hh in self.households if hh.gis_attributes.get("Energielabel", "") in ["A", "B"]) / len(self.households) * 100, 3) if self.households else 0,}
+            
+        return kpi_data
+
+
     def __str__(self):
         """
         Returns a string representation of the current state of the environment.

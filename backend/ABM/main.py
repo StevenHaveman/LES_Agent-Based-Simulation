@@ -22,6 +22,7 @@ config_id, config = utilities.choose_config()
 # Global lists to store data from the simulation for potential use by an API or UI.
 graphics_data = []  # Stores yearly aggregated data for charts/graphs.
 households_data = []  # Stores detailed household information per year (updated yearly)
+kpi_data = {}  # Stores key performance indicators (KPIs) collected at the end of each year.
 
 # Global pause flag
 simulation_paused = False
@@ -78,6 +79,7 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
     """
     global graphics_data
     global households_data
+    global kpi_data
 
     if seed is None:
         seed = random.randint(0, 2 ** 32 - 1)
@@ -86,6 +88,7 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
     np.random.seed(seed)
 
     graphics_data.clear()
+    kpi_data.clear()
     households_data.clear()
 
     # model = Environment(nr_households=nr_households, nr_residents=nr_residents) We will likely need to change this when we create households based on GIS data, and residents based on survey data.
@@ -115,6 +118,13 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
 
         model.collect_end_of_year_data(data)
         graphics_data.append(data)
+        kpi_data = model.collect_kpi_data()
+
+        print("Test KPI data:")
+        print (f"KPIs collected for year {year + 1}:")
+        for kpi_name, kpi_value in kpi_data.items():
+            print(f"  {kpi_name}: {kpi_value}")
+
 
         # Export data to JSON file if configured
         if config['collect_data']:

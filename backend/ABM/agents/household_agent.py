@@ -44,6 +44,7 @@ class Household(Agent):
         self.KPI_TO_ENERGY_LABEL = {"Bad": "F","Poor": "D","Medium": "C", "OK": "B","Good": "A"}
         self.ENERGY_LABEL_TO_KPI = {"G": "Bad","F": "Bad", "E": "Poor","D": "Poor", "C": "Medium", "B": "OK", "A": "Good"}
         self.gis_attributes = gis_attributes or {}
+        self.renovation_costs_spend  = 0
         self.current_kpi_level = self.convert_energy_label_to_kpi_level()
         self.residents = []
         self.package_installations = {package.name: False for package in self.model.sustainability_packages}
@@ -118,6 +119,7 @@ class Household(Agent):
             # install new package
             self.package_installations[best_package.name] = True
             self.active_package = best_package
+            self.renovation_costs_spend += best_package.price
 
             # KPI + label update
             self.current_kpi_level = best_package.target_level
