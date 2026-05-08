@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import overviewService from '../services/OverviewService';
 
+const intervalTime = 10000; // 1000 is 1 second
+
 export const useMapData = () => {
     const [houses, setHouses] = useState([]);
-    const [currentYear, setCurrentYear] = useState(null);
 
     useEffect(() => {
         const fetchHouseholds = async () => {
             try {
                 const data = await overviewService.fetchHouseholds();
-
                 const mapped = data.map(h => ({
                     lat: h.GIS_attributes?.Latitude,
                     lng: h.GIS_attributes?.Longitude,
@@ -27,28 +27,10 @@ export const useMapData = () => {
                 console.error('Failed to load houses', err);
             }
         };
-
-        const checkForYearChange = async () => {
-            try {
-                const graphicsData = await overviewService.getSimulationGraphicResults();
-                if (graphicsData && graphicsData.length > 0) {
-                    const latestYear = graphicsData[graphicsData.length - 1]?.year;
-                    
-                    if (latestYear && latestYear !== currentYear) {
-                        setCurrentYear(latestYear);
-                        await fetchHouseholds();
-                    }
-                }
-            } catch (err) {
-                console.error('Failed to check for year change', err);
-            }
-        };
-
         fetchHouseholds();
-        const interval = setInterval(checkForYearChange, 1000);
-        
+        const interval = setInterval(fetchHouseholds, intervalTime);
         return () => clearInterval(interval);
-    }, [currentYear]);
+    }, []);
 
     return houses;
 };
