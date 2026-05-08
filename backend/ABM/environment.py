@@ -48,7 +48,6 @@ class Environment(Model):
         self.package_data = utilities.load_package_data("data/15_package_steps.xlsx")
         self.sustainability_packages = []
         for _, row in self.package_data.iterrows():
-
             package = UpgradePackage(
                 config=self.config,
                 package_step_id=row["package_step_id"],
@@ -57,7 +56,7 @@ class Environment(Model):
                 price=row["total_price_mid"],
                 yearly_savings=row["savings"],
                 break_even_in_years=row["break_even_in_years"],
-                co2_reduction=row["op_co2_B"],
+                co2_output=row["op_co2_B"],
                 kpi_score=0
             )
             self.sustainability_packages.append(package)
@@ -74,27 +73,22 @@ class Environment(Model):
         self.income_distribution = (utilities.calculate_income_distribution(self.survey_data))
         self.streets = []
         self.yearly_stats = []
-        self.total_co2 = 0
+        self.total_co2_baseline = 0
         self.current_co2 = 0
+        self.total_co2_emitted_over_time = 0
 
+        # Initialize households, residents, streets, and social norms
 
-
-        # self.create_agents(nr_households, nr_residents)
         self.create_household_agents()
-        self.create_resident_agents(nr_residents=5)
-        self.generate_streets() 
+        self.create_resident_agents(nr_residents=1)
+        self.generate_streets()
+        self.calculate_total_co2() 
         self.update_social_norms()
 
     def create_household_agents(self): # TODO: This is a new version of the create_agents function that will use GIS data to create households with more realistic attributes and distributions. This will likely involve parsing the GIS data to determine household locations, sizes, and other relevant attributes, and then creating Household agents accordingly.
         
         for i, row in self.gis_data.iterrows():
             hh = Household(i, self, gis_attributes=row.to_dict())
-
-            # init emissions #TODO make a emmision based on kpi level since we went away from solar and heatpump.
-            # initial_savings = package.calc_co2_savings(hh)
-            # hh.co2_saved_yearly += initial_savings
-            # self.current_co2 -= initial_savings
-
             # flags
             for package in self.sustainability_packages:
                 hh.skip_prev_flags[package.name] = False
@@ -119,7 +113,6 @@ class Environment(Model):
                 self.residents.append(resident)
 
                 id_counter += 1
-
 
     def generate_streets(self,):
         """
@@ -205,6 +198,10 @@ class Environment(Model):
         print("Updating social norms in environment step...")
         self.update_social_norms()
 
+        # Update current CO2 emissions after all households have made their decisions and packages have been applied. 
+        # This assumes that the households' step function updates their current CO2 emissions based on their active package and other factors.
+        self.current_co2 = self.current_co2 = sum(hh.current_co2_emissions for hh in self.households)
+        self.total_co2_emitted_over_time += self.current_co2
         for package in self.sustainability_packages:
             package.step()
 
@@ -381,6 +378,32 @@ class Environment(Model):
             }
             households_data.append(hh_data)
         return households_data
+    
+    def calculate_total_co2(self):
+        """Calculates the total baseline CO2 emissions for the district based on the initial attributes of the households. This is used as a reference point for tracking CO2 reductions over time."""
+        # This function assumes that each household has an attribute or method to estimate its initial CO2 emissions based on its energy label and other relevant factors. 
+        # The total baseline CO2 is the sum of these initial emissions across all households.
+        self.total_co2_baseline = sum(hh.original_co2_emissions for hh in self.households)
+        # Initialize current CO2 to baseline at the start of the simulation
+        self.current_co2 = self.total_co2_baseline
+
+    def collect_kpi_data(self): # TODO This function will need to be updated to collect the relevant data for the KPIs we want to track, which may include things like total CO2 saved, average attitude changes, or other metrics based on the agents' attributes and decisions.
+        """Collects key performance indicator (KPI) data from the current state of the environment."""
+        ##% of houses ready for heat network: Energy label B or higher​
+        # Etc. Tbd​
+        # Total CO2 emitted in simulation, total CO2 reduced during simulation.​
+        # Total spending on renovation by households
+
+        kpi_data = {
+            "co2_emissions_start_simulation": self.total_co2_baseline,
+            "current_co2_emissions": self.current_co2,
+            "total_co2_reduced": self.total_co2_baseline - self.current_co2,
+            "total_co2_emitted_during_simulation": self.total_co2_emitted_over_time,
+            "total_spending_on_renovation": round(sum(hh.renovation_costs_spend for hh in self.households), 2),
+            "percentage_houses_ready_for_heat_network": round(sum(1 for hh in self.households if hh.gis_attributes.get("Energielabel", "") in ["A", "B"]) / len(self.households) * 100, 3) if self.households else 0,}
+            
+        return kpi_data
+
 
     def __str__(self):
         """

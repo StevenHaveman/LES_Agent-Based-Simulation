@@ -44,6 +44,10 @@ class Household(Agent):
         self.KPI_TO_ENERGY_LABEL = {"Bad": "F","Poor": "D","Medium": "C", "OK": "B","Good": "A"}
         self.ENERGY_LABEL_TO_KPI = {"G": "Bad","F": "Bad", "E": "Poor","D": "Poor", "C": "Medium", "B": "OK", "A": "Good"}
         self.gis_attributes = gis_attributes or {}
+        self.original_co2_emissions = self.get_initial_co2_emissions()
+        self.current_co2_emissions = self.original_co2_emissions # This will be updated as packages are installed and CO2 savings are realized.
+        self.co2_saved_yearly = 0
+        self.renovation_costs_spend  = 0
         self.current_kpi_level = self.convert_energy_label_to_kpi_level()
         self.residents = []
         self.package_installations = {package.name: False for package in self.model.sustainability_packages}
@@ -52,13 +56,6 @@ class Household(Agent):
         # Flags for "Direct" subjective norm, per package
         self.skip_prev_flags = {} # {package_name: False/True}
         self.skip_next_flags = {} # {package_name: False/True}
-
-        self.solarpanel_amount = random.choice(self.config['solar_panel_amount_options'])
-        self.energy_generation = random.randint(*self.config['energy_generation_range'])
-        self.gas_usage = random.randint(*self.config['yearly_gas_usage'])
-        self.energy_usage = random.randint(*self.config['yearly_energy_usage'])
-        self.heatpump_usage = random.randint(*self.config['yearly_heatpump_usage'])
-        self.co2_saved_yearly = 0
 
     def convert_energy_label_to_kpi_level(self):
         label = self.gis_attributes.get("Energielabel")
@@ -112,25 +109,39 @@ class Household(Agent):
             
             # turn off the currently active package if there is one.
             if self.active_package is not None:
-                print(f"Household {self.unique_id} is switching from current kpi level {self.current_kpi_level} package {self.active_package.name} to target level {best_package.target_level} package {best_package.name} with support score {best_score:.2f}")
+                # print(f"Household {self.unique_id} is switching from current kpi level {self.current_kpi_level} package {self.active_package.name} to target level {best_package.target_level} package {best_package.name} with support score {best_score:.2f}")
                 self.package_installations[self.active_package.name] = False
 
             # install new package
             self.package_installations[best_package.name] = True
             self.active_package = best_package
+            self.renovation_costs_spend += best_package.price
 
             # KPI + label update
             self.current_kpi_level = best_package.target_level
             self.gis_attributes["Energielabel"] = (self.convert_kpi_level_to_energy_label(self.current_kpi_level))
 
-            # CO2
-            self.model.current_co2 -= (best_package.calc_co2_savings(self))
+            self.current_co2_emissions = best_package.co2_output # Update current CO2 emissions to the new level after installing the package.
+
+    def get_initial_co2_emissions(self):
+        """Estimates the initial annual CO2 emissions of the household based on its energy label and other GIS attributes.
+        This is a simplified estimation and can be refined with more detailed data and calculations."""
+        current_kpi = self.convert_energy_label_to_kpi_level()
+
+        matching_packages = [
+            package for package in self.model.sustainability_packages
+            if package.baseline_level == current_kpi
+        ]
+
+        if not matching_packages:
+            return 0
+
+        # Takes the maximum CO2 emissions among the matching packages as a proxy for the household's initial emissions, since the packages are designed to improve upon that baseline.
+        return max(package.co2_output for package in matching_packages)
 
     def calc_co2_emissions(self,):
-        co2_electricity = self.energy_usage * self.config['CO2_electricity']
-        co2_gas = self.gas_usage * self.config['CO2_gas']
 
-        return co2_electricity + co2_gas
+        pass
 
     def step(self):
         """

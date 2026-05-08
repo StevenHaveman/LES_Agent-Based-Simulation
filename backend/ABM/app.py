@@ -10,7 +10,7 @@ This application provides endpoints to:
 from __future__ import annotations
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from main import run_simulation, graphics_data, households_data
+from main import run_simulation, graphics_data, households_data, kpi_data
 import utilities
 import threading
 import traceback
@@ -123,6 +123,21 @@ def fetch_households():
     if not households_data:
         return jsonify({"error": "No household data available"}), 400
     return jsonify(households_data)
+
+@app.route('/kpi_data', methods=['GET'])
+def fetch_kpi_data():
+    """
+    Retrieve KPI data from the most recently run simulation.
+
+    This includes information about the simulation's performance metrics.
+
+    Returns:
+        JSON response with the KPI data.
+        Returns a 400 error if no KPI data is available.
+    """
+    if not kpi_data:
+        return jsonify({"error": "No KPI data available"}), 400
+    return jsonify(kpi_data)
 
 
 @app.route('/AI_response', methods=['POST'])
