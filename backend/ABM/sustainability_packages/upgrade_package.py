@@ -11,7 +11,7 @@ class UpgradePackage:
     Poor -> Good
     """
 
-    def __init__(self,config,package_step_id,baseline_level,target_level,price,yearly_savings,break_even_in_years,co2_reduction,kpi_score):
+    def __init__(self,config,package_step_id,baseline_level,target_level,price,yearly_savings,break_even_in_years,co2_output,kpi_score):
         self.config = config
         self.package_step_id = package_step_id
         # Upgrade path
@@ -24,7 +24,7 @@ class UpgradePackage:
         self.yearly_savings = yearly_savings
         self.break_even_in_years = break_even_in_years
         # Sustainability properties
-        self.co2_reduction = co2_reduction
+        self.co2_output = co2_output
         self.kpi_score = kpi_score
 
         # Package-specific subjective norm modifier, defaults to 1.0 if not in config. This allows for certain packages to have a stronger or weaker influence from social norms, which can be calibrated based on real-world data or expert judgment.
@@ -75,7 +75,7 @@ class UpgradePackage:
         """
 
         # to be implemented based on the specific upgrade package.
-        return self.co2_reduction
+        return self.co2_output
     
     def __str__(self):
         """String representation of the UpgradePackage for easy debugging and visualization."""
@@ -85,7 +85,7 @@ class UpgradePackage:
             f"name={self.name}, "
             f"cost={self.price}, "
             f"break_even={self.break_even_in_years}, "
-            f"co2_reduction={self.co2_reduction}, "
+            f"co2_output={self.co2_output}, "
             f"kpi_score={self.kpi_score}"
             f")"
         )

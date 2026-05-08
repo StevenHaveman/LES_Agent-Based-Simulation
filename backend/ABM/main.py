@@ -109,8 +109,8 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
         model.step()
 
         print(f"\nEnd of Year {year + 1}:")
-        for package_name, count in model.decided_residents_this_step_per_package.items():
-            print(f"  Decisions this year for {package_name}: {count}")
+        # for package_name, count in model.decided_residents_this_step_per_package.items():
+        #     print(f"  Decisions this year for {package_name}: {count}")
 
         print("  Current Environment State (end):")
         # print(model)

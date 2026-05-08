@@ -52,6 +52,7 @@ def load_gis_data(gis_data_path: str):
     Args:
         gis_data_path (str): The file path to the GIS data.
     Returns:
+        pd.DataFrame: A DataFrame containing the GIS data with relevant columns.
     """
 
     df = pd.DataFrame(pd.read_excel(gis_data_path))
@@ -65,7 +66,6 @@ def load_gis_data(gis_data_path: str):
     # Clean the data by dropping rows with missing critical GIS attributes (e.g., 'bouwjaar', 'woning type', 'WoonplaatsNaam').
     df_clean = df.dropna(subset=['Bouwjaar', 'Woning type', 'WoonplaatsNaam', 'Energielabel'])
 
-    # TODO Remove the tail 100 for testing purposes, in the final version this should be removed to include all data.
     return df_clean[["OBJECTID","Oppervlakte","Huisnummer","Postcode","OpenbareRuimteNaam","WoonplaatsNaam","Energielabel","Bouwjaar","Latitude","Longitude", "Woning type"]]
 
 def load_package_data(package_data_path: str):
