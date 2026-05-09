@@ -115,12 +115,12 @@ const KPIWindow = () => {
             <h3>Average Income: {Math.round(avg_income)}€</h3>
             <h3>Subjective Norm ({sim_config.subj_norm_level}): {sim_config.subjective_norm}</h3> */}
 
-            <div>CO2 at Start: {kpi.co2_emissions_start_simulation ?? 0}</div>
-            <div>Current CO2: {kpi.current_co2_emissions ?? 0}</div>
-            <div>Total CO2 Reduced: {kpi.total_co2_reduced ?? 0}</div>
-            <div>Total CO2 Emitted: {kpi.total_co2_emitted_during_simulation ?? 0}</div>
-            <div>Total Renovation Spending: {kpi.total_spending_on_renovation ?? 0}€</div>
-            <div>% Houses Ready for Heat Network: {kpi.percentage_houses_ready_for_heat_network ?? 0}%</div>
+            <div>CO2 at Start: {kpi.co2_emissions_start_simulation?.toFixed(1) ?? 0}</div>
+            <div>Current CO2: {kpi.current_co2_emissions?.toFixed(1) ?? 0}</div>
+            <div>Total CO2 Reduced: {kpi.total_co2_reduced?.toFixed(1) ?? 0}</div>
+            <div>Total CO2 Emitted: {kpi.total_co2_emitted_during_simulation?.toFixed(1) ?? 0}</div>
+            <div>Total Renovation Spending: {kpi.total_spending_on_renovation?.toFixed(0) ?? 0}€</div>
+            <div>% Houses Ready for Heat Network: {kpi.percentage_houses_ready_for_heat_network?.toFixed(1) ?? 0}%</div>
         </>
     );
 };

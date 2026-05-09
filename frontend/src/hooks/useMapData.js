@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import overviewService from '../services/OverviewService';
 
-const intervalTime = 10000; // 1000 is 1 second
+const intervalTime = 3000; // 1000 is 1 second
 
 export const useMapData = () => {
     const [houses, setHouses] = useState([]);

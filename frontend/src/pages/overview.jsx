@@ -133,7 +133,7 @@ function OverviewContent() {
                     <KPIWindow />
                 </div>
                 <div className="charts-container">
-                    Chart (coming soon)
+                    <GraphicsView />
                 </div>
                 {/* <div className="KPI-container">
                     <KPIWindow />
