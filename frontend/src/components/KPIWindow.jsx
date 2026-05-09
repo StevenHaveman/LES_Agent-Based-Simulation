@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { use } from 'react';
 import '../styles/KPIWindow.css';
 import { useOverview } from '../hooks/useOverview.js';
 import { useSimulationRun } from '../hooks/useSimulationRun.js';
@@ -54,8 +54,11 @@ const KPIWindow = () => {
      *   yearly_heatpump_usage: number[]
      * }}, Function]
      */
+
     const [sim_config, set_sim_config] = React.useState([]);
+    const [kpi_data, set_kpi_data] = React.useState(null);
     const [loading, set_loading] = React.useState(true);
+
 
     React.useEffect(function () {
         let interval_id;
@@ -64,10 +67,10 @@ const KPIWindow = () => {
             try {
                 set_house_hold_data(await useOverview().fetchHouseholds(undefined));
                 set_sim_config(await useOverview().fetchSimulationConfig());
+                set_kpi_data(await useOverview().fetchKPIData());
             } catch (error) {
-                console.error('error fetching household data:', error);
+                console.error('error fetching household or KPI data:', error);
             }
-
             set_loading(false);
         }
 
@@ -86,13 +89,14 @@ const KPIWindow = () => {
         start_fetch_loop();
 
         return function () {
-            if (interval_id)
-            {clearInterval(interval_id);}
+            if (interval_id) clearInterval(interval_id);
         };
     }, []);
 
-    if (loading)
-    {return <div><h3>Loading...</h3></div>;}
+
+    if (loading) {
+        return <div><h3>Loading...</h3></div>;
+    }
 
     const counted_solar_data_hh = countHouseholdsWithPackage(house_hold_data, 'Solar Panel_installed');
     const counted_heat_pump_data_hh = countHouseholdsWithPackage(house_hold_data, 'Heat Pump_installed');
@@ -101,13 +105,22 @@ const KPIWindow = () => {
 
     const percentFactor = 100;
 
+
+    const kpi = kpi_data || {};
     return (
         <>
-            <h3>Solar Panels: {Math.round((counted_solar_data_hh / house_hold_data.length) * percentFactor)}%</h3>
+            {/* <h3>Solar Panels: {Math.round((counted_solar_data_hh / house_hold_data.length) * percentFactor)}%</h3>
             <h3>Heat Pumps: {Math.round((counted_heat_pump_data_hh / house_hold_data.length) * percentFactor)}%</h3>
             <h3>Fully Converted: {Math.round((counted_full_data_hh / house_hold_data.length) * percentFactor)}%</h3>
             <h3>Average Income: {Math.round(avg_income)}€</h3>
-            <h3>Subjective Norm ({sim_config.subj_norm_level}): {sim_config.subjective_norm}</h3>
+            <h3>Subjective Norm ({sim_config.subj_norm_level}): {sim_config.subjective_norm}</h3> */}
+
+            <div>CO2 at Start: {kpi.co2_emissions_start_simulation ?? 0}</div>
+            <div>Current CO2: {kpi.current_co2_emissions ?? 0}</div>
+            <div>Total CO2 Reduced: {kpi.total_co2_reduced ?? 0}</div>
+            <div>Total CO2 Emitted: {kpi.total_co2_emitted_during_simulation ?? 0}</div>
+            <div>Total Renovation Spending: {kpi.total_spending_on_renovation ?? 0}€</div>
+            <div>% Houses Ready for Heat Network: {kpi.percentage_houses_ready_for_heat_network ?? 0}%</div>
         </>
     );
 };

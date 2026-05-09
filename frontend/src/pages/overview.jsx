@@ -130,7 +130,7 @@ function OverviewContent() {
                     Municipality View (coming soon)
                 </div>
                 <div className="kpi-container">
-                    KPI's (coming soon)
+                    <KPIWindow />
                 </div>
                 <div className="charts-container">
                     Chart (coming soon)

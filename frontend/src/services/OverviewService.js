@@ -31,6 +31,14 @@ const API_URL = 'http://127.0.0.1:5000';
 
 class OverviewService {
 
+    async fetchKPIData() {
+        const response = await fetch(`${API_URL}/kpi_data`);
+        if (!response.ok) {
+            throw new Error('Fetching KPI data failed');
+        }
+        return await response.json();
+    }
+
     async fetchHouseholds() {
         const response = await fetch(`${API_URL}/households`);
         if (!response.ok) {

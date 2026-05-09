@@ -2,6 +2,10 @@ import OverviewService from '../services/OverviewService';
 
 export function useOverview() {
 
+    const fetchKPIData = async () => {
+        return await OverviewService.fetchKPIData();
+    };
+
     const getSimulationGraphicResults = async () => {
         try {
             const result = await OverviewService.getSimulationGraphicResults();
@@ -23,6 +27,7 @@ export function useOverview() {
     return {
         getSimulationGraphicResults,
         fetchHouseholds,
-        fetchSimulationConfig
+        fetchSimulationConfig,
+        fetchKPIData
     };
 }
