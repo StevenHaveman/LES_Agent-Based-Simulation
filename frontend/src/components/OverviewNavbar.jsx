@@ -11,7 +11,7 @@ import '../styles/OverviewNavbar.css';
  * @param {string} props.title - The title to display in the navigation bar.
  * @returns {JSX.Element} The rendered OverviewNavbar component.
  */
-const OverviewNavbar = ({ title }) => {
+const OverviewNavbar = ({ title, year }) => {
     const seconds = 3;
     // State to track whether the simulation is paused.
     const [paused, setPaused] = useState(false);
@@ -72,6 +72,7 @@ const OverviewNavbar = ({ title }) => {
                     <img className="overview-logo" src="LES_logo2.png" alt="Logo rechts" />
                 </div>
                 <div className="control-bar">
+                    <span className='simulation-year'>Simulation year: {year}</span>
                     <button className="pause-button" onClick={togglePause}>
                         {paused ? 'Hervat Simulatie' : 'Pauzeer Simulatie'}
                     </button>
@@ -88,8 +89,10 @@ const OverviewNavbar = ({ title }) => {
     );
 };
 
+
 OverviewNavbar.propTypes = {
     title: PropTypes.string.isRequired,
+    year: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default OverviewNavbar;

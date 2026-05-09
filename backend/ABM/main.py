@@ -118,7 +118,8 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
 
         model.collect_end_of_year_data(data)
         graphics_data.append(data)
-        kpi_data = model.collect_kpi_data()
+        kpi_data.clear()
+        kpi_data.update(model.collect_kpi_data())
 
         print("Test KPI data:")
         print (f"KPIs collected for year {year + 1}:")

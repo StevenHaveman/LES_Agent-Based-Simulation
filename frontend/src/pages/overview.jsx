@@ -20,6 +20,7 @@ import ResidentInfo from '../components/ResidentInfo.jsx';
 import KPIWindow from '../components/KPIWindow.jsx';
 import SimulationParameters from '../components/SimulationParameters.jsx';
 import { useMapData } from '../hooks/useMapData.js';
+import { useSimulationYear } from '../hooks/useSimulationYear.js';
 
 function OverviewContent() {
     const state = useOverviewState();
@@ -35,6 +36,7 @@ function OverviewContent() {
     ]);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
     const houses = useMapData();
+    const year = useSimulationYear();
 
     useEffect(() => {
         if (selectedHouse && houses.length > 0) {
@@ -77,11 +79,10 @@ function OverviewContent() {
 
     const selectedResidents = selectedHouse ? selectedHouse.residents : [];
     const selectedResident = selectedResidents[selectedResidentIndex] || null;
-    console.log('Selected Resident:', selectedResident);
 
     return (
         <>
-            <OverviewNavbar title="Overview"> </OverviewNavbar>
+            <OverviewNavbar title="Overview" year={year} />
             <div className={`overview-container${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
                 <div className={`sidebar-container${sidebarCollapsed ? ' collapsed' : ''}`}>
                     <SidebarToggle collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(v => !v)} />
@@ -129,10 +130,10 @@ function OverviewContent() {
                     Municipality View (coming soon)
                 </div>
                 <div className="kpi-container">
-                    KPI's (coming soon)
+                    <KPIWindow />
                 </div>
                 <div className="charts-container">
-                    Chart (coming soon)
+                    <GraphicsView />
                 </div>
                 {/* <div className="KPI-container">
                     <KPIWindow />
