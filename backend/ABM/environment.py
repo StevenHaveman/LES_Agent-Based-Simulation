@@ -1,6 +1,7 @@
 import random
 from mesa import Model
 import numpy as np
+from collections import defaultdict
 from agents.household_agent import Household
 from agents.resident_agent import Resident
 import utilities
@@ -71,7 +72,7 @@ class Environment(Model):
         self.residents = []  # gewone Python-lijst voor filteren/gemak
         self.survey_data = utilities.load_survey_data("data/survey_data.xlsx")
         self.income_distribution = (utilities.calculate_income_distribution(self.survey_data))
-        self.streets = []
+        self.street_groups = {} # Build street groups based on GIS data, this will be used for calculating street-level norms and for the heatmap visualization.
         self.yearly_stats = []
         self.total_co2_baseline = 0
         self.current_co2 = 0
@@ -81,7 +82,8 @@ class Environment(Model):
 
         self.create_household_agents()
         self.create_resident_agents(nr_residents=1)
-        self.generate_streets()
+        # self.generate_streets()
+        self.build_street_groups()
         self.calculate_total_co2() 
         self.update_social_norms()
 
@@ -150,34 +152,60 @@ class Environment(Model):
     def update_social_norms(self):
         """
         Updates injunctive, descriptive, and perceived norms
-        for all residents in the system.
+        per street (GIS-based social context).
         """
-        n_households = max(len(self.households), 1)
-        n_residents = max(len(self.residents), 1)
+
+        # Optional: store street-level norms for debugging / analysis
+        if not hasattr(self, "street_norms"):
+            self.street_norms = {}
 
         for package in self.sustainability_packages:
 
-            # DESCRIPTIVE NORM (behavior) 
-            installed_ratio = sum(
-                hh.package_installations.get(package.name, False)
-                for hh in self.households
-            ) / n_households
+            for street_name, households in self.street_groups.items():
 
-            # INJUNCTIVE NORM (social approval proxy) # TODO This is currently a very simplified proxy for social approval, based on average attitude. This could be made more complex by considering package-specific attitudes, or by incorporating other social factors.
-            avg_attitude = sum(
-                r.attitude for r in self.residents
-            ) / n_residents # TODO Attitude is currently randomly assigned, will need to update when we have survey data to determine resident attitudes.
+                # Skip empty streets
+                if not households:
+                    continue
 
-            # ASSIGN ONCE
-            for res in self.residents:
-                res.descriptive_norm[package.name] = installed_ratio # TODO This is currently based on household installations, but could be updated to be based on resident decisions instead if that is more appropriate for the model.
-                res.injunctive_norm[package.name] = avg_attitude # TODO this is currently based on average attitude, maybe package specific attitudes with install popularity could be used.
-                
-                # PERCEIVED NORM # This is currently a simple average of descriptive and injunctive norms, but could be made more complex by weighting them differently or by incorporating other factors.
-                res.perceived_norm[package.name] = (
-                    0.5 * res.injunctive_norm[package.name]
-                    + 0.5 * res.descriptive_norm[package.name]
-                )          
+                # DESCRIPTIVE NORM
+                # actual adoption behavior in this street)
+                adoption_rate = sum(
+                    hh.package_installations.get(package.name, False)
+                    for hh in households
+                ) / len(households)
+
+                # 2. INJUNCTIVE NORM
+                # We can weight the influence of average attitude and adoption rate differently based on the package's norm influence strength, 
+                # which allows for calibration based on real-world data or expert judgment.
+                all_residents = [r for hh in households for r in hh.residents]
+
+                avg_attitude = np.mean([r.attitude for r in all_residents])
+                injunctive_norm = (0.7 * avg_attitude + 0.3 * adoption_rate)
+
+                # PERCEIVED NORM
+                perceived_norm = (
+                    0.5 * injunctive_norm +
+                    0.5 * adoption_rate
+                )
+
+                # STORE STREET-LEVEL RESULTS
+                if street_name not in self.street_norms:
+                    self.street_norms[street_name] = {}
+
+                self.street_norms[street_name][package.name] = {
+                    "adoption_rate": adoption_rate,
+                    "injunctive_norm": injunctive_norm,
+                    "perceived_norm": perceived_norm,
+                    "avg_attitude": avg_attitude
+                }
+
+                # 5. ASSIGN TO RESIDENTS
+                # (each resident in street gets same social context)
+                for hh in households:
+                    for res in hh.residents:
+                        res.descriptive_norm[package.name] = adoption_rate
+                        res.injunctive_norm[package.name] = injunctive_norm
+                        res.perceived_norm[package.name] = perceived_norm     
 
     def step(self):
         """
@@ -192,11 +220,11 @@ class Environment(Model):
         for pkg_name in self.decided_residents_this_step_per_package:
             self.decided_residents_this_step_per_package[pkg_name] = 0
 
-        for hh in self.households:
-             hh.step()
 
         print("Updating social norms in environment step...")
         self.update_social_norms()
+        for hh in self.households:
+             hh.step()
 
         # Update current CO2 emissions after all households have made their decisions and packages have been applied. 
         # This assumes that the households' step function updates their current CO2 emissions based on their active package and other factors.
@@ -287,8 +315,7 @@ class Environment(Model):
         data = {
             "year": year,
             "package_data": self.collect_package_adoption_data(),
-            # "tpb_data": self.collect_cluster_tpb_data(),
-            "tpb_data": {}, # TODO This function is not yet implemented, but will collect data on the TPB components for different clusters of residents, which can be used for analyzing behavior patterns and for informing the conversational agent's interactions with residents.
+            "tpb_data": self.collect_street_heatmap_data(), # TODO This function is not yet implemented, but will collect data on the TPB components for different clusters of residents, which can be used for analyzing behavior patterns and for informing the conversational agent's interactions with residents.
             "co2_data": self.collect_co2_data(),
             "decisions_this_year_total":sum(self.decided_residents_this_step_per_package.values()),
             "decisions_this_year_per_package": dict(self.decided_residents_this_step_per_package)
@@ -298,51 +325,70 @@ class Environment(Model):
 
         return data
 
-    def collect_cluster_tpb_data(self): # TODO: Chanhe to street names?
+    def collect_street_heatmap_data(self):
 
-        cluster_data = {}
+        street_data = {}
 
-        for resident in self.residents:
+        for household in self.households:
+            street_name = household.gis_attributes.get("OpenbareRuimteNaam", "Unknown")
 
-            cluster = resident.cluster_type
+            if street_name not in street_data:
+                street_data[street_name] = {}
 
-            if cluster not in cluster_data:
-                cluster_data[cluster] = {
-                    "attitude": [],
-                    "perceived_norm": [],
-                    "pbc": []
+                for package in self.sustainability_packages:
+                    street_data[street_name][package.name] = {
+                        "attitude": [],
+                        "perceived_norm": [],
+                        "pbc": [],
+                        "adoption": 0
+                    }
+
+            for resident in household.residents:
+                for package in self.sustainability_packages:
+
+                    package_name = package.name
+
+                    street_data[street_name][package_name]["attitude"].append(
+                        resident.attitude
+                    )
+
+                    street_data[street_name][package_name]["perceived_norm"].append(
+                        resident.perceived_norm[package_name]
+                    )
+
+                    street_data[street_name][package_name]["pbc"].append(
+                        resident.behavioral_control[package_name]
+                    )
+
+                    if resident.package_decisions.get(package_name, False):
+                        street_data[street_name][package_name]["adoption"] += 1
+
+
+        # --- RESULT ---
+        result = {}
+
+        for street, packages in street_data.items():
+            result[street] = {}
+
+            for package_name, values in packages.items():
+
+                result[street][package_name] = {
+                    "average_attitude":
+                        np.mean(values["attitude"]) if values["attitude"] else 0,
+
+                    "average_perceived_norm":
+                        np.mean(values["perceived_norm"]) if values["perceived_norm"] else 0,
+
+                    "average_pbc":
+                        np.mean(values["pbc"]) if values["pbc"] else 0,
+
+                    "adoption_count":
+                        values["adoption"]
                 }
 
-            cluster_data[cluster]["attitude"].append(
-                resident.attitude
-            )
+        print(f"Collected street heatmap data for year: {result}")
 
-            cluster_data[cluster]["perceived_norm"].append(
-                np.mean(
-                    list(resident.perceived_norm.values())
-                )
-            )
-
-            cluster_data[cluster]["pbc"].append(
-                np.mean(
-                    list(resident.behavioral_control.values())
-                )
-            )
-
-        return {
-            cluster: {
-                "average_attitude":
-                    np.mean(values["attitude"]),
-
-                "average_perceived_norm":
-                    np.mean(values["perceived_norm"]),
-
-                "average_pbc":
-                    np.mean(values["pbc"])
-            }
-
-            for cluster, values in cluster_data.items()
-        }
+        return result
 
     def collect_housing_stock_data(self):
         """
@@ -510,6 +556,14 @@ class Environment(Model):
             
         return kpi_data
 
+    def build_street_groups(self):
+        streets = defaultdict(list)
+
+        for hh in self.households:
+            street_name = hh.gis_attributes.get("OpenbareRuimteNaam", "Unknown")
+            streets[street_name].append(hh)
+
+        self.street_groups = streets
 
     def __str__(self):
         """
