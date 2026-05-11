@@ -283,33 +283,139 @@ class Environment(Model):
         Returns:
             dict: A dictionary containing the collected data for the start of the year.
         """
-        data_per_package = {}
-        for package in self.sustainability_packages:
-            residents_positive_decision = sum(
-                1 for hh in self.households for res in hh.residents if res.package_decisions.get(package.name, False)
-            )
-            households_with_package = sum(
-                1 for hh in self.households if hh.package_installations.get(package.name, False)
-            )
-            data_per_package[package.name] = {
-                "residents_positive_decision": residents_positive_decision,
-                "households_with_package": households_with_package,
-                "price": package.price
-            }
-        
-        total_decisions_this_year = sum(self.decided_residents_this_step_per_package.values())
-        total_yearly_co2_saved = sum(hh.co2_saved_yearly for hh in self.households)
 
         data = {
             "year": year,
-            "decisions_this_year_total": total_decisions_this_year, # This is actually decisions from end of previous year / during this step
-            "decisions_this_year_per_package": dict(self.decided_residents_this_step_per_package),
-            "start_state_per_package": data_per_package,
-            "total_co2_saved_yearly": total_yearly_co2_saved,
-        }
+            "package_data": self.collect_package_adoption_data(),
+            "tpb_data": self.collect_cluster_tpb_data(),
+            "housing_stock": self.collect_housing_stock_data(),
+            "co2_data": self.collect_co2_data(),
+            "decisions_this_year_total":sum(self.decided_residents_this_step_per_package.values()),
+            "decisions_this_year_per_package": dict(self.decided_residents_this_step_per_package)
+                }
 
         self.yearly_stats.append(data)
+
         return data
+
+    def collect_cluster_tpb_data(self): # TODO: Chanhe to street names?
+
+        cluster_data = {}
+
+        for resident in self.residents:
+
+            cluster = resident.cluster_type
+
+            if cluster not in cluster_data:
+                cluster_data[cluster] = {
+                    "attitude": [],
+                    "perceived_norm": [],
+                    "pbc": []
+                }
+
+            cluster_data[cluster]["attitude"].append(
+                resident.attitude
+            )
+
+            cluster_data[cluster]["perceived_norm"].append(
+                np.mean(
+                    list(resident.perceived_norm.values())
+                )
+            )
+
+            cluster_data[cluster]["pbc"].append(
+                np.mean(
+                    list(resident.behavioral_control.values())
+                )
+            )
+
+        return {
+            cluster: {
+                "average_attitude":
+                    np.mean(values["attitude"]),
+
+                "average_perceived_norm":
+                    np.mean(values["perceived_norm"]),
+
+                "average_pbc":
+                    np.mean(values["pbc"])
+            }
+
+            for cluster, values in cluster_data.items()
+        }
+
+    def collect_housing_stock_data(self):
+        """
+        Collects data on the housing stock, specifically the distribution of energy labels among the households. 
+        This can be used to understand the baseline characteristics of the housing stock in the simulation and how it may influence residents' decisions regarding sustainability packages.
+        """
+
+        labels = {
+            "A": 0,
+            "B": 0,
+            "C": 0,
+            "D": 0,
+            "E": 0,
+            "F": 0,
+            "G": 0
+        }
+
+        for hh in self.households:
+            label = hh.gis_attributes.get("Energielabel")
+            if label in labels:
+                labels[label] += 1
+        return labels
+    
+    def collect_co2_data(self):
+        """
+        Collects data related to CO2 emissions and reductions in the environment, 
+        based on the current state of the households and their sustainability package installations. 
+        This data can be used for tracking the environmental impact of the agents' decisions over time.
+        """
+        co2_data = {
+            "baseline_emissions": self.total_co2,
+            "yearly_emissions": self.current_co2,
+            "cumulative_emissions": self.total_co2_emitted_over_time,
+            "co2_reduction": self.total_co2 - self.current_co2,
+            "monthly_average": self.current_co2 / 12 # we use years now so we may need to delete this.
+        }
+
+        return co2_data
+
+    def collect_package_adoption_data(self):
+        """"        
+        Collects data on the adoption of sustainability packages across the households
+        """
+        package_data = {}
+
+        for package in self.sustainability_packages:
+            # Count the number of residents who have decided for this package.
+            residents_positive_decision = sum(
+                1
+                for hh in self.households
+                for res in hh.residents
+                if res.package_decisions.get(
+                    package.name,
+                    False
+                )
+            )
+            # Count the number of households that have installed this package.
+            households_with_package = sum(
+                1
+                for hh in self.households
+                if hh.package_installations.get(
+                    package.name,
+                    False
+                )
+            )
+            # Store the data for this package, including the current price.
+            package_data[package.name] = {
+                "residents_positive_decision": residents_positive_decision,
+                "households_with_package":households_with_package,
+                "price":package.price
+            }
+
+        return package_data
 
     def collect_end_of_year_data(self, data_from_start_of_year): # TODO Will need to update when new attributes are added top the agents and households.
         """
