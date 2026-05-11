@@ -164,6 +164,7 @@ class Resident(Agent):
 
         # Only calculate intentions and behavior if not all packages have been decided on
         if not all(self.package_decisions.get(p.name, False) for p in self.environment.sustainability_packages):
+            self.calc_behavioral_control()
             self.calc_intention()
             self.calc_behavior()
 
@@ -172,4 +173,3 @@ class Resident(Agent):
 
         # If all decisions are made, recalculate subjective norm and behavioral control
         # self.calc_perceived_norm() # is done in update_social_norms in environment, which is called at the beginning of each step, so should be updated for all agents before they make their decisions
-        self.calc_behavioral_control()

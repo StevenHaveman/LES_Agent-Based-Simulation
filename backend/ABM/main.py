@@ -9,6 +9,7 @@ information at the end of each simulation year.
 import random
 import numpy as np
 import time
+import json
 from environment import Environment
 import utilities
 from shared_state import get_delay
@@ -138,7 +139,10 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
         print(f"Household data collected for year {year + 1}: {len(households_data)} households")
 
         # print(households_data[:2])  # Print the first 2 households for a quick check, can be removed later.
+        graphics_data.append(data)
 
+        # print("\n=== GRAPHICS DATA ===")
+        # print(json.dumps(graphics_data[-1], indent=4))
         # Wait before next simulation year
         time.sleep(get_delay())
 
