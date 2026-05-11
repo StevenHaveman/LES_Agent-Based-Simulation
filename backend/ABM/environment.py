@@ -287,8 +287,8 @@ class Environment(Model):
         data = {
             "year": year,
             "package_data": self.collect_package_adoption_data(),
-            "tpb_data": self.collect_cluster_tpb_data(),
-            "housing_stock": self.collect_housing_stock_data(),
+            # "tpb_data": self.collect_cluster_tpb_data(),
+            "tpb_data": {}, # TODO This function is not yet implemented, but will collect data on the TPB components for different clusters of residents, which can be used for analyzing behavior patterns and for informing the conversational agent's interactions with residents.
             "co2_data": self.collect_co2_data(),
             "decisions_this_year_total":sum(self.decided_residents_this_step_per_package.values()),
             "decisions_this_year_per_package": dict(self.decided_residents_this_step_per_package)
@@ -373,10 +373,10 @@ class Environment(Model):
         This data can be used for tracking the environmental impact of the agents' decisions over time.
         """
         co2_data = {
-            "baseline_emissions": self.total_co2,
+            "baseline_emissions": self.total_co2_baseline,
             "yearly_emissions": self.current_co2,
             "cumulative_emissions": self.total_co2_emitted_over_time,
-            "co2_reduction": self.total_co2 - self.current_co2,
+            "co2_reduction": self.total_co2_baseline - self.current_co2,
             "monthly_average": self.current_co2 / 12 # we use years now so we may need to delete this.
         }
 
