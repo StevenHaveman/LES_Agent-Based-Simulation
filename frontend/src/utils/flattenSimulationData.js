@@ -1,7 +1,7 @@
 export function flattenSimulationData(simulationData, yKey) {
     return simulationData.flatMap(d => {
         const entries = [];
-        const { year, end_state_per_package } = d;
+        const { year, package_data, housing_stock } = d;
 
         const extract = (key, stateObj, stateLabel) => {
             let value = null;
@@ -18,14 +18,20 @@ export function flattenSimulationData(simulationData, yKey) {
                 case 'solar_panel_positive_decisions':
                     value = stateObj?.['Solar Panel']?.residents_positive_decision;
                     break;
+                case 'energy_label_A':
+                    value = housing_stock?.['A'];
+                    break;
             }
-            
             if (value !== undefined && value !== null) {
                 entries.push({ year, state: stateLabel, value });
             }
         };
 
-        extract(yKey, end_state_per_package, 'End');
+        if (yKey === 'energy_label_A') {
+            extract(yKey, housing_stock, 'End');
+        } else {
+            extract(yKey, package_data, 'End');
+        }
         return entries;
     });
 }

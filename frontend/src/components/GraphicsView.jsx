@@ -11,32 +11,14 @@ import Graphic from './Graphic.jsx';
 const GraphicsView = () => {
     return (
         <div className="graphics-view-container">
-            {/* Wrapper for the graphic displaying solar panel price */}
             <div className="graphic-wrapper">
                 <Graphic
-                    title="Solar Panel Price" // Title of the graphic
-                    yAxisKey="solar_panel_price" // Key for the Y-axis data
+                    title="Households energy labels over time"
+                    yAxisKey="energy_label_A"
                 />
-            </div>
-            {/* Wrapper for the graphic displaying heat pump price */}
-            <div className="graphic-wrapper">
                 <Graphic
-                    title="Heat Pump Price" // Title of the graphic
-                    yAxisKey="heat_pump_price" // Key for the Y-axis data
-                />
-            </div>
-            {/* Wrapper for the graphic displaying households with sustainability packages */}
-            <div className="graphic-wrapper">
-                <Graphic
-                    title="Households with Solarpanel package" // Title of the graphic
-                    yAxisKey="solar_panel_households" // Key for the Y-axis data
-                />
-            </div>
-            {/* Wrapper for the graphic displaying positive decisions for solar panels */}
-            <div className="graphic-wrapper">
-                <Graphic
-                    title="Positive Decisions" // Title of the graphic
-                    yAxisKey="solar_panel_positive_decisions" // Key for the Y-axis data
+                    title="CO2 Emissions"
+                    yAxisKey="co2"
                 />
             </div>
         </div>

@@ -317,9 +317,10 @@ class Environment(Model):
             "package_data": self.collect_package_adoption_data(),
             "tpb_data": self.collect_street_heatmap_data(), # TODO This function is not yet implemented, but will collect data on the TPB components for different clusters of residents, which can be used for analyzing behavior patterns and for informing the conversational agent's interactions with residents.
             "co2_data": self.collect_co2_data(),
-            "decisions_this_year_total":sum(self.decided_residents_this_step_per_package.values()),
-            "decisions_this_year_per_package": dict(self.decided_residents_this_step_per_package)
-                }
+            "decisions_this_year_total": sum(self.decided_residents_this_step_per_package.values()),
+            "decisions_this_year_per_package": dict(self.decided_residents_this_step_per_package),
+            "housing_stock": self.collect_housing_stock_data(),
+        }
 
         self.yearly_stats.append(data)
 
