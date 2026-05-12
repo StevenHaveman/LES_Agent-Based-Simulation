@@ -62,7 +62,8 @@ class Environment(Model):
             pkg.name: 0 for pkg in self.sustainability_packages
         }
     
-        self.energy_price = self.config['energy_price'] 
+        self.energy_price = self.config['energy_price']
+        self.survey_clusters = self.config.get('cluster_profiles') # This is the number of clusters we will use for the survey-based perceived behavioral control, which can be calibrated based on the survey data and the desired level of heterogeneity in resident characteristics and 
         self.households = []  # gewone Python-lijst voor filteren/gemak
         self.gis_data = utilities.load_gis_data("data/AmstelHeuvelWijk2_TableToExcel.xlsx")
         self.residents = []  # gewone Python-lijst voor filteren/gemak
@@ -100,8 +101,12 @@ class Environment(Model):
 
         for hh in self.households:
             for _ in range(nr_residents):
-                resident = Resident(id_counter, self, hh)
+                # survey cluster assignment for attitude and perceived behavioral control (PBC)
+                survey_profile = random.choices(self.survey_clusters, weights=[0.5, 0.35, 0.15], k=1)[0]
+                resident = Resident(id_counter, self, hh, survey_profile)
                 resident.income = utilities.generate_income(self.income_distribution) # Generate income based on distribution from survey data
+
+
 
                 for package_name, installed in hh.package_installations.items():
                     if installed:
@@ -232,19 +237,49 @@ class Environment(Model):
     def collect_environment_data(self): # update this function to collect all the needed info from all the agents within the simulation.
         environment_data = {
             "energy_price": self.energy_price,
-            "nr_agents_with_solar_panel": "nog doen", # TODO: ...
-            "nr_agents_with_heat_pump": "nog doen", # TODO: ...
-            "average_income": np.mean([resident.income for resident in self.residents]),
-            "average_attitude": np.mean([resident.attitude for resident in self.residents]),
-            "average_perceived_norm": {
-                package.name: np.mean([resident.perceived_norm[package.name] for resident in self.residents])
-                for package in self.sustainability_packages
-            },
-            "average_behavioral_control": {
-                package.name: np.mean([resident.behavioral_control[package.name] for resident in self.residents])
-                for package in self.sustainability_packages
-            }
+
+            # adoption counts (NEW - belangrijk voor validation)
+            "nr_agents_with_solar_panel": sum(
+                1 for h in self.households
+                if h.package_installations.get("Solar Panel", False)
+            ),
+
+            "nr_agents_with_heat_pump": sum(
+                1 for h in self.households
+                if h.package_installations.get("Heat Pump", False)
+            ),
+
+            # population-level stats
+            "average_income": np.mean(
+                [r.income for h in self.households for r in h.residents]
+            ) if self.residents else 0,
+
+            "average_attitude": np.mean(
+                [r.attitude for h in self.households for r in h.residents]
+            ) if self.residents else 0,
         }
+
+        # --- PER PACKAGE METRICS ---
+        average_perceived_norm = {}
+        average_pbc = {}
+
+        for package in self.sustainability_packages:
+
+            # perceived norm (psychological)
+            average_perceived_norm[package.name] = np.mean([
+                r.perceived_norm[package.name]
+                for h in self.households
+                for r in h.residents
+            ]) if self.residents else 0
+
+            # actual control (household constraint → correct PBC!)
+            average_pbc[package.name] = np.mean([
+                h.actual_control[package.name]
+                for h in self.households
+            ]) if self.households else 0
+
+        environment_data["average_perceived_norm"] = average_perceived_norm
+        environment_data["average_pbc"] = average_pbc
 
         return environment_data
     
@@ -344,21 +379,24 @@ class Environment(Model):
 
                     package_name = package.name
 
+                    # Attitude (individual)
                     street_data[street_name][package_name]["attitude"].append(
                         resident.attitude
                     )
 
+                    # Norm (individual perception)
                     street_data[street_name][package_name]["perceived_norm"].append(
                         resident.perceived_norm[package_name]
                     )
 
+                    # PBC (household-level constraint)
                     street_data[street_name][package_name]["pbc"].append(
-                        resident.behavioral_control[package_name]
+                        household.actual_control[package_name]
                     )
 
+                    # Adoption (behavior)
                     if resident.package_decisions.get(package_name, False):
                         street_data[street_name][package_name]["adoption"] += 1
-
 
         # --- RESULT ---
         result = {}
@@ -369,17 +407,10 @@ class Environment(Model):
             for package_name, values in packages.items():
 
                 result[street][package_name] = {
-                    "average_attitude":
-                        np.mean(values["attitude"]) if values["attitude"] else 0,
-
-                    "average_perceived_norm":
-                        np.mean(values["perceived_norm"]) if values["perceived_norm"] else 0,
-
-                    "average_pbc":
-                        np.mean(values["pbc"]) if values["pbc"] else 0,
-
-                    "adoption_count":
-                        values["adoption"]
+                    "average_attitude": np.mean(values["attitude"]) if values["attitude"] else 0,
+                    "average_perceived_norm": np.mean(values["perceived_norm"]) if values["perceived_norm"] else 0,
+                    "average_pbc": np.mean(values["pbc"]) if values["pbc"] else 0,
+                    "adoption_count": values["adoption"]
                 }
 
         print(f"Collected street heatmap data for year: {result}")

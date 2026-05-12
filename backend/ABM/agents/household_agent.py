@@ -52,6 +52,7 @@ class Household(Agent):
         self.residents = []
         self.package_installations = {package.name: False for package in self.model.sustainability_packages}
         self.active_package = None  # Track the currently active package for this household, if any.
+        self.actual_control = {package.name: 0.0 for package in self.model.sustainability_packages} # This will be calculated based on the household's attributes and the requirements of each package, and can be used in the decision-making process of the residents.
 
         # Flags for "Direct" subjective norm, per package
         self.skip_prev_flags = {} # {package_name: False/True}
@@ -63,6 +64,31 @@ class Household(Agent):
     
     def convert_kpi_level_to_energy_label(self, kpi_level):
         return self.KPI_TO_ENERGY_LABEL.get(kpi_level)
+    
+    def get_household_income(self):
+        return sum(res.income for res in self.residents)
+    
+    def calculate_actual_control(self):
+        """
+        Calculates actual control / feasibility for each package.
+        Based on household-level constraints such as:
+        - income
+        - package cost
+        - ROI
+        - energy label
+        - feasibility
+        """
+
+        household_income = self.get_household_income()
+
+        for package in self.model.sustainability_packages:
+
+            self.actual_control[package.name] = (
+                package.calculate_behavioral_influence(
+                    household_income,
+                    self
+                )
+            )
 
     def choose_household_package(self):
         """
@@ -86,7 +112,15 @@ class Household(Agent):
                 if res.package_decisions.get(package.name, False)
             )
 
-            score = supporters / len(self.residents)
+            # Resident support score
+            support_score = supporters / len(self.residents)
+
+            actual_control_score = (self.actual_control[package.name])
+
+            # TODO PUT IT IN CONFIG
+            # Combine support and actual control into final score for package selection, using weights (e.g., 70% support, 30% actual control).
+            score = (0.7 * support_score + 0.3 * actual_control_score)
+
             target_rank = self.LEVEL_RANK[package.target_level]
             
             # choose the package with:
@@ -152,6 +186,8 @@ class Household(Agent):
         it re-evaluates the household's decision to install that package.
         Also calculates the total amount of CO2 saved by each package.
         """
+        self.calculate_actual_control()
+
         for resident in self.residents:
             resident.step()
         
