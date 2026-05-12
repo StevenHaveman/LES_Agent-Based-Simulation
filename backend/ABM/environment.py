@@ -5,8 +5,6 @@ from collections import defaultdict
 from agents.household_agent import Household
 from agents.resident_agent import Resident
 import utilities
-from sustainability_packages.solar_panel import SolarPanel
-from sustainability_packages.heat_pump import HeatPump
 from sustainability_packages.upgrade_package import UpgradePackage
 import json
 import os
@@ -21,8 +19,6 @@ class Environment(Model):
     Attributes:
         config_id (int): Identifier for the chosen configuration.
         config (dict): The configuration dictionary.
-        solar_panel (SolarPanel): Instance of the SolarPanel package.
-        heat_pump (HeatPump): Instance of the HeatPump package.
         sustainability_packages (list): List of all available sustainability packages.
         decided_residents_this_step_per_package (dict): Tracks the number of residents
             who made a positive decision for each package in the current step.

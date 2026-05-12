@@ -38,6 +38,9 @@ class Resident(Agent):
         self.perceived_norm = {p.name: 0.0 for p in self.environment.sustainability_packages}
 
         # BEHAVIORAL CONTROL (PBC)
+        # PBC split missing:
+        # - current: physical/structural feasibility proxy (income, household constraints)
+        # - survey-based perceived behavioral control (agent cognition from clustering)
         self.behavioral_control = {p.name: 0.0 for p in self.environment.sustainability_packages}
 
         # INTENTION SYSTEM
