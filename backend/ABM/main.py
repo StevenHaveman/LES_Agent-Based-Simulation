@@ -143,7 +143,6 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
 
         # print("\n=== GRAPHICS DATA ===")
         # print(json.dumps(graphics_data[-1], indent=4))
-        print(graphics_data[1].items())  # Print the most recently collected graphics data for this year, can be removed later.
         # Wait before next simulation year
         time.sleep(get_delay())
 

@@ -413,7 +413,7 @@ class Environment(Model):
                     "adoption_count": values["adoption"]
                 }
 
-        print(f"Collected street heatmap data for year: {result}")
+        # print(f"Collected street heatmap data for year: {result}")
 
         return result
 
