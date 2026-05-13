@@ -52,15 +52,9 @@ const OverviewNavbar = ({ title, year }) => {
             setDelay(delayRes.delay);
         };
 
-        const handleKeyDown = (e) => {
-            if (e.key.toLowerCase() === 'k') {
-                togglePause();
-            }
-        };
-
         fetchInitialData();
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
+        // window.addEventListener('keydown', handleKeyDown);
+        // return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
     return (
