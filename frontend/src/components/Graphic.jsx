@@ -65,13 +65,8 @@ import PropTypes from 'prop-types';
 import '../styles/Graphic.css';
 import { useOverview } from '../hooks/useOverview.js';
 import { useSimulationRun } from '../hooks/useSimulationRun.js';
-import { flattenSimulationData } from '../utils/flattenSimulationData.js';
 
 const validKeys = [
-    'solar_panel_price',
-    'heat_pump_price',
-    'solar_panel_households',
-    'solar_panel_positive_decisions',
     'energy_label_A',
     'energy_label_B',
     'energy_label_C',
@@ -84,6 +79,7 @@ const validKeys = [
 
 const delayMs = 1000;
 const defaultSimulationDelaySeconds = 3;
+const simulationYearStart = 2025;
 
 const Graphic = ({ title = '', yAxisKey = '' }) => {
     const [simulationData, setSimulationData] = useState([]);
@@ -92,17 +88,6 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
     const yKey = validKeys.includes(yAxisKey) ? yAxisKey : validKeys[0];
     const isEnergyChart = yKey.startsWith('energy_label');
     const isCo2Chart = yKey === 'co2';
-
-    const energyData = simulationData.map(item => ({
-        year: item.year,
-        A: item.housing_stock.A,
-        B: item.housing_stock.B,
-        C: item.housing_stock.C,
-        D: item.housing_stock.D,
-        E: item.housing_stock.E,
-        F: item.housing_stock.F,
-        G: item.housing_stock.G
-    }));
 
     useEffect(() => {
         let intervalId;
@@ -138,149 +123,143 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
         return <div>Loading...</div>;
     }
 
-    const flattenedData = flattenSimulationData(simulationData, yKey);
-    
-    const yValues = flattenedData.map(d => d.value);
-    const yMin = Math.floor(Math.min(...yValues));
-    const yMax = Math.ceil(Math.max(...yValues));
-
     const uniqueSimulationData = Array.from(
-    new Map(
-        simulationData.map(item => [item.year, item])
-    ).values()
+        new Map(
+            simulationData.map(item => [item.year, item])
+        ).values()
     );
     
     const barPercentageNummer = 1.0;
     const categoryPercentageNummer = 1.0;
 
     const co2ChartData = {
-    labels: uniqueSimulationData.map(item => item.year),
+        labels: uniqueSimulationData.map((_, idx) => simulationYearStart + idx),
 
-    datasets: [
-        {
-            label: 'Baseline Emissions',
-            data: uniqueSimulationData.map(
-                item => item.co2_data.baseline_emissions
-            ),
+        datasets: [
+            {
+                label: 'Baseline Emissions',
+                data: uniqueSimulationData.map(
+                    item => item.co2_data.baseline_emissions
+                ),
 
-            borderColor: '#888888',
-            backgroundColor: '#88888833',
+                borderColor: '#888888',
+                backgroundColor: '#88888833',
 
-            fill: true,
+                fill: true,
 
-            tension: 0.3
-        },
+                tension: 0.3
+            },
 
-        {
-            label: 'Yearly Emissions',
-            data: uniqueSimulationData.map(
-                item => item.co2_data.yearly_emissions
-            ),
+            {
+                label: 'Yearly Emissions',
+                data: uniqueSimulationData.map(
+                    item => item.co2_data.yearly_emissions
+                ),
 
-            borderColor: '#1bc04d',
-            backgroundColor: '#22B14C33',
+                borderColor: '#1bc04d',
+                backgroundColor: '#22B14C33',
 
-            fill: true,
+                fill: true,
 
-            tension: 0.3
-        }
-    ]
-};
-
-const co2ChartOptions = {
-    responsive: true,
-
-    interaction: {
-        mode: 'index',
-        intersect: false
-    },
-
-    plugins: {
-        legend: {
-            position: 'top'
-        }
-    }
-};
-
-    const chartData = {
-      labels: uniqueSimulationData.map((item) => item.year),
-
-      datasets: [
-        {
-          label: "A",
-          data: uniqueSimulationData.map((item) => item.housing_stock.A),
-          backgroundColor: "#22B14C",
-          barPercentage: barPercentageNummer,
-          categoryPercentage: categoryPercentageNummer,
-        },
-        {
-          label: "B",
-          data: uniqueSimulationData.map((item) => item.housing_stock.B),
-          backgroundColor: "#B5E61D",
-          barPercentage: barPercentageNummer,
-          categoryPercentage: categoryPercentageNummer,
-        },
-        {
-          label: "C",
-          data: uniqueSimulationData.map((item) => item.housing_stock.C),
-          backgroundColor: "#FFF200",
-          barPercentage: barPercentageNummer,
-          categoryPercentage: categoryPercentageNummer,
-        },
-        {
-          label: "D",
-          data: uniqueSimulationData.map((item) => item.housing_stock.D),
-          backgroundColor: "#FFA800",
-          barPercentage: barPercentageNummer,
-          categoryPercentage: categoryPercentageNummer,
-        },
-        {
-          label: "E",
-          data: uniqueSimulationData.map((item) => item.housing_stock.E),
-          backgroundColor: "#FF3C00",
-          barPercentage: barPercentageNummer,
-          categoryPercentage: categoryPercentageNummer,
-        },
-        {
-          label: "F",
-          data: uniqueSimulationData.map((item) => item.housing_stock.F),
-          backgroundColor: "#ED1C24",
-          barPercentage: barPercentageNummer,
-          categoryPercentage: categoryPercentageNummer,
-        },
-        {
-          label: "G",
-          data: uniqueSimulationData.map((item) => item.housing_stock.G),
-          backgroundColor: "#880015",
-          barPercentage: barPercentageNummer,
-          categoryPercentage: categoryPercentageNummer,
-        },
-      ],
+                tension: 0.3
+            }
+        ]
     };
 
-const chartOptions = {
-    responsive: true,
+    const co2ChartOptions = {
+        responsive: true,
 
-    interaction: {
-        mode: 'index',
-        intersect: false
-    },
-
-    plugins: {
-        legend: {
-            position: 'top'
-        }
-    },
-
-    scales: {
-        x: {
-            stacked: true
+        interaction: {
+            mode: 'index',
+            intersect: false
         },
-        y: {
-            stacked: true
+
+        plugins: {
+            legend: {
+                position: 'top'
+            }
         }
-    }
-};
+    };
+
+    const chartData = {
+        labels: uniqueSimulationData.map((_, idx) => simulationYearStart + idx),
+
+        datasets: [
+            {
+                label: 'A',
+                data: uniqueSimulationData.map((item) => item.housing_stock.A),
+                backgroundColor: '#22B14C',
+                barPercentage: barPercentageNummer,
+                categoryPercentage: categoryPercentageNummer,
+            },
+            {
+                label: 'B',
+                data: uniqueSimulationData.map((item) => item.housing_stock.B),
+                backgroundColor: '#B5E61D',
+                barPercentage: barPercentageNummer,
+                categoryPercentage: categoryPercentageNummer,
+            },
+            {
+                label: 'C',
+                data: uniqueSimulationData.map((item) => item.housing_stock.C),
+                backgroundColor: '#FFF200',
+                barPercentage: barPercentageNummer,
+                categoryPercentage: categoryPercentageNummer,
+            },
+            {
+                label: 'D',
+                data: uniqueSimulationData.map((item) => item.housing_stock.D),
+                backgroundColor: '#FFA800',
+                barPercentage: barPercentageNummer,
+                categoryPercentage: categoryPercentageNummer,
+            },
+            {
+                label: 'E',
+                data: uniqueSimulationData.map((item) => item.housing_stock.E),
+                backgroundColor: '#FF3C00',
+                barPercentage: barPercentageNummer,
+                categoryPercentage: categoryPercentageNummer,
+            },
+            {
+                label: 'F',
+                data: uniqueSimulationData.map((item) => item.housing_stock.F),
+                backgroundColor: '#ED1C24',
+                barPercentage: barPercentageNummer,
+                categoryPercentage: categoryPercentageNummer,
+            },
+            {
+                label: 'G',
+                data: uniqueSimulationData.map((item) => item.housing_stock.G),
+                backgroundColor: '#880015',
+                barPercentage: barPercentageNummer,
+                categoryPercentage: categoryPercentageNummer,
+            },
+        ],
+    };
+
+    const chartOptions = {
+        responsive: true,
+
+        interaction: {
+            mode: 'index',
+            intersect: false
+        },
+
+        plugins: {
+            legend: {
+                position: 'top'
+            }
+        },
+
+        scales: {
+            x: {
+                stacked: true
+            },
+            y: {
+                stacked: true
+            }
+        }
+    };
 
     return (
         <div className="graphic-container">

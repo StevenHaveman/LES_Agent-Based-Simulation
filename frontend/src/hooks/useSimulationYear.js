@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import overviewService from '../services/OverviewService';
 
+const delayMs = 1000;
+
 export const useSimulationYear = () => {
     const [year, setYear] = useState(null);
-
     useEffect(() => {
         const fetchYear = async () => {
             try {
@@ -18,7 +19,7 @@ export const useSimulationYear = () => {
         };
 
         fetchYear();
-        const interval = setInterval(fetchYear, 1000);
+        const interval = setInterval(fetchYear, delayMs);
         return () => clearInterval(interval);
     }, []);
 

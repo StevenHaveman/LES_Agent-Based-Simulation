@@ -12,9 +12,15 @@ const GraphicsView = () => {
     return (
         <div className="graphics-view-container">
             <div className="graphic-wrapper">
+                <button>Options</button>
+                <h2 className="graphics-title-centered">Graphs</h2>
                 <Graphic
-                    title="Households energy labels over time"
+                    title="Performance categories over time"
                     yAxisKey="energy_label_A"
+                />
+                <Graphic
+                    title="CO2 Emissions"
+                    yAxisKey="co2"
                 />
                 <Graphic
                     title="CO2 Emissions"
