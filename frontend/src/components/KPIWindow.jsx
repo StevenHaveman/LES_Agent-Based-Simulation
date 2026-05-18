@@ -3,6 +3,7 @@ import '../styles/KPIWindow.css';
 import { useOverview } from '../hooks/useOverview.js';
 import { useSimulationRun } from '../hooks/useSimulationRun.js';
 import { countHouseholdsWithPackage, countHouseholdsWithBoth, averageHouseholdIncome } from '../utils/householdStats.js';
+import { useSimulationYear } from '../hooks/useSimulationYear.js';
 
 const KPIWindow = () => {
     /** @type {[Array<{
@@ -58,7 +59,7 @@ const KPIWindow = () => {
     const [sim_config, set_sim_config] = React.useState([]);
     const [kpi_data, set_kpi_data] = React.useState(null);
     const [loading, set_loading] = React.useState(true);
-
+    const year = useSimulationYear();
 
     React.useEffect(function () {
         let interval_id;
@@ -89,10 +90,9 @@ const KPIWindow = () => {
         start_fetch_loop();
 
         return function () {
-            if (interval_id) clearInterval(interval_id);
+            if (interval_id) {clearInterval(interval_id);}
         };
     }, []);
-
 
     if (loading) {
         return <div><h3>Loading...</h3></div>;
@@ -105,6 +105,12 @@ const KPIWindow = () => {
 
     const percentFactor = 100;
 
+    function formatK(num) {
+        if (Math.abs(num) >= 1000) {
+            return (num / 1000).toFixed(0) + 'k';
+        }
+        return num.toString();
+    }
 
     const kpi = kpi_data || {};
     return (
@@ -114,13 +120,13 @@ const KPIWindow = () => {
             <h3>Fully Converted: {Math.round((counted_full_data_hh / house_hold_data.length) * percentFactor)}%</h3>
             <h3>Average Income: {Math.round(avg_income)}€</h3>
             <h3>Subjective Norm ({sim_config.subj_norm_level}): {sim_config.subjective_norm}</h3> */}
-
-            <div>CO2 at Start: {kpi.co2_emissions_start_simulation?.toFixed(1) ?? 0}</div>
-            <div>Current CO2: {kpi.current_co2_emissions?.toFixed(1) ?? 0}</div>
-            <div>Total CO2 Reduced: {kpi.total_co2_reduced?.toFixed(1) ?? 0}</div>
-            <div>Total CO2 Emitted: {kpi.total_co2_emitted_during_simulation?.toFixed(1) ?? 0}</div>
-            <div>Total Renovation Spending: {kpi.total_spending_on_renovation?.toFixed(0) ?? 0}€</div>
-            <div>% Houses Ready for Heat Network: {kpi.percentage_houses_ready_for_heat_network?.toFixed(1) ?? 0}%</div>
+            <h3>KPI's</h3>
+            <div>CO2 emissions in 2025: {formatK(Number(kpi.co2_emissions_start_simulation?.toFixed(0)))} kg</div>
+            <div>CO2 emissions in{year !== null ? ` ${year + 2024}` : ''}: {formatK(Number(kpi.current_co2_emissions?.toFixed(0)))} kg</div>
+            <div>Total CO2 Reduced: {formatK(Number(kpi.total_co2_reduced?.toFixed(0)))} kg</div>
+            <div>Total CO2 Emitted: {formatK(Number(kpi.total_co2_emitted_during_simulation?.toFixed(0)))} kg</div>
+            <div>Total Renovation Spending: {formatK(Number(kpi.total_spending_on_renovation?.toFixed(0)))}€</div>
+            <div>% Houses Ready for Heat Network: {kpi.percentage_houses_ready_for_heat_network?.toFixed(0) ?? 0}%</div>
         </>
     );
 };

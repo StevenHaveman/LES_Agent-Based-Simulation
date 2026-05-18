@@ -17,3 +17,7 @@
     height: 100%;
     box-sizing: border-box;
 }
+
+.graphics-title-centered {
+    align-self: center;
+}

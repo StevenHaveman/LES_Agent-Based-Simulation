@@ -8,9 +8,13 @@ const latitude = 52.091831;
 const longitude = 4.388425;
 const zoomLevel = 16;
 
-const MapView = ({ houses, onHouseClick }) => {
+const radiusMeters = 4;
+const radiusWeight = 4;
+
+const MapView = ({ houses, onHouseClick, selectedHouse }) => {
     const mapRef = useRef(null);
     const markersRef = useRef([]);
+    const selectedCircleRef = useRef(null);
 
     useEffect(() => {
         if (!mapRef.current) {
@@ -32,8 +36,8 @@ const MapView = ({ houses, onHouseClick }) => {
         houses.forEach(house => {
             const address = house.address || '';
             const street = address.split(/\s\d/)[0].trim();
-            if (!street) return;
-            if (!map[street]) map[street] = { residents: [] };
+            if (!street) {return;}
+            if (!map[street]) {map[street] = { residents: [] };}
             if (Array.isArray(house.residents)) {
                 map[street].residents.push(...house.residents);
             }
@@ -46,9 +50,14 @@ const MapView = ({ houses, onHouseClick }) => {
     }, [houses]);
 
     useEffect(() => {
-        if (!mapRef.current) return;
+        if (!mapRef.current) {return;}
         markersRef.current.forEach(marker => marker.remove());
         markersRef.current = [];
+        if (selectedCircleRef.current) {
+            selectedCircleRef.current.remove();
+            selectedCircleRef.current = null;
+        }
+
         houses.forEach(house => {
             const icon = getLabelIcon(house.energyLabel);
             const marker = L.marker([house.lat, house.lng], { icon }).addTo(mapRef.current);
@@ -56,7 +65,7 @@ const MapView = ({ houses, onHouseClick }) => {
             const street = address.split(/\s\d/)[0].trim();
             const streetInfo = streetIncomeMap[street];
             if (streetInfo && streetInfo.avgIncome) {
-                marker.bindTooltip(`Street: ${street}<br/>Avg. income: €${streetInfo.avgIncome}`, {direction: 'top'});
+                marker.bindTooltip(`Street: ${street}<br/>Avg. income: €${streetInfo.avgIncome}`, { direction: 'top' });
             } else {
                 marker.bindTooltip('No residents');
             }
@@ -65,7 +74,20 @@ const MapView = ({ houses, onHouseClick }) => {
             }
             markersRef.current.push(marker);
         });
-    }, [houses, onHouseClick, streetIncomeMap]);
+
+        if (selectedHouse && selectedHouse.lat && selectedHouse.lng) {
+            selectedCircleRef.current = L.circle([selectedHouse.lat, selectedHouse.lng], {
+                radius: radiusMeters,
+                color: 'blue',
+                weight: radiusWeight,
+                fill: true,
+                fillColor: 'white',
+                fillOpacity: 0.5,
+                interactive: false,
+                pane: 'markerPane',
+            }).addTo(mapRef.current);
+        }
+    }, [houses, onHouseClick, streetIncomeMap, selectedHouse]);
 
     return <div id="map" style={{ height: '100%', width: '100%' }} />;
 };
@@ -77,6 +99,10 @@ MapView.propTypes = {
         energyLabel: PropTypes.string.isRequired,
     })).isRequired,
     onHouseClick: PropTypes.func,
+    selectedHouse: PropTypes.shape({
+        lat: PropTypes.number.isRequired,
+        lng: PropTypes.number.isRequired,
+    }),
 };
 
 export default MapView;

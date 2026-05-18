@@ -22,12 +22,13 @@ const ResidentInfo = ({ resident, home }) => {
     return (
         <div className="resident_info-container">
             <div className="info">
+                <h3>Resident Information</h3>
                 <h3>Address: {home.address}</h3>
-                <h3>Energy label: {home.energyLabel}</h3>
+                <h3>Performance categorie: {home.energyLabel}</h3>
                 <h3>Total residents: {home.residents.length}</h3>
                 <h3>Type home: {home.houseType}</h3>
                 <hr className="resident-info-divider" />
-                <img src="/INNO/blankUser.png" alt="" width="100" height="100" />
+                <h3>Resident Details</h3>
                 <h3>Name: {resident.name}</h3>
                 <h3>Income: €{resident.income + ',-'}</h3>
             </div>

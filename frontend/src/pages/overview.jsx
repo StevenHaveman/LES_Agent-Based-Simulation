@@ -26,7 +26,7 @@ function OverviewContent() {
     const state = useOverviewState();
     const [selectedHouse, setSelectedHouse] = useState(null);
     const [selectedResidentIndex, setSelectedResidentIndex] = useState(0);
-    const [selectedLabels, setSelectedLabels] = useState(["A", "B", "C", "D", "E", "F", "G"]);
+    const [selectedLabels, setSelectedLabels] = useState(['A', 'B', 'C', 'D', 'E', 'F', 'G']);
     const [selectedWoningTypes, setSelectedWoningTypes] = useState([
         'Twee-onder-een-kap / rijwoning hoek',
         'Rijwoning tussen',
@@ -82,7 +82,7 @@ function OverviewContent() {
 
     return (
         <>
-            <OverviewNavbar title="Overview" year={year} />
+            <OverviewNavbar title="LES agent" year={year + 2024} />
             <div className={`overview-container${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
                 <div className={`sidebar-container${sidebarCollapsed ? ' collapsed' : ''}`}>
                     <SidebarToggle collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(v => !v)} />
@@ -103,7 +103,7 @@ function OverviewContent() {
                         />
                     ) : (
                         <>
-                            <MapView houses={filteredHouses} onHouseClick={handleHouseClick} />
+                            <MapView houses={filteredHouses} onHouseClick={handleHouseClick} selectedHouse={selectedHouse} />
                         </>
                     )}
                 </div>
@@ -120,14 +120,14 @@ function OverviewContent() {
                         residents={selectedResidents}
                         selectedResidentIndex={selectedResidentIndex}
                         home={selectedHouse}
-                        />
+                    />
                     <ResidentInfo resident={selectedResident} home={selectedHouse} />
                 </div>
                 {/* <div className="parameters-container"> // TODO: CHANGE LOCATION
                     <SimulationParameters> </SimulationParameters>
                 </div> */}
                 <div className="municipality-container">
-                    Municipality View (coming soon)
+                    Control center (coming soon)
                 </div>
                 <div className="kpi-container">
                     <KPIWindow />
