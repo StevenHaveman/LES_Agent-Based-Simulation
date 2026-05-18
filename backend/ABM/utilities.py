@@ -125,10 +125,10 @@ def generate_income(income_distribution):
     selected_group = random.choices(groups,weights=weights,k=1)[0]
     
     income_ranges = {
-        "0-2.000 euro": (1000, 2000),
+        "0-2.000 euro": (0, 2000),
         "2.000-4.000 euro": (2000, 4000),
         "4.000-6.000 euro": (4000, 6000),
-        "6.000 euro of meer": (6000, 9000),
+        "6.000 euro of meer": (6000, 8000),
     }
 
     min_income, max_income = income_ranges[selected_group]

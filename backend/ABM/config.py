@@ -50,6 +50,23 @@ configs = {
         'subj_norm_sensitivity': None,
         'control_sensitivity': None,
         'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
+        'cluster_profiles': {
+                    0: {
+                        "name": "engaged",
+                        "attitude": 0.81,
+                        "pbc": 0.73,
+                    },
+                    1: {
+                        "name": "neutral",
+                        "attitude": 0.60,
+                        "pbc": 0.48,
+                    },
+                    2: {
+                        "name": "resistant",
+                        "attitude": 0.22,
+                        "pbc": 0.18,
+                    }
+                },
 
         # Data collection parameters
         'collect_data': True, # Whether to collect data for analysis
@@ -103,6 +120,23 @@ configs = {
         'norm_sensitivity': None,
         'control_sensitivity': None,
         'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
+        'cluster_profiles': {
+            0: {
+                "name": "engaged",
+                "attitude": 0.81,
+                "pbc": 0.73,
+            },
+            1: {
+                "name": "neutral",
+                "attitude": 0.60,
+                "pbc": 0.48,
+            },
+            2: {
+                "name": "resistant",
+                "attitude": 0.22,
+                "pbc": 0.18,
+            }
+        },
         
         # Weights for RAA components in intention calculation (can be adjusted to test different influence scenarios)
         'weight_attitude': 1.0,
@@ -144,7 +178,24 @@ configs = {
         'attitude_sensitivity': None,
         'norm_sensitivity': None,
         'control_sensitivity': None,
-        'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy 
+        'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
+        'cluster_profiles': {
+            0: {
+                "name": "engaged",
+                "attitude": 0.81,
+                "pbc": 0.73,
+            },
+            1: {
+                "name": "neutral",
+                "attitude": 0.60,
+                "pbc": 0.48,
+            },
+            2: {
+                "name": "resistant",
+                "attitude": 0.22,
+                "pbc": 0.18,
+            }
+        }, 
 
         # Weights for RAA components in intention calculation (can be adjusted to test different influence scenarios)
         'weight_attitude': 1.0,
