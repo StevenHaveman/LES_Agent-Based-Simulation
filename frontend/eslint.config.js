@@ -8,6 +8,7 @@ const DEFAULT_TAB_SIZE = 4;
 
 export default defineConfig([
     {
+        ignores: ['src/tests/**'],
         files: ['**/*.{js,mjs,cjs,jsx}'],
         plugins: { js, '@stylistic': stylistic },
         extends: ['js/recommended'],

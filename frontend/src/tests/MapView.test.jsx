@@ -1,6 +1,11 @@
+/**
+ * @jest-environment jsdom
+ */
+import '@testing-library/jest-dom';
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import MapView from '../components/MapView';
+
 jest.mock('leaflet', () => {
     const mapMock = {
         setView: jest.fn().mockReturnThis(),

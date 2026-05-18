@@ -65,7 +65,6 @@ import PropTypes from 'prop-types';
 import '../styles/Graphic.css';
 import { useOverview } from '../hooks/useOverview.js';
 import { useSimulationRun } from '../hooks/useSimulationRun.js';
-import { flattenSimulationData } from '../utils/flattenSimulationData.js';
 
 const validKeys = [
     'energy_label_A',
@@ -80,6 +79,7 @@ const validKeys = [
 
 const delayMs = 1000;
 const defaultSimulationDelaySeconds = 3;
+const simulationYearStart = 2025;
 
 const Graphic = ({ title = '', yAxisKey = '' }) => {
     const [simulationData, setSimulationData] = useState([]);
@@ -88,17 +88,6 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
     const yKey = validKeys.includes(yAxisKey) ? yAxisKey : validKeys[0];
     const isEnergyChart = yKey.startsWith('energy_label');
     const isCo2Chart = yKey === 'co2';
-
-    const energyData = simulationData.map(item => ({
-        year: item.year,
-        A: item.housing_stock.A,
-        B: item.housing_stock.B,
-        C: item.housing_stock.C,
-        D: item.housing_stock.D,
-        E: item.housing_stock.E,
-        F: item.housing_stock.F,
-        G: item.housing_stock.G
-    }));
 
     useEffect(() => {
         let intervalId;
@@ -134,12 +123,6 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
         return <div>Loading...</div>;
     }
 
-    const flattenedData = flattenSimulationData(simulationData, yKey);
-    
-    const yValues = flattenedData.map(d => d.value);
-    const yMin = Math.floor(Math.min(...yValues));
-    const yMax = Math.ceil(Math.max(...yValues));
-
     const uniqueSimulationData = Array.from(
         new Map(
             simulationData.map(item => [item.year, item])
@@ -150,7 +133,7 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
     const categoryPercentageNummer = 1.0;
 
     const co2ChartData = {
-        labels: uniqueSimulationData.map((_, idx) => 2025 + idx),
+        labels: uniqueSimulationData.map((_, idx) => simulationYearStart + idx),
 
         datasets: [
             {
@@ -199,7 +182,7 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
     };
 
     const chartData = {
-        labels: uniqueSimulationData.map((_, idx) => 2025 + idx),
+        labels: uniqueSimulationData.map((_, idx) => simulationYearStart + idx),
 
         datasets: [
             {

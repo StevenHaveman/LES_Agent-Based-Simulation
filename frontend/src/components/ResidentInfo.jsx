@@ -40,7 +40,19 @@ ResidentInfo.propTypes = {
     resident: PropTypes.shape({
         name: PropTypes.string.isRequired,
         income: PropTypes.number.isRequired,
-        address: PropTypes.string.isRequired,
+        address: PropTypes.string,
+    }),
+    home: PropTypes.shape({
+        address: PropTypes.string,
+        energyLabel: PropTypes.string,
+        residents: PropTypes.arrayOf(
+            PropTypes.shape({
+                name: PropTypes.string,
+                income: PropTypes.number,
+                address: PropTypes.string,
+            })
+        ),
+        houseType: PropTypes.string,
     }),
 };
 

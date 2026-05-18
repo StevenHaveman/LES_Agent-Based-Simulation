@@ -18,9 +18,10 @@ import OverviewNavbar from '../components/OverviewNavbar.jsx';
 import ResidentInfo from '../components/ResidentInfo.jsx';
 
 import KPIWindow from '../components/KPIWindow.jsx';
-import SimulationParameters from '../components/SimulationParameters.jsx';
 import { useMapData } from '../hooks/useMapData.js';
 import { useSimulationYear } from '../hooks/useSimulationYear.js';
+
+const simulationYearStart = 2024;
 
 function OverviewContent() {
     const state = useOverviewState();
@@ -52,10 +53,6 @@ function OverviewContent() {
         setSelectedResidentIndex(0);
     };
 
-    const handleResidentSelect = (idx) => {
-        setSelectedResidentIndex(idx);
-    };
-
     const handleToggleLabel = (label) => {
         setSelectedLabels(prev =>
             prev.includes(label)
@@ -82,7 +79,7 @@ function OverviewContent() {
 
     return (
         <>
-            <OverviewNavbar title="LES agent" year={year + 2024} />
+            <OverviewNavbar title="LES agent" year={year + simulationYearStart} />
             <div className={`overview-container${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
                 <div className={`sidebar-container${sidebarCollapsed ? ' collapsed' : ''}`}>
                     <SidebarToggle collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(v => !v)} />
