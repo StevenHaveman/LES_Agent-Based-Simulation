@@ -160,7 +160,9 @@ class Resident(Agent):
                     self.environment.decided_residents_this_step_per_package[package.name] = \
                         self.environment.decided_residents_this_step_per_package.get(package.name, 0) + 1
 
+        # after decision-making
+        self.attitude += 0.01 * (1 - self.attitude)
+        self.survey_pbc += 0.01 * (1 - self.survey_pbc)
+
         # income dynamics (keeps agent evolving over time)
-        self.income = int(
-            round(self.income * np.random.choice(self.config['raise_income']), -1)
-        )
+        self.income = int(round(self.income * np.random.choice(self.config['raise_income']), -1))
