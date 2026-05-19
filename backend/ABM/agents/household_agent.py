@@ -50,6 +50,7 @@ class Household(Agent):
         self.current_kpi_level = self.convert_energy_label_to_kpi_level()
         self.residents = []
         self.package_installations = {package.name: False for package in self.model.sustainability_packages}
+        self.renovation_cooldown = 0
         self.active_package = None  # Track the currently active package for this household, if any.
         self.actual_control = {package.name: 0.0 for package in self.model.sustainability_packages} # This will be calculated based on the household's attributes and the requirements of each package, and can be used in the decision-making process of the residents.
 
@@ -89,12 +90,21 @@ class Household(Agent):
                 )
             )
 
+    def update_cooldown(self):
+        if self.renovation_cooldown > 0:
+            print(f"Household {self.unique_id} is in renovation cooldown for {self.renovation_cooldown} more years.")
+            self.renovation_cooldown = max(0, self.renovation_cooldown - 1)
+
+
     def choose_household_package(self):
         """
         Determines which sustainability package to install based on the support of residents and the household's decision threshold.
         """
 
         if not self.residents:
+            return
+        
+        if self.renovation_cooldown > 0:
             return
 
         best_package = None
@@ -146,6 +156,7 @@ class Household(Agent):
                 self.package_installations[self.active_package.name] = False
 
             # install new package
+            self.renovation_cooldown = self.config.get("renovation_cooldown", 0) # Set cooldown after installing a package to prevent rapid switching
             self.package_installations[best_package.name] = True
             self.active_package = best_package
             self.renovation_costs_spend += best_package.price
@@ -186,6 +197,8 @@ class Household(Agent):
         Also calculates the total amount of CO2 saved by each package.
         """
         self.calculate_actual_control()
+
+        self.update_cooldown() # Update renovation cooldown at the beginning of the step, so that the household can make a new decision after the cooldown period has passed.
 
         for resident in self.residents:
             resident.step()

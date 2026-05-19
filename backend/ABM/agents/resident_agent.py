@@ -34,11 +34,6 @@ class Resident(Agent):
         self.decision_threshold = self.config['decision_threshold']
         self.income = 0
 
-        # RAA NORM STRUCTURE
-        # self.injunctive_norm = {p.name: 0.0 for p in self.environment.sustainability_packages}
-        # self.descriptive_norm = {p.name: 0.0 for p in self.environment.sustainability_packages}
-        # self.perceived_norm = {p.name: 0.0 for p in self.environment.sustainability_packages}
-
         # gets updated each step based on the current adoption levels in the environment.
         self.perceived_norm = 0.0
 

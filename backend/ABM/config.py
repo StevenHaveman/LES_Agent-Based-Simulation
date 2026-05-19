@@ -39,6 +39,7 @@ configs = {
         "solar_panel_amount_options": [6, 8, 10], # Number of solar panels a household can choose to install
         "energy_generation_range": (298, 425), # Estimated energy generation per panel per year (kWh)
         "household_decision_threshold": 0.5, # Percentage of residents that need to agree for the household to install solar panels
+        "renovation_cooldown": 10, # Number of years a household needs to wait after installing a package before it can install another one (to prevent unrealistic rapid switching)
 
         # Resident Agent parameters
         'median_income': 3300,  # Based on Dutch median income (2024)
@@ -109,6 +110,7 @@ configs = {
         "solar_panel_amount_options": [6, 8, 10], # Number of solar panels a household can choose to install
         "energy_generation_range": (298, 425), # Estimated energy generation per panel per year (kWh)
         "household_decision_threshold": 0.5, # Percentage of residents that need to agree for the household to install solar panels
+        "renovation_cooldown": 10, # Number of years a household needs to wait after installing a package before it can install another one (to prevent unrealistic rapid switching)
 
         # Resident Agent parameters
         'median_income': 3300,  # Based on Dutch median income (2024)
@@ -168,7 +170,7 @@ configs = {
         "solar_panel_amount_options": [6, 8, 10],
         "energy_generation_range": (298, 425),
         "household_decision_threshold": 0.5,
-
+        "renovation_cooldown": 10,
         # Resident Agent parameters
         'median_income': 3300,
         'sigma_normal': 700,
