@@ -206,22 +206,9 @@ class Environment(Model):
         for package in self.sustainability_packages:
             package.step()
 
-    def collect_environment_data(self): # update this function to collect all the needed info from all the agents within the simulation.
+    def collect_environment_data(self):
+
         environment_data = {
-            "energy_price": self.energy_price,
-
-            # adoption counts (NEW - belangrijk voor validation)
-            "nr_agents_with_solar_panel": sum(
-                1 for h in self.households
-                if h.package_installations.get("Solar Panel", False)
-            ),
-
-            "nr_agents_with_heat_pump": sum(
-                1 for h in self.households
-                if h.package_installations.get("Heat Pump", False)
-            ),
-
-            # population-level stats
             "average_income": np.mean(
                 [r.income for h in self.households for r in h.residents]
             ) if self.residents else 0,
@@ -231,27 +218,16 @@ class Environment(Model):
             ) if self.residents else 0,
         }
 
-        # --- PER PACKAGE METRICS ---
-        average_perceived_norm = {}
-        average_pbc = {}
-
-        for package in self.sustainability_packages:
-
-            # perceived norm (psychological)
-            average_perceived_norm[package.name] = np.mean([
-                r.perceived_norm[package.name]
-                for h in self.households
-                for r in h.residents
-            ]) if self.residents else 0
-
-            # actual control (household constraint → correct PBC!)
-            average_pbc[package.name] = np.mean([
+        # system-level feasibility (no cognitive per package split needed here)
+        average_actual_control = {
+            package.name: np.mean([
                 h.actual_control[package.name]
                 for h in self.households
             ]) if self.households else 0
+            for package in self.sustainability_packages
+        }
 
-        environment_data["average_perceived_norm"] = average_perceived_norm
-        environment_data["average_pbc"] = average_pbc
+        environment_data["average_actual_control"] = average_actual_control
 
         return environment_data
     
@@ -318,7 +294,7 @@ class Environment(Model):
         data = {
             "year": year,
             "package_data": self.collect_package_adoption_data(),
-            "tpb_data": self.collect_street_heatmap_data(), # TODO This function is not yet implemented, but will collect data on the TPB components for different clusters of residents, which can be used for analyzing behavior patterns and for informing the conversational agent's interactions with residents.
+            # "tpb_data": self.collect_street_heatmap_data(), # TODO This function is not yet implemented, but will collect data on the TPB components for different clusters of residents, which can be used for analyzing behavior patterns and for informing the conversational agent's interactions with residents.
             "co2_data": self.collect_co2_data(),
             "decisions_this_year_total": sum(self.decided_residents_this_step_per_package.values()),
             "decisions_this_year_per_package": dict(self.decided_residents_this_step_per_package),

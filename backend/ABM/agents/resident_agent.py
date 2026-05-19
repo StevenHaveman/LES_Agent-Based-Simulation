@@ -66,19 +66,7 @@ class Resident(Agent):
         self.package_decisions = {
             p.name: False for p in self.environment.sustainability_packages
         }
-                
-    def calc_behavior(self): # New voor RAA model
-        for package in self.environment.sustainability_packages:
-            if self.package_decisions.get(package.name, False):
-                continue
 
-            intention = self.intentions[package.name]
-
-            if intention > self.intention_threshold:
-                if self.check_actual_control(package):
-                    self.package_decisions[package.name] = True
-                    self.environment.decided_residents_this_step_per_package[package.name] = \
-                        self.environment.decided_residents_this_step_per_package.get(package.name, 0) + 1
 
     def calc_intention(self): # New voor RAA model
         """
@@ -95,12 +83,8 @@ class Resident(Agent):
             attitude_part = self.attitude * self.attitude_sensitivity
             norm_part = (self.perceived_norm * self.norm_sensitivity * package.norm_influence_strength)  # package-specific influence strength on norms
 
-            # Household-level feasibility (financial/technical constraints)
-            actual_control = self.household.actual_control[package.name]
-            # Combine perceived control (survey) with actual control
-            combined_control = (0.6 * self.survey_pbc + 0.4 * actual_control)
-            # Apply agent-specific sensitivity to control
-            control_part = (combined_control * self.control_sensitivity)
+            # # Perceived behavioral control (survey-based perception only)
+            control_part = self.survey_pbc * self.control_sensitivity
 
             # get the weights for each component from the config, or default to 1.0 if not specified
             w_att = self.config.get("weight_attitude", 1.0)
@@ -161,7 +145,7 @@ class Resident(Agent):
             # Calculate psychological drivers
             self.calc_intention()
 
-            # Decision-making (intention → support signal)
+            # Resident expresses support (no feasibility check here))
             for package in self.environment.sustainability_packages:
 
                 if self.package_decisions.get(package.name, False):
