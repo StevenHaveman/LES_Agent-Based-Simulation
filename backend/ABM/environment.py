@@ -299,8 +299,10 @@ class Environment(Model):
             "decisions_this_year_total": sum(self.decided_residents_this_step_per_package.values()),
             "decisions_this_year_per_package": dict(self.decided_residents_this_step_per_package),
             "housing_stock": self.collect_housing_stock_data(),
+            "kpi_stock": self.collect_kpi_stock_data(),
         }
 
+        print(data["kpi_stock"])
         self.yearly_stats.append(data)
 
         return data
@@ -387,6 +389,28 @@ class Environment(Model):
             if label in labels:
                 labels[label] += 1
         return labels
+    
+
+    def collect_kpi_stock_data(self):
+        """
+        Collects the distribution of household KPI levels.
+        """
+
+        kpi_levels = {
+            "Bad": 0,
+            "Poor": 0,
+            "Medium": 0,
+            "OK": 0,
+            "Good": 0
+        }
+
+        for hh in self.households:
+            kpi = hh.current_kpi_level
+
+            if kpi in kpi_levels:
+                kpi_levels[kpi] += 1
+
+        return kpi_levels
     
     def collect_co2_data(self):
         """
