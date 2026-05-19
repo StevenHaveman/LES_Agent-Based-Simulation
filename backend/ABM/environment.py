@@ -299,8 +299,11 @@ class Environment(Model):
             "decisions_this_year_total": sum(self.decided_residents_this_step_per_package.values()),
             "decisions_this_year_per_package": dict(self.decided_residents_this_step_per_package),
             "housing_stock": self.collect_housing_stock_data(),
+            "kpi_stock": self.collect_kpi_stock_data(),
+            "cluster_behavior_data": self.collect_cluster_behavior_data()
         }
 
+        print(data["cluster_behavior_data"])
         self.yearly_stats.append(data)
 
         return data
@@ -387,6 +390,69 @@ class Environment(Model):
             if label in labels:
                 labels[label] += 1
         return labels
+    
+    def collect_cluster_behavior_data(self):
+        """
+        Collects behavioral statistics per resident cluster.
+        """
+
+        cluster_data = {}
+
+        for resident in self.residents:
+
+            cluster = resident.cluster_type
+
+            # create cluster if not exists
+            if cluster not in cluster_data:
+                cluster_data[cluster] = {
+                    "attitudes": [],
+                    "perceived_norms": [],
+                    "pbc_scores": [],
+                    "count": 0
+                }
+
+            cluster_data[cluster]["attitudes"].append(resident.attitude)
+            cluster_data[cluster]["perceived_norms"].append(resident.perceived_norm)
+            cluster_data[cluster]["pbc_scores"].append(resident.survey_pbc)
+            cluster_data[cluster]["count"] += 1
+
+        # calculate averages
+        result = {}
+
+        for cluster, values in cluster_data.items():
+
+            result[cluster] = {
+                "average_attitude": np.mean(values["attitudes"]) if values["attitudes"] else 0,
+
+                "average_perceived_norm": np.mean(values["perceived_norms"]) if values["perceived_norms"] else 0,
+
+                "average_pbc": np.mean(values["pbc_scores"]) if values["pbc_scores"] else 0,
+
+                "resident_count": values["count"]
+            }
+
+        return result
+
+    def collect_kpi_stock_data(self):
+        """
+        Collects the distribution of household KPI levels.
+        """
+
+        kpi_levels = {
+            "Bad": 0,
+            "Poor": 0,
+            "Medium": 0,
+            "OK": 0,
+            "Good": 0
+        }
+
+        for hh in self.households:
+            kpi = hh.current_kpi_level
+
+            if kpi in kpi_levels:
+                kpi_levels[kpi] += 1
+
+        return kpi_levels
     
     def collect_co2_data(self):
         """

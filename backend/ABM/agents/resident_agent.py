@@ -26,7 +26,7 @@ class Resident(Agent):
         self.unique_id = id
         self.household = household
         self.environment = model
-
+        self.cluster_type = survey_profile["cluster_type"] # This is the cluster type from the survey profiles, which can be used for analysis and potentially for influencing behavior in more complex ways in the future.
         # Survey-based profile for attitude.
         self.attitude = survey_profile["attitude"]
 
