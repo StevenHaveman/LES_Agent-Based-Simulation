@@ -92,7 +92,7 @@ class Household(Agent):
 
     def update_cooldown(self):
         if self.renovation_cooldown > 0:
-            print(f"Household {self.unique_id} is in renovation cooldown for {self.renovation_cooldown} more years.")
+            # print(f"Household {self.unique_id} is in renovation cooldown for {self.renovation_cooldown} more years.")
             self.renovation_cooldown = max(0, self.renovation_cooldown - 1)
 
 

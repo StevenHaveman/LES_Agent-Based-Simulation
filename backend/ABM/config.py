@@ -53,17 +53,17 @@ configs = {
         'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
         'cluster_profiles': {
                     0: {
-                        "name": "engaged",
+                        "cluster_type": "engaged",
                         "attitude": 0.81,
                         "pbc": 0.73,
                     },
                     1: {
-                        "name": "neutral",
+                        "cluster_type": "neutral",
                         "attitude": 0.60,
                         "pbc": 0.48,
                     },
                     2: {
-                        "name": "resistant",
+                        "cluster_type": "resistant",
                         "attitude": 0.22,
                         "pbc": 0.18,
                     }
@@ -124,17 +124,17 @@ configs = {
         'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
         'cluster_profiles': {
             0: {
-                "name": "engaged",
+                "cluster_type": "engaged",
                 "attitude": 0.81,
                 "pbc": 0.73,
             },
             1: {
-                "name": "neutral",
+                "cluster_type": "neutral",
                 "attitude": 0.60,
                 "pbc": 0.48,
             },
             2: {
-                "name": "resistant",
+                "cluster_type": "resistant",
                 "attitude": 0.22,
                 "pbc": 0.18,
             }
@@ -183,17 +183,17 @@ configs = {
         'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
         'cluster_profiles': {
             0: {
-                "name": "engaged",
+                "cluster_type": "engaged",
                 "attitude": 0.81,
                 "pbc": 0.73,
             },
             1: {
-                "name": "neutral",
+                "cluster_type": "neutral",
                 "attitude": 0.60,
                 "pbc": 0.48,
             },
             2: {
-                "name": "resistant",
+                "cluster_type": "resistant",
                 "attitude": 0.22,
                 "pbc": 0.18,
             }
