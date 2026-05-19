@@ -100,6 +100,7 @@ class Resident(Agent):
         agent_data = {
             "id": self.unique_id,
             "household_id": self.household.unique_id,
+            "cluster_type": self.cluster_type,
             "income": self.income, # change to household level income if we want to analyze household-level constraints more directly
             "attitude": self.attitude,
             "attitude_sensitivity": self.attitude_sensitivity,
