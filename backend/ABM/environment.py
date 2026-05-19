@@ -151,62 +151,34 @@ class Environment(Model):
                 self.streets[chosen_list].append(self.households[i])
 
     def update_social_norms(self):
-        """
-        Updates injunctive, descriptive, and perceived norms
-        per street (GIS-based social context).
-        """
+        # This function updates the perceived social norms for each resident based on the current state of their street. For simplicity, 
+        # we calculate an average attitude and PBC for the residents in the same street and use that to update each resident's perceived norm. 
+        # This is a simplified approach and can be further refined to consider more complex interactions and influences among residents.
+        for street_name, households in self.street_groups.items():
 
-        # Optional: store street-level norms for debugging / analysis
-        if not hasattr(self, "street_norms"):
-            self.street_norms = {}
+            # Get all residents in the street
+            residents_in_street = [
+                r
+                for hh in households
+                for r in hh.residents
+            ]
 
-        for package in self.sustainability_packages:
+            if not residents_in_street:
+                continue
 
-            for street_name, households in self.street_groups.items():
+            # Calculate average attitude and PBC for the street
+            for resident in residents_in_street:
+                other_residents = [r for r in residents_in_street if r.unique_id != resident.unique_id]
 
-                # Skip empty streets
-                if not households:
+                if not other_residents:
                     continue
 
-                # DESCRIPTIVE NORM
-                # actual adoption behavior in this street)
-                adoption_rate = sum(
-                    hh.package_installations.get(package.name, False)
-                    for hh in households
-                ) / len(households)
+                avg_attitude = np.mean([r.attitude for r in other_residents])
 
-                # 2. INJUNCTIVE NORM
-                # We can weight the influence of average attitude and adoption rate differently based on the package's norm influence strength, 
-                # which allows for calibration based on real-world data or expert judgment.
-                all_residents = [r for hh in households for r in hh.residents]
+                avg_pbc = np.mean([r.survey_pbc for r in other_residents])
 
-                avg_attitude = np.mean([r.attitude for r in all_residents])
-                injunctive_norm = (0.7 * avg_attitude + 0.3 * adoption_rate)
-
-                # PERCEIVED NORM
-                perceived_norm = (
-                    0.5 * injunctive_norm +
-                    0.5 * adoption_rate
-                )
-
-                # STORE STREET-LEVEL RESULTS
-                if street_name not in self.street_norms:
-                    self.street_norms[street_name] = {}
-
-                self.street_norms[street_name][package.name] = {
-                    "adoption_rate": adoption_rate,
-                    "injunctive_norm": injunctive_norm,
-                    "perceived_norm": perceived_norm,
-                    "avg_attitude": avg_attitude
-                }
-
-                # 5. ASSIGN TO RESIDENTS
-                # (each resident in street gets same social context)
-                for hh in households:
-                    for res in hh.residents:
-                        res.descriptive_norm[package.name] = adoption_rate
-                        res.injunctive_norm[package.name] = injunctive_norm
-                        res.perceived_norm[package.name] = perceived_norm     
+                # Update the resident's perceived norm based on the average attitude and PBC of their street.
+                resident.perceived_norm = (0.5 * avg_attitude + 0.5 * avg_pbc) 
 
     def step(self):
         """
