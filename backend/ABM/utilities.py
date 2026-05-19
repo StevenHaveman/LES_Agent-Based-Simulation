@@ -116,14 +116,13 @@ def calculate_income_distribution(df):
     return distribution
 
 
-def generate_income(income_distribution):
+def generate_income(income_distribution): #TODO Add to config to give new income ranges in the future if needed, and to make it more flexible for different contexts.
     """Generates a random income value based on the provided income distribution."""
-
     groups = list(income_distribution.keys())
     weights = list(income_distribution.values())
 
-    selected_group = random.choices(groups,weights=weights,k=1)[0]
-    
+    selected_group = random.choices(groups, weights=weights, k=1)[0]
+
     income_ranges = {
         "0-2.000 euro": (0, 2000),
         "2.000-4.000 euro": (2000, 4000),
@@ -133,4 +132,7 @@ def generate_income(income_distribution):
 
     min_income, max_income = income_ranges[selected_group]
 
-    return random.randint(min_income, max_income)
+    step = 500
+    values = list(range(min_income, max_income + 1, step))
+
+    return random.choice(values)
