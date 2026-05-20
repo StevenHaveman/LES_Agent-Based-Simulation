@@ -21,3 +21,44 @@
 .graphics-title-centered {
     align-self: center;
 }
+
+.graphics-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.4);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.graphics-options-modal {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 2em;
+    border-radius: 8px;
+    min-width: 320px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.graphics-modal-title {
+    margin-top: 0;
+}
+
+.graphics-modal-row {
+    margin-bottom: 0.75em;
+}
+
+.graphics-modal-close {
+    margin-top: 1em;
+    padding: 0.5em 1.5em;
+    background: #eee;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}

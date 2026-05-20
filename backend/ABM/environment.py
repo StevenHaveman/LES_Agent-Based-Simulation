@@ -554,7 +554,15 @@ class Environment(Model):
         for household in self.households:
             resident_details = []
             for i, resident in enumerate(household.residents, start=1):
-                res_data = {"name": f"Resident {i}", "income": resident.income, 'unique_id': resident.unique_id}
+                res_data = {
+                    "name": f"Resident {i}",
+                    "income": resident.income,
+                    "unique_id": resident.unique_id,
+                    "perceived_norm": getattr(resident, "perceived_norm", None),
+                    "norm_sensitivity": getattr(resident, "norm_sensitivity", None),
+                    "survey_pbc": getattr(resident, "survey_pbc", None),
+                    "control_sensitivity": getattr(resident, "control_sensitivity", None)
+                }
                 for pkg_name in [p.name for p in self.sustainability_packages]:
                     res_data[f"{pkg_name}_decision"] = resident.package_decisions.get(pkg_name, False)
                 resident_details.append(res_data)

@@ -2,35 +2,29 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../styles/ResidentInfo.css';
 
-/**
- * ResidentInfo component displays detailed information about a selected resident,
- * including their name and income. If no resident is selected, it shows a hint message.
- *
- * @param {Object} props - The component props.
- * @param {Object|null} props.resident - The selected resident object containing their details.
- * @param {string} props.resident.name - The name of the resident.
- * @param {number} props.resident.income - The income of the resident.
- * @returns {JSX.Element} The rendered ResidentInfo component.
- */
 const ResidentInfo = ({ resident, home }) => {
-    // If no resident is selected, render a hint message.
-    if (!resident) {return <div className="select-resident-hint">
-        <h3> Click on a Resident</h3>
-    </div>;}
+    if (!resident) {
+        return <div className="select-resident-hint">
+            <h3> Click on a Resident</h3>
+        </div>;
+    }
 
-    // Render the resident's information.
     return (
         <div className="resident_info-container">
             <div className="info">
-                <h3>Resident Information</h3>
+                <h3>Residence Information</h3>
                 <h3>Address: {home.address}</h3>
-                <h3>Performance categorie: {home.energyLabel}</h3>
+                <h3>Performance category: {home.energyLabel}</h3>
                 <h3>Total residents: {home.residents.length}</h3>
                 <h3>Type home: {home.houseType}</h3>
                 <hr className="resident-info-divider" />
                 <h3>Resident Details</h3>
                 <h3>Name: {resident.name}</h3>
                 <h3>Income: €{resident.income + ',-'}</h3>
+                <h4>Perceived Norm: {resident.perceived_norm.toFixed(2)}</h4>
+                <h4>Norm Sensitivity: {resident.norm_sensitivity.toFixed(2)}</h4>
+                <h4>Survey PBC: {resident.survey_pbc.toFixed(2)}</h4>
+                <h4>Control Sensitivity: {typeof resident.control_sensitivity === 'number' ? resident.control_sensitivity.toFixed(2) : resident.control_sensitivity}</h4>
             </div>
         </div>
     );
