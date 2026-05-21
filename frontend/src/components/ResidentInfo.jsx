@@ -21,10 +21,10 @@ const ResidentInfo = ({ resident, home }) => {
                 <h3>Resident Details</h3>
                 <h3>Name: {resident.name}</h3>
                 <h3>Income: €{resident.income + ',-'}</h3>
-                <h4>Perceived Norm: {resident.perceived_norm.toFixed(2)}</h4>
-                <h4>Norm Sensitivity: {resident.norm_sensitivity.toFixed(2)}</h4>
-                <h4>Survey PBC: {resident.survey_pbc.toFixed(2)}</h4>
-                <h4>Control Sensitivity: {typeof resident.control_sensitivity === 'number' ? resident.control_sensitivity.toFixed(2) : resident.control_sensitivity}</h4>
+                <h3>Perceived Norm: {resident.perceived_norm.toFixed(2)}</h3>
+                <h3>Norm Sensitivity: {resident.norm_sensitivity.toFixed(2)}</h3>
+                <h3>Survey PBC: {resident.survey_pbc.toFixed(2)}</h3>
+                <h3>Control Sensitivity: {typeof resident.control_sensitivity === 'number' ? resident.control_sensitivity.toFixed(2) : resident.control_sensitivity}</h3>
             </div>
         </div>
     );

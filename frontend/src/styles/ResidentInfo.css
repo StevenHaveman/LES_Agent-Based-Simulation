@@ -15,7 +15,12 @@
 .info{
     display: flex;
     flex-direction: column;
+}
 
+.info h3 {
+    margin: 0.2rem 0;
+    font-size: 1.02rem;
+    font-weight: 600;
 }
 
 .select-resident-hint{

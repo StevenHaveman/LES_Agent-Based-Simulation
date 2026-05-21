@@ -27,8 +27,8 @@ const GraphicsView = () => {
     return (
         <div className="graphics-view-container">
             <div className="graphic-wrapper">
-                <button onClick={() => setShowOptions(v => !v)}>Options</button>
-                <h2 className="graphics-title-centered">Graphs</h2>
+                <button onClick={() => setShowOptions(v => !v)}>Choose your graphs</button>
+                <h3 className="graphics-title-centered">Graphs</h3>
                 {showOptions && (
                     <div className="graphics-modal-overlay" onClick={() => setShowOptions(false)}>
                         <div className="graphics-options-modal" onClick={e => e.stopPropagation()}>
