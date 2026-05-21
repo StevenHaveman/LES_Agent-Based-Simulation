@@ -557,6 +557,7 @@ class Environment(Model):
                 res_data = {
                     "name": f"Resident {i}",
                     "income": resident.income,
+                    "cluster_type" : resident.cluster_type,
                     "unique_id": resident.unique_id,
                     "kpi_level": household.current_kpi_level,
                     "attitude": getattr(resident, "attitude", None),
