@@ -10,7 +10,7 @@ This application provides endpoints to:
 from __future__ import annotations
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from main import run_simulation, graphics_data, households_data, kpi_data
+from main import run_simulation, graphics_data, households_data, households_historical_data, kpi_data
 import utilities
 import threading
 import traceback
@@ -123,6 +123,10 @@ def fetch_households():
     if not households_data:
         return jsonify({"error": "No household data available"}), 400
     return jsonify(households_data)
+
+@app.route('/households_historical', methods=['GET'])
+def fetch_households_historical():
+    return jsonify(households_historical_data if households_historical_data else [])
 
 @app.route('/kpi_data', methods=['GET'])
 def fetch_kpi_data():

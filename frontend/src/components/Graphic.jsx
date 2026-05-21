@@ -1,371 +1,248 @@
+import React, { useState, useEffect } from "react";
 
-import React, { useState, useEffect } from 'react';
 import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    PointElement,
-    LineElement,
-    Filler,
-    Title,
-    Tooltip,
-    Legend
-} from 'chart.js';
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+  Filler,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 
 ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    PointElement,
-    LineElement,
-    Filler,
-    Title,
-    Tooltip,
-    Legend
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+  Filler,
+  Title,
+  Tooltip,
+  Legend,
 );
 
-import { Bar, Line } from 'react-chartjs-2';
+import PropTypes from "prop-types";
 
-import PropTypes from 'prop-types';
+import "../styles/Graphic.css";
 
-import '../styles/Graphic.css';
-import { useOverview } from '../hooks/useOverview.js';
-import { useSimulationRun } from '../hooks/useSimulationRun.js';
+import { useOverview } from "../hooks/useOverview.js";
+import { useSimulationRun } from "../hooks/useSimulationRun.js";
+
+import EnergyChart from "../charts/EnergyChart";
+import Co2Chart from "../charts/Co2Chart";
+import KpiChart from "../charts/KpiChart";
+import ClusterChart from "../charts/ClusterChart";
+import ClusterTrendChart from "../charts/ClusterTrendChart";
 
 const validKeys = [
-    'energy_label_A',
-    'energy_label_B',
-    'energy_label_C',
-    'energy_label_D',
-    'energy_label_E',
-    'energy_label_F',
-    'energy_label_G',
-    'co2',
-    'kpi_stock',
-    'cluster_behavior_data'
+  "energy_label_A",
+  "energy_label_B",
+  "energy_label_C",
+  "energy_label_D",
+  "energy_label_E",
+  "energy_label_F",
+  "energy_label_G",
+  "co2",
+  "kpi_stock",
+  "cluster_behavior_data",
+  "cluster_behavior_trends",
 ];
 
 const delayMs = 1000;
 const defaultSimulationDelaySeconds = 3;
 const simulationYearStart = 2025;
 
+const barPercentageNummer = 1.0;
+const categoryPercentageNummer = 1.0;
 
 const clusterMetrics = [
-    { key: 'average_attitude', label: 'Attitude', color: '#1f77b4' },
-    { key: 'average_perceived_norm', label: 'Perceived Norm', color: '#ff7f0e' },
-    { key: 'average_pbc', label: 'PBC', color: '#2ca02c' }
+  {
+    key: "average_attitude",
+    label: "Attitude",
+    color: "#0095ff",
+  },
+
+  {
+    key: "average_perceived_norm",
+    label: "Perceived Norm",
+    color: "#ff7801",
+  },
+
+  {
+    key: "average_pbc",
+    label: "PBC",
+    color: "#238b23",
+  },
 ];
 
-const Graphic = ({ title = '', yAxisKey = '' }) => {
-    const [simulationData, setSimulationData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [selectedClusterMetric, setSelectedClusterMetric] = useState(clusterMetrics[0].key);
+const chartOptions = {
+  responsive: true,
 
-    const yKey = validKeys.includes(yAxisKey) ? yAxisKey : validKeys[0];
-    const isEnergyChart = yKey.startsWith('energy_label');
-    const isCo2Chart = yKey === 'co2';
-    const isKpiChart = yKey === 'kpi_stock';
-    const isClusterChart = yKey === 'cluster_behavior_data';
+  interaction: {
+    mode: "index",
+    intersect: false,
+  },
 
-    useEffect(() => {
-        let intervalId;
+  plugins: {
+    legend: {
+      position: "top",
+    },
+  },
 
-        const fetchData = async () => {
-            try {
-                const result = await useOverview().getSimulationGraphicResults();
-                setSimulationData(result);
-                setLoading(false);
-            } catch (error) {
-                console.error('Error fetching simulation data', error);
-                setLoading(false);
-            }
-        };
+  scales: {
+    x: {
+      stacked: true,
+    },
 
-        const fetchInterval = async () => {
-            const res = await useSimulationRun().getSimulationDelay();
-            const delay = parseInt(res.delay || defaultSimulationDelaySeconds) * delayMs;
+    y: {
+      stacked: true,
+    },
+  },
+};
 
-            await fetchData();
+const Graphic = ({ title = "", yAxisKey = "" }) => {
+  const [simulationData, setSimulationData] = useState([]);
 
-            intervalId = setInterval(fetchData, delay);
-        };
+  const [loading, setLoading] = useState(true);
 
-        fetchInterval();
+  const [selectedClusterMetric, setSelectedClusterMetric] = useState(
+    clusterMetrics[0].key,
+  );
 
-        return () => {
-            if (intervalId) {clearInterval(intervalId);}
-        };
-    }, []);
+  const yKey = validKeys.includes(yAxisKey) ? yAxisKey : validKeys[0];
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
+  useEffect(() => {
+    let intervalId;
 
-    const uniqueSimulationData = Array.from(
-        new Map(
-            simulationData.map(item => [item.year, item])
-        ).values()
-    );
-    
-    const barPercentageNummer = 1.0;
-    const categoryPercentageNummer = 1.0;
+    const fetchData = async () => {
+      try {
+        const result = await useOverview().getSimulationGraphicResults();
 
-    const co2ChartData = {
-        labels: uniqueSimulationData.map((_, idx) => simulationYearStart + idx),
+        setSimulationData(result);
 
-        datasets: [
-            {
-                label: 'Baseline Emissions',
-                data: uniqueSimulationData.map(
-                    item => item.co2_data.baseline_emissions
-                ),
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching simulation data", error);
 
-                borderColor: '#888888',
-                backgroundColor: '#88888833',
-
-                fill: true,
-
-                tension: 0.3
-            },
-
-            {
-                label: 'Yearly Emissions',
-                data: uniqueSimulationData.map(
-                    item => item.co2_data.yearly_emissions
-                ),
-
-                borderColor: '#1bc04d',
-                backgroundColor: '#22B14C33',
-
-                fill: true,
-
-                tension: 0.3
-            }
-        ]
+        setLoading(false);
+      }
     };
 
-    const co2ChartOptions = {
-        responsive: true,
+    const fetchInterval = async () => {
+      const res = await useSimulationRun().getSimulationDelay();
 
-        interaction: {
-            mode: 'index',
-            intersect: false
-        },
+      const delay =
+        parseInt(res.delay || defaultSimulationDelaySeconds) * delayMs;
 
-        plugins: {
-            legend: {
-                position: 'top'
-            }
-        }
+      await fetchData();
+
+      intervalId = setInterval(fetchData, delay);
     };
 
+    fetchInterval();
 
-    const kpiChartData = {
-        labels: uniqueSimulationData.map((_, idx) => simulationYearStart + idx),
-        datasets: [
-            {
-                label: 'Bad',
-                data: uniqueSimulationData.map((item) => item.kpi_stock ? item.kpi_stock.Bad : 0),
-                backgroundColor: '#880015',
-                barPercentage: barPercentageNummer,
-                categoryPercentage: categoryPercentageNummer,
-            },
-            {
-                label: 'Poor',
-                data: uniqueSimulationData.map((item) => item.kpi_stock ? item.kpi_stock.Poor : 0),
-                backgroundColor: '#ED1C24',
-                barPercentage: barPercentageNummer,
-                categoryPercentage: categoryPercentageNummer,
-            },
-            {
-                label: 'Medium',
-                data: uniqueSimulationData.map((item) => item.kpi_stock ? item.kpi_stock.Medium : 0),
-                backgroundColor: '#FFA800',
-                barPercentage: barPercentageNummer,
-                categoryPercentage: categoryPercentageNummer,
-            },
-            {
-                label: 'OK',
-                data: uniqueSimulationData.map((item) => item.kpi_stock ? item.kpi_stock.OK : 0),
-                backgroundColor: '#FFF200',
-                barPercentage: barPercentageNummer,
-                categoryPercentage: categoryPercentageNummer,
-            },
-            {
-                label: 'Good',
-                data: uniqueSimulationData.map((item) => item.kpi_stock ? item.kpi_stock.Good : 0),
-                backgroundColor: '#22B14C',
-                barPercentage: barPercentageNummer,
-                categoryPercentage: categoryPercentageNummer,
-            },
-        ],
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
     };
+  }, []);
 
-    const clusterChartData = (() => {
-        const clusters = new Set();
-        uniqueSimulationData.forEach(item => {
-            if (item.cluster_behavior_data) {
-                Object.keys(item.cluster_behavior_data).forEach(cluster => clusters.add(cluster));
-            }
-        });
-        const clusterList = Array.from(clusters);
-        const metric = clusterMetrics.find(m => m.key === selectedClusterMetric) || clusterMetrics[0];
-        const datasets = clusterList.map((cluster, cIdx) => ({
-            label: cluster,
-            data: uniqueSimulationData.map(item =>
-                item.cluster_behavior_data && item.cluster_behavior_data[cluster]
-                    ? item.cluster_behavior_data[cluster][metric.key]
-                    : 0
-            ),
-            backgroundColor: metric.color + (cIdx === 0 ? '99' : cIdx === 1 ? '66' : '33'),
-            borderColor: metric.color,
-            barPercentage: 0.7,
-            categoryPercentage: 0.7,
-        }));
-        return {
-            labels: uniqueSimulationData.map((_, idx) => simulationYearStart + idx),
-            datasets
-        };
-    })();
-    
-    const chartData = {
-        labels: uniqueSimulationData.map((_, idx) => simulationYearStart + idx),
-        datasets: [
-            {
-                label: 'A',
-                data: uniqueSimulationData.map((item) => item.housing_stock.A),
-                backgroundColor: '#22B14C',
-                barPercentage: barPercentageNummer,
-                categoryPercentage: categoryPercentageNummer,
-            },
-            {
-                label: 'B',
-                data: uniqueSimulationData.map((item) => item.housing_stock.B),
-                backgroundColor: '#B5E61D',
-                barPercentage: barPercentageNummer,
-                categoryPercentage: categoryPercentageNummer,
-            },
-            {
-                label: 'C',
-                data: uniqueSimulationData.map((item) => item.housing_stock.C),
-                backgroundColor: '#FFF200',
-                barPercentage: barPercentageNummer,
-                categoryPercentage: categoryPercentageNummer,
-            },
-            {
-                label: 'D',
-                data: uniqueSimulationData.map((item) => item.housing_stock.D),
-                backgroundColor: '#FFA800',
-                barPercentage: barPercentageNummer,
-                categoryPercentage: categoryPercentageNummer,
-            },
-            {
-                label: 'E',
-                data: uniqueSimulationData.map((item) => item.housing_stock.E),
-                backgroundColor: '#FF3C00',
-                barPercentage: barPercentageNummer,
-                categoryPercentage: categoryPercentageNummer,
-            },
-            {
-                label: 'F',
-                data: uniqueSimulationData.map((item) => item.housing_stock.F),
-                backgroundColor: '#ED1C24',
-                barPercentage: barPercentageNummer,
-                categoryPercentage: categoryPercentageNummer,
-            },
-            {
-                label: 'G',
-                data: uniqueSimulationData.map((item) => item.housing_stock.G),
-                backgroundColor: '#880015',
-                barPercentage: barPercentageNummer,
-                categoryPercentage: categoryPercentageNummer,
-            },
-        ],
-    };
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-    const chartOptions = {
-        responsive: true,
+  const uniqueSimulationData = Array.from(
+    new Map(simulationData.map((item) => [item.year, item])).values(),
+  );
+  const chartComponents = {
+    co2: (
+      <Co2Chart
+        uniqueSimulationData={uniqueSimulationData}
+        simulationYearStart={simulationYearStart}
+      />
+    ),
 
-        interaction: {
-            mode: 'index',
-            intersect: false
-        },
+    kpi_stock: (
+      <KpiChart
+        uniqueSimulationData={uniqueSimulationData}
+        simulationYearStart={simulationYearStart}
+        chartOptions={chartOptions}
+        barPercentageNummer={barPercentageNummer}
+        categoryPercentageNummer={categoryPercentageNummer}
+      />
+    ),
 
-        plugins: {
-            legend: {
-                position: 'top'
-            }
-        },
+    cluster_behavior_data: (
+      <ClusterChart
+        uniqueSimulationData={uniqueSimulationData}
+        simulationYearStart={simulationYearStart}
+        selectedClusterMetric={selectedClusterMetric}
+        clusterMetrics={clusterMetrics}
+        chartOptions={chartOptions}
+      />
+    ),
 
-        scales: {
-            x: {
-                stacked: true
-            },
-            y: {
-                stacked: true
-            }
-        }
-    };
+    cluster_behavior_trends: (
+      <ClusterTrendChart
+        uniqueSimulationData={uniqueSimulationData}
+        simulationYearStart={simulationYearStart}
+        selectedClusterMetric={selectedClusterMetric}
+        clusterMetrics={clusterMetrics}
+      />
+    ),
+  };
 
-    return (
-        <div className="graphic-container">
-            <h3 className="graphic-title">{title}</h3>
-            {isClusterChart && (
-                <div style={{ marginBottom: '1em' }}>
-                    <label htmlFor="cluster-metric-select">Select metric:&nbsp;</label>
-                    <select
-                        id="cluster-metric-select"
-                        value={selectedClusterMetric}
-                        onChange={e => setSelectedClusterMetric(e.target.value)}
-                    >
-                        {clusterMetrics.map(metric => (
-                            <option key={metric.key} value={metric.key}>{metric.label}</option>
-                        ))}
-                    </select>
-                </div>
-            )}
-            <div className="graphic-square-wrapper">
-                {isEnergyChart ? (
-                    <Bar
-                        data={chartData}
-                        options={chartOptions}
-                    />
-                ) : isCo2Chart ? (
-                    <Line
-                        data={co2ChartData}
-                        options={co2ChartOptions}
-                    />
-                ) : isKpiChart ? (
-                    <Bar
-                        data={kpiChartData}
-                        options={chartOptions}
-                    />
-                ) : isClusterChart ? (
-                    <Bar
-                        data={clusterChartData}
-                        options={{
-                            ...chartOptions,
-                            scales: {
-                                x: { stacked: false },
-                                y: { stacked: false }
-                            },
-                            plugins: {
-                                legend: { position: 'top' }
-                            }
-                        }}
-                    />
-                ) : (
-                    <div>Invalid key</div>
-                )}
-            </div>
+  const selectedChart = yKey.startsWith("energy_label") ? (
+    <EnergyChart
+      uniqueSimulationData={uniqueSimulationData}
+      simulationYearStart={simulationYearStart}
+      chartOptions={chartOptions}
+      barPercentageNummer={barPercentageNummer}
+      categoryPercentageNummer={categoryPercentageNummer}
+    />
+  ) : (
+    chartComponents[yKey]
+  );
+
+  return (
+    <div className="graphic-container">
+      <h3 className="graphic-title">{title}</h3>
+
+    {/* Cluster dropdown */}
+      {(yKey === "cluster_behavior_data" ||
+        yKey === "cluster_behavior_trends") && (
+        <div style={{ marginBottom: "1em" }}>
+          <label htmlFor="cluster-metric-select">Select metric:&nbsp;</label>
+
+          <select
+            id="cluster-metric-select"
+            value={selectedClusterMetric}
+            onChange={(e) => setSelectedClusterMetric(e.target.value)}
+          >
+            {clusterMetrics.map((metric) => (
+              <option key={metric.key} value={metric.key}>
+                {metric.label}
+              </option>
+            ))}
+          </select>
         </div>
-    );
+      )}
+
+      <div className="graphic-square-wrapper">
+        {selectedChart || <div>Invalid key</div>}
+      </div>
+    </div>
+  );
 };
 
 Graphic.propTypes = {
-    title: PropTypes.string,
-    yAxisKey: PropTypes.string
+  title: PropTypes.string,
+  yAxisKey: PropTypes.string,
 };
 
 export default Graphic;

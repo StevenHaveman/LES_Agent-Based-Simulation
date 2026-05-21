@@ -23,6 +23,7 @@ config_id, config = utilities.choose_config()
 # Global lists to store data from the simulation for potential use by an API or UI.
 graphics_data = []  # Stores yearly aggregated data for charts/graphs.
 households_data = []  # Stores detailed household information per year (updated yearly)
+households_historical_data = []  # Stores historical resident score data per year
 kpi_data = {}  # Stores key performance indicators (KPIs) collected at the end of each year.
 
 # Global pause flag
@@ -80,6 +81,7 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
     """
     global graphics_data
     global households_data
+    global households_historical_data
     global kpi_data
 
     if seed is None:
@@ -91,6 +93,7 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
     graphics_data.clear()
     kpi_data.clear()
     households_data.clear()
+    households_historical_data.clear()
 
     # model = Environment(nr_households=nr_households, nr_residents=nr_residents) We will likely need to change this when we create households based on GIS data, and residents based on survey data.
     model = Environment()
@@ -135,6 +138,12 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
         # Update household data (per year)
         households_data.clear()
         households_data.extend(model.collect_household_information())
+        
+        year_resident_data = {
+            "year": year + 1,
+            "households": model.collect_household_information()
+        }
+        households_historical_data.append(year_resident_data)
 
         print(f"Household data collected for year {year + 1}: {len(households_data)} households")
 

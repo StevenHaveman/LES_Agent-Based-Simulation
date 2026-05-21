@@ -9,18 +9,39 @@
     grid-column: 1 / 11;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    overflow-y: auto;
+    padding: 1rem;
 }
 
 .info{
     display: flex;
     flex-direction: column;
+    width: 100%;
+    max-width: 500px;
 }
 
 .info h3 {
     margin: 0.2rem 0;
     font-size: 1.02rem;
     font-weight: 600;
+}
+
+.info p {
+    margin: 0.4rem 0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.resident-trends-section {
+    margin-top: 1rem;
+    width: 100%;
+}
+
+.resident-trend-chart {
+    width: 100%;
+    height: 250px;
+    margin-top: 1rem;
 }
 
 .select-resident-hint{
