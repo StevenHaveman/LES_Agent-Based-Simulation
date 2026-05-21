@@ -60,7 +60,7 @@ const ResidentInfo = ({ resident, home }) => {
     const getResidentTrends = () => {
         if (!historicalData || historicalData.length === 0) return null;
 
-        const trends = { years: [], perceived_norm: [], survey_pbc: [], control_sensitivity: [] };
+        const trends = { years: [], perceived_norm: [], survey_pbc: [], attitude: [] };
 
         historicalData.forEach(yearData => {
             if (yearData.households && Array.isArray(yearData.households)) {
@@ -68,10 +68,10 @@ const ResidentInfo = ({ resident, home }) => {
                 if (household) {
                     const residentData = household.residents.find(r => r.unique_id === resident.unique_id);
                     if (residentData) {
-                        trends.years.push(yearData.year);
+                        trends.years.push((Number(yearData.year) || 0) + 2024);
                         trends.perceived_norm.push(residentData.perceived_norm || 0);
                         trends.survey_pbc.push(residentData.survey_pbc || 0);
-                        trends.control_sensitivity.push(typeof residentData.control_sensitivity === 'number' ? residentData.control_sensitivity : 0);
+                        trends.attitude.push(typeof residentData.attitude === 'number' ? residentData.attitude : 0);
                     }
                 }
             }
@@ -105,8 +105,8 @@ const ResidentInfo = ({ resident, home }) => {
                 pointHoverRadius: 6,
             },
             {
-                label: 'Control Sensitivity',
-                data: trends.control_sensitivity,
+                label: 'Attitude',
+                data: trends.attitude,
                 borderColor: '#d62728',
                 backgroundColor: '#d6272833',
                 fill: true,
@@ -121,18 +121,18 @@ const ResidentInfo = ({ resident, home }) => {
         <div className="resident_info-container">
             <div className="info">
                 <h3>Residence Information</h3>
-                <p><strong>Address:</strong> {home.address}</p>
-                <p><strong>Performance category:</strong> {home.energyLabel}</p>
-                <p><strong>Total residents:</strong> {home.residents.length}</p>
+                {/* <p><strong>Address:</strong> {home.address}</p> */}
+                <p><strong>Package level:</strong> {resident.kpi_level}</p>
+                {/* <p><strong>Total residents:</strong> {home.residents.length}</p> */}
                 <p><strong>Type home:</strong> {home.houseType}</p>
                 <hr className="resident-info-divider" />
                 <h3>Resident Details</h3>
                 <p><strong>Name:</strong> {resident.name}</p>
                 <p><strong>Income:</strong> €{resident.income + ',-'}</p>
                 <p><strong>Perceived Norm:</strong> {resident.perceived_norm.toFixed(2)}</p>
-                <p><strong>Norm Sensitivity:</strong> {resident.norm_sensitivity.toFixed(2)}</p>
+                {/* <p><strong>Norm Sensitivity:</strong> {resident.norm_sensitivity.toFixed(2)}</p> */}
                 <p><strong>Survey PBC:</strong> {resident.survey_pbc.toFixed(2)}</p>
-                <p><strong>Control Sensitivity:</strong> {typeof resident.control_sensitivity === 'number' ? resident.control_sensitivity.toFixed(2) : resident.control_sensitivity}</p>
+                {/* <p><strong>Control Sensitivity:</strong> {typeof resident.control_sensitivity === 'number' ? resident.control_sensitivity.toFixed(2) : resident.control_sensitivity}</p> */}
                 
                 {trendChartData && !loading && (
                     <div className="resident-trends-section">
@@ -168,12 +168,12 @@ const ResidentInfo = ({ resident, home }) => {
                 {!trendChartData && !loading && historicalData.length > 0 && (
                     <div className="resident-trends-section">
                         <hr className="resident-info-divider" />
-                        <p style={{ fontSize: '0.9rem', color: '#666' }}>No historical data found for this resident.</p>
+                        <p style={{ fontSize: '0.9rem'}}>No historical data found for this resident.</p>
                     </div>
                 )}
                 {loading && (
                     <div className="resident-trends-section">
-                        <p style={{ fontSize: '0.9rem', color: '#666' }}>Loading historical data...</p>
+                        <p style={{ fontSize: '0.9rem'}}>Loading historical data...</p>
                     </div>
                 )}
             </div>

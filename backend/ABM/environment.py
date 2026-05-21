@@ -558,6 +558,8 @@ class Environment(Model):
                     "name": f"Resident {i}",
                     "income": resident.income,
                     "unique_id": resident.unique_id,
+                    "kpi_level": household.current_kpi_level,
+                    "attitude": getattr(resident, "attitude", None),
                     "perceived_norm": getattr(resident, "perceived_norm", None),
                     "norm_sensitivity": getattr(resident, "norm_sensitivity", None),
                     "survey_pbc": getattr(resident, "survey_pbc", None),
