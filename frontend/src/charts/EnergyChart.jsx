@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Bar } from 'react-chartjs-2';
 
 const EnergyChart = ({
@@ -82,3 +83,11 @@ const EnergyChart = ({
 };
 
 export default EnergyChart;
+
+EnergyChart.propTypes = {
+    uniqueSimulationData: PropTypes.arrayOf(PropTypes.object).isRequired,
+    simulationYearStart: PropTypes.number,
+    chartOptions: PropTypes.object,
+    barPercentageNummer: PropTypes.number,
+    categoryPercentageNummer: PropTypes.number,
+};

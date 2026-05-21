@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Line } from 'react-chartjs-2';
 
 const Co2Chart = ({
@@ -67,3 +68,8 @@ const Co2Chart = ({
 };
 
 export default Co2Chart;
+
+Co2Chart.propTypes = {
+    uniqueSimulationData: PropTypes.arrayOf(PropTypes.object).isRequired,
+    simulationYearStart: PropTypes.number,
+};

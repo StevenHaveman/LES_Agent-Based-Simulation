@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Line } from 'react-chartjs-2';
 
 const borderOpacities = ['FF', 'CC', '99'];
@@ -85,3 +86,10 @@ const ClusterTrendChart = ({
 };
 
 export default ClusterTrendChart;
+
+ClusterTrendChart.propTypes = {
+    uniqueSimulationData: PropTypes.arrayOf(PropTypes.object).isRequired,
+    simulationYearStart: PropTypes.number,
+    selectedClusterMetric: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    clusterMetrics: PropTypes.arrayOf(PropTypes.object),
+};

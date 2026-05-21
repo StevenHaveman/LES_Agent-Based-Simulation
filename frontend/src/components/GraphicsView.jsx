@@ -10,6 +10,8 @@ const GRAPH_OPTIONS = [
     { key: 'cluster_behavior_trends', label: 'Cluster averages over time' }
 ];
 
+const graphSlots = 3;
+
 const GraphicsView = () => {
     const [showOptions, setShowOptions] = useState(false);
     const [selectedGraphs, setSelectedGraphs] = useState([
@@ -19,7 +21,7 @@ const GraphicsView = () => {
     ]);
 
     const handleGraphChange = (idx, newKey) => {
-        if (selectedGraphs.includes(newKey)) return; // Prevents selecting the same graph
+        if (selectedGraphs.includes(newKey)) {return;} // Prevents selecting the same graph
         const newGraphs = [...selectedGraphs];
         newGraphs[idx] = newKey;
         setSelectedGraphs(newGraphs);
@@ -34,7 +36,7 @@ const GraphicsView = () => {
                     <div className="graphics-modal-overlay" onClick={() => setShowOptions(false)}>
                         <div className="graphics-options-modal" onClick={e => e.stopPropagation()}>
                             <h4 className="graphics-modal-title">Select 3 graphs to display:</h4>
-                            {[0, 1, 2].map(idx => (
+                            {Array.from({ length: graphSlots }).map((_, idx) => (
                                 <div key={idx} className="graphic-modal-row">
                                     <label>Graph {idx + 1}:&nbsp;</label>
                                     <select
@@ -49,11 +51,11 @@ const GraphicsView = () => {
                                     </select>
                                 </div>
                             ))}
-                            <button style={{marginTop:'1em'}} onClick={() => setShowOptions(false)}>Close</button>
+                            <button style={{ marginTop:'1em' }} onClick={() => setShowOptions(false)}>Close</button>
                         </div>
                     </div>
                 )}
-                {selectedGraphs.map((key, idx) => {
+                {selectedGraphs.map((key) => {
                     const option = GRAPH_OPTIONS.find(opt => opt.key === key);
                     return (
                         <Graphic

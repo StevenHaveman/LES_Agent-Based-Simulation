@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Bar } from 'react-chartjs-2';
 
 const backgroundOpacities = ['99', '66', '33'];
@@ -70,3 +71,11 @@ const ClusterChart = ({
 };
 
 export default ClusterChart;
+
+ClusterChart.propTypes = {
+    uniqueSimulationData: PropTypes.arrayOf(PropTypes.object).isRequired,
+    simulationYearStart: PropTypes.number,
+    selectedClusterMetric: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    clusterMetrics: PropTypes.arrayOf(PropTypes.object),
+    chartOptions: PropTypes.object,
+};
