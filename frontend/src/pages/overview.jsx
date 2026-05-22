@@ -31,7 +31,7 @@ function OverviewContent() {
     const state = useOverviewState();
     const [showGraphOptions, setShowGraphOptions] = useState(false);
     const [selectedGraphs, setSelectedGraphs] = useState([
-        'cluster_behavior_data',
+        'cluster_behavior_trends',
         'co2',
         'kpi_stock'
     ]);

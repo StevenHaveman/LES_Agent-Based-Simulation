@@ -60,8 +60,19 @@ const MapView = ({ houses, onHouseClick, selectedHouse }) => {
             selectedCircleRef.current = null;
         }
 
+        const getHouseLabel = (house) => {
+            if (house.kpi_level !== undefined && house.kpi_level !== null) {
+                return house.kpi_level;
+            }
+            if (Array.isArray(house.residents) && house.residents.length > 0) {
+                const r = house.residents.find(res => res && (res.kpi_level !== undefined && res.kpi_level !== null));
+                if (r) { return r.kpi_level; }
+            }
+            return house.energyLabel;
+        };
+
         houses.forEach(house => {
-            const icon = getLabelIcon(house.energyLabel);
+            const icon = getLabelIcon(getHouseLabel(house));
             const marker = L.marker([house.lat, house.lng], { icon }).addTo(mapRef.current);
             const address = house.address || '';
             const street = address.split(/\s\d/)[0].trim();
@@ -98,7 +109,9 @@ MapView.propTypes = {
     houses: PropTypes.arrayOf(PropTypes.shape({
         lat: PropTypes.number.isRequired,
         lng: PropTypes.number.isRequired,
-        energyLabel: PropTypes.string.isRequired,
+        energyLabel: PropTypes.string,
+        kpi_level: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        residents: PropTypes.array,
     })).isRequired,
     onHouseClick: PropTypes.func,
     selectedHouse: PropTypes.shape({
