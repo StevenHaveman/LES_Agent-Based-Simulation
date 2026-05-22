@@ -63,7 +63,7 @@ const clusterMetrics = [
     {
         key: 'average_attitude',
         label: 'Attitude',
-        color: '#0095ff',
+        color: '#00ffaa',
     },
 
     {
@@ -78,6 +78,8 @@ const clusterMetrics = [
         color: '#238b23',
     },
 ];
+
+const clusterColors = ['#2ac72a', '#5a5754', '#ff0000'];
 
 const chartOptions = {
     responsive: true,
@@ -183,6 +185,7 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
                 simulationYearStart={simulationYearStart}
                 selectedClusterMetric={selectedClusterMetric}
                 clusterMetrics={clusterMetrics}
+                clusterColors={clusterColors}
                 chartOptions={chartOptions}
             />
         ),
@@ -193,6 +196,7 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
                 simulationYearStart={simulationYearStart}
                 selectedClusterMetric={selectedClusterMetric}
                 clusterMetrics={clusterMetrics}
+                clusterColors={clusterColors}
             />
         ),
     };

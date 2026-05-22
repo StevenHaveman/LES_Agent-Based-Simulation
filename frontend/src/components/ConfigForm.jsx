@@ -81,36 +81,6 @@ const ConfigForm = () => {
                         <p className="form-subtitle">Put Starting Values</p>
                     </header>
                     <form onSubmit={handleSubmit} className="form-body">
-                        {/* Input for number of households */}
-                        <div className="form-group">
-                            <label htmlFor="nr_households" className="form-label">Number of Households</label>
-                            <input
-                                type="number"
-                                id="nr_households"
-                                name="nr_households"
-                                value={formData.nr_households}
-                                onChange={handleChange}
-                                className="form-input"
-                                min="1"
-                                required
-                            />
-                        </div>
-
-                        {/* Input for number of residents */}
-                        <div className="form-group">
-                            <label htmlFor="nr_residents" className="form-label">Number of Residents</label>
-                            <input
-                                type="number"
-                                id="nr_residents"
-                                name="nr_residents"
-                                value={formData.nr_residents}
-                                onChange={handleChange}
-                                className="form-input"
-                                min="1"
-                                required
-                            />
-                        </div>
-
                         {/* Input for simulation duration */}
                         <div className="form-group">
                             <label htmlFor="simulation_years" className="form-label">Duration of Simulation (years)</label>

@@ -9,7 +9,8 @@ const ClusterTrendChart = ({
     uniqueSimulationData,
     simulationYearStart,
     selectedClusterMetric,
-    clusterMetrics
+    clusterMetrics,
+    clusterColors
 }) => {
 
     const clusters = new Set();
@@ -35,10 +36,10 @@ const ClusterTrendChart = ({
         ),
 
         borderColor:
-            `${metric.color}${borderOpacities[cIdx] || '99'}`,
+            `${(clusterColors[cIdx] || metric.color)}${borderOpacities[cIdx] || '99'}`,
 
         backgroundColor:
-            `${metric.color}${backgroundOpacities[cIdx] || '11'}`,
+            `${(clusterColors[cIdx] || metric.color)}${backgroundOpacities[cIdx] || '11'}`,
 
         borderWidth: 2,
         fill: false,
@@ -92,4 +93,5 @@ ClusterTrendChart.propTypes = {
     simulationYearStart: PropTypes.number,
     selectedClusterMetric: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     clusterMetrics: PropTypes.arrayOf(PropTypes.object),
+    clusterColors: PropTypes.arrayOf(PropTypes.string),
 };

@@ -5,6 +5,7 @@ import '../styles/overviewpage.css';
 import '../styles/globalPageStyles.css';
 import { OverviewProvider, useOverviewState } from '../state/overviewState.jsx';
 
+import GraphSelector from '../components/GraphSelector.jsx';
 import GraphicsView from '../components/GraphicsView.jsx';
 import MapView from '../components/MapView.jsx';
 import MapFilterMenu from '../components/MapFilterMenu.jsx';
@@ -20,11 +21,18 @@ import ResidentInfo from '../components/ResidentInfo.jsx';
 import KPIWindow from '../components/KPIWindow.jsx';
 import { useMapData } from '../hooks/useMapData.js';
 import { useSimulationYear } from '../hooks/useSimulationYear.js';
+import { GRAPH_OPTIONS, GRAPH_SLOTS } from '../components/graphOptions.js';
 
 const simulationYearStart = 2024;
 
 function OverviewContent() {
     const state = useOverviewState();
+    const [showGraphOptions, setShowGraphOptions] = useState(false);
+    const [selectedGraphs, setSelectedGraphs] = useState([
+        'cluster_behavior_data',
+        'co2',
+        'kpi_stock'
+    ]);
     const [selectedHouse, setSelectedHouse] = useState(null);
     const [selectedResidentIndex, setSelectedResidentIndex] = useState(0);
     const [selectedLabels, setSelectedLabels] = useState(['A', 'B', 'C', 'D', 'E', 'F', 'G']);
@@ -67,6 +75,14 @@ function OverviewContent() {
                 ? prev.filter(t => t !== type)
                 : [...prev, type]
         );
+    };
+
+    const handleGraphChange = (idx, newKey) => {
+        if (selectedGraphs.includes(newKey)) {return;}
+
+        const newGraphs = [...selectedGraphs];
+        newGraphs[idx] = newKey;
+        setSelectedGraphs(newGraphs);
     };
 
     const filteredHouses = houses.filter(h =>
@@ -129,8 +145,18 @@ function OverviewContent() {
                 <div className="kpi-container">
                     <KPIWindow />
                 </div>
+                <div className="charts-chooser-container">
+                    <GraphSelector
+                        showOptions={showGraphOptions}
+                        setShowOptions={setShowGraphOptions}
+                        selectedGraphs={selectedGraphs}
+                        handleGraphChange={handleGraphChange}
+                        graphOptions={GRAPH_OPTIONS}
+                        graphSlots={GRAPH_SLOTS}
+                    />
+                </div>
                 <div className="charts-container">
-                    <GraphicsView />
+                    <GraphicsView selectedGraphs={selectedGraphs} />
                 </div>
                 {/* <div className="KPI-container">
                     <KPIWindow />

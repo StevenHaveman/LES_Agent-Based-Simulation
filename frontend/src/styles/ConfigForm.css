@@ -1,5 +1,5 @@
 .form-container {
-    min-height: 100vh;
+    min-height: 75vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -202,4 +202,9 @@ select.form-input {
 select.form-input {
     background-color: white;
     cursor: pointer;
+}
+
+.title-config-page {
+    font-size: 55px;
+    text-align: center;
 }

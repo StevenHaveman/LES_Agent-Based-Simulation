@@ -2,13 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Bar } from 'react-chartjs-2';
 
-const backgroundOpacities = ['99', '66', '33'];
-
 const ClusterChart = ({
     uniqueSimulationData,
     simulationYearStart,
     selectedClusterMetric,
     clusterMetrics,
+    clusterColors,
     chartOptions
 }) => {
 
@@ -34,10 +33,9 @@ const ClusterChart = ({
             item.cluster_behavior_data?.[cluster]?.[metric.key] || 0
         ),
 
-        backgroundColor:
-            `${metric.color}${backgroundOpacities[cIdx] || '33'}`,
+        backgroundColor: `${clusterColors[cIdx] || metric.color}CC`,
 
-        borderColor: metric.color,
+        borderColor: clusterColors[cIdx] || metric.color,
 
         barPercentage: 0.7,
         categoryPercentage: 0.7,
@@ -77,5 +75,6 @@ ClusterChart.propTypes = {
     simulationYearStart: PropTypes.number,
     selectedClusterMetric: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     clusterMetrics: PropTypes.arrayOf(PropTypes.object),
+    clusterColors: PropTypes.arrayOf(PropTypes.string),
     chartOptions: PropTypes.object,
 };

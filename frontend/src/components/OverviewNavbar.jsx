@@ -153,7 +153,7 @@ const OverviewNavbar = ({ title, year }) => {
                     <img className="overview-logo" src="LES_logo2.png" alt="Logo rechts" />
                 </div>
                 <div className="control-bar">
-                    <span className='simulation-year'>Simulation year: {year}</span>
+                    <span className='simulation-year'>Simulation Year: {year}</span>
                     <button className="pause-button" onClick={togglePause}>
                         {paused ? 'Continue Simulation' : 'Pause Simulation'}
                     </button>
