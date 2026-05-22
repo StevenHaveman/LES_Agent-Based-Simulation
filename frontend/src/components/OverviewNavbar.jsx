@@ -114,10 +114,10 @@ const OverviewNavbar = ({ title, year }) => {
             <ToastContainer position="top-right" hideProgressBar={false} />
             <div className="overview-navbar">
                 <div className="navbar-left">
-                    <button className="start-button" onClick={openSimulationModal}>
+                    <button className="start-button" onClick={openSimulationModal} title="Start Simulation">
                         <span className="material-symbols-outlined">reset_settings</span>
                     </button>
-                    <button className="reset-button" onClick={resetSimulation}>
+                    <button className="reset-button" onClick={resetSimulation} title="Reset Simulation">
                         <span className="material-symbols-outlined">replay</span>
                     </button>
                     {showModal && (
@@ -202,9 +202,13 @@ const OverviewNavbar = ({ title, year }) => {
                     <span className="simulation-year">Simulation Year: {year}</span>
                     <button className="pause-button" onClick={togglePause}>
                         {paused ? (
-                            <span className="material-symbols-outlined">play_circle</span>
+                            <span className="material-symbols-outlined" title="Play">
+                                play_circle
+                            </span>
                         ) : (
-                            <span className="material-symbols-outlined">stop_circle</span>
+                            <span className="material-symbols-outlined" title="Pause">
+                                stop_circle
+                            </span>
                         )}
                     </button>
                     <h5> Delay: </h5>
