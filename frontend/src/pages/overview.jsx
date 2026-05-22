@@ -23,7 +23,7 @@ import { useMapData } from '../hooks/useMapData.js';
 import { useSimulationYear } from '../hooks/useSimulationYear.js';
 import { GRAPH_OPTIONS, GRAPH_SLOTS } from '../components/graphOptions.js';
 
-import "@fontsource/montserrat";
+import '@fontsource/montserrat';
 
 const simulationYearStart = 2024;
 

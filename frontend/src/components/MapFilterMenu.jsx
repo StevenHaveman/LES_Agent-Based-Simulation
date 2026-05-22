@@ -53,18 +53,6 @@ function MapFilterMenu({ selectedLabels, onToggleLabel, selectedWoningTypes, onT
                     </button>
                 ))}
             </div>
-            <h4>Filter by Woning Type</h4>
-            <div className="filter-buttons">
-                {woningTypes.map(type => (
-                    <button
-                        key={type}
-                        className={selectedWoningTypes.includes(type) ? 'active' : ''}
-                        onClick={() => onToggleWoningType(type)}
-                    >
-                        {type}
-                    </button>
-                ))}
-            </div>
         </div>
     );
 }
