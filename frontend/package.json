@@ -13,6 +13,8 @@
     "test": "jest"
   },
   "dependencies": {
+    "@fontsource/montserrat": "^5.2.8",
+    "@fontsource/urbanist": "^5.2.7",
     "@tanstack/react-router": "^1.105.0",
     "chart.js": "^4.5.1",
     "firebase": "^11.4.0",

@@ -62,13 +62,13 @@ const categoryPercentageNummer = 1.0;
 const clusterMetrics = [
     {
         key: 'average_attitude',
-        label: 'Attitude',
+        label: 'Att',
         color: '#00ffaa',
     },
 
     {
         key: 'average_perceived_norm',
-        label: 'Perceived Norm',
+        label: 'PN',
         color: '#ff7801',
     },
 

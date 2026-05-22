@@ -109,7 +109,7 @@ const OverviewNavbar = ({ title, year }) => {
 
     return (
         <>
-            <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
+            <ToastContainer position="top-right" hideProgressBar={false} autoClose={false} />
             <div className="overview-navbar">
                 <div className="navbar-left">
                     <button className="start-button" onClick={openSimulationModal}>
@@ -155,7 +155,7 @@ const OverviewNavbar = ({ title, year }) => {
                 <div className="control-bar">
                     <span className='simulation-year'>Simulation Year: {year}</span>
                     <button className="pause-button" onClick={togglePause}>
-                        {paused ? 'Continue Simulation' : 'Pause Simulation'}
+                        {paused ? <span className="material-symbols-outlined">play_circle</span> : <span className="material-symbols-outlined">stop_circle</span>}
                     </button>
                     <h5> Delay: </h5>
                     <select className="delay-select" value={delay} onChange={updateDelay}>

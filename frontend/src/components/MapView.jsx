@@ -7,6 +7,8 @@ import getLabelIcon from '../utils/getLabelIcon';
 const latitude = 52.091831;
 const longitude = 4.388425;
 const zoomLevel = 16;
+const maxZoomLevel = 22;
+const maxNativeZoomLevel = 19;
 
 const radiusMeters = 4;
 const radiusWeight = 4;
@@ -20,7 +22,7 @@ const MapView = ({ houses, onHouseClick, selectedHouse }) => {
         if (!mapRef.current) {
             mapRef.current = L.map('map').setView([latitude, longitude], zoomLevel);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap' // Name in the bottom right corner
+                attribution: '© OpenStreetMap',maxZoom: maxZoomLevel, maxNativeZoom: maxNativeZoomLevel // Name in the bottom right corner
             }).addTo(mapRef.current);
         }
         return () => {

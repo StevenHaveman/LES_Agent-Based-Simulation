@@ -23,6 +23,8 @@ import { useMapData } from '../hooks/useMapData.js';
 import { useSimulationYear } from '../hooks/useSimulationYear.js';
 import { GRAPH_OPTIONS, GRAPH_SLOTS } from '../components/graphOptions.js';
 
+import "@fontsource/montserrat";
+
 const simulationYearStart = 2024;
 
 function OverviewContent() {
@@ -95,7 +97,8 @@ function OverviewContent() {
 
     return (
         <>
-            <OverviewNavbar title="LES agent" year={year + simulationYearStart} />
+            <OverviewNavbar title="INSIGHT: Integrated Neighborhood Simulation for Informing Green Housing Transitions
+ " year={year + simulationYearStart} />
             <div className={`overview-container${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
                 <div className={`sidebar-container${sidebarCollapsed ? ' collapsed' : ''}`}>
                     <SidebarToggle collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(v => !v)} />

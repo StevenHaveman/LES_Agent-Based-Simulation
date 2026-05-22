@@ -12,6 +12,7 @@ import {
     Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import { averageResidentScores } from '../utils/residentStats';
 import '../styles/ResidentInfo.css';
 
 ChartJS.register(
@@ -138,6 +139,11 @@ const ResidentInfo = ({ resident, home }) => {
         }
         : null;
     const decibel = 2;
+    const averageBehaviorScore = averageResidentScores(resident, [
+        'attitude',
+        'perceived_norm',
+        'survey_pbc',
+    ]);
     return (
         <div className="resident_info-container">
             <div className="info">
@@ -159,19 +165,22 @@ const ResidentInfo = ({ resident, home }) => {
                     <strong>Income:</strong> €{resident.income + ',-'}
                 </p>
                 <p>
-                    <strong>Perceived Norm:</strong> {resident.perceived_norm.toFixed(decibel)}
-                </p>
-                {/* <p><strong>Norm Sensitivity:</strong> {resident.norm_sensitivity.toFixed(decibel)}</p> */}
-                <p>
-                    <strong>Survey PBC:</strong> {resident.survey_pbc.toFixed(decibel)}
-                </p>
-                {/* <p><strong>Control Sensitivity:</strong> {typeof resident.control_sensitivity === 'number' ? resident.control_sensitivity.toFixed(decibel) : resident.control_sensitivity}</p> */}
-                <p>
                     <strong>Cluster Type:</strong> {resident.cluster_type}
                 </p>
                 <p>
-                    <strong>Attitude:</strong> {resident.attitude.toFixed(decibel)}
+                    <strong>Attitude (Att):</strong> {resident.attitude.toFixed(decibel)}
                 </p>
+                <p>
+                    <strong>Perceived Norm (PN):</strong> {resident.perceived_norm.toFixed(decibel)}
+                </p>
+                {/* <p><strong>Norm Sensitivity:</strong> {resident.norm_sensitivity.toFixed(decibel)}</p> */}
+                <p>
+                    <strong>Percieved Behaviour Control (PBC):</strong> {resident.survey_pbc.toFixed(decibel)}
+                </p>
+                <p>
+                    <strong>Average Total:</strong> {averageBehaviorScore.toFixed(decibel)}
+                </p>
+                {/* <p><strong>Control Sensitivity:</strong> {typeof resident.control_sensitivity === 'number' ? resident.control_sensitivity.toFixed(decibel) : resident.control_sensitivity}</p> */}
 
                 {trendChartData && !loading && (
                     <div className="resident-trends-section">
