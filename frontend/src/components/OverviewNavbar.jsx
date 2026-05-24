@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import PropTypes from 'prop-types';
-import { useSimulationRun } from '../hooks/useSimulationRun.js';
-import simulationParametersService from '../services/SimulationParametersService';
-import simulationService from '../services/SimulationService';
 import '../styles/OverviewNavbar.css';
+import useOverviewNavbarLogic from '../hooks/useOverviewNavbarLogic';
+import HelpModal from './HelpModal.jsx';
 
 /**
  * OverviewNavbar component provides a navigation bar for the simulation overview page.
@@ -16,130 +15,36 @@ import '../styles/OverviewNavbar.css';
  * @returns {JSX.Element} The rendered OverviewNavbar component.
  */
 const OverviewNavbar = ({ title, year }) => {
-    const seconds = 3;
-    // State to track whether the simulation is paused.
-    const [paused, setPaused] = useState(false);
+    const {
+        paused,
+        delay,
+        showModal,
+        setShowModal,
+        inputParams,
+        handleParamChange,
+        startSimulation,
+        resetSimulation,
+        togglePause,
+        updateDelay,
+        openSimulationModal,
+    } = useOverviewNavbarLogic();
 
-    const [delay, setDelay] = useState(seconds);
-
-    const togglePause = async () => {
-        const result = await useSimulationRun().togglePause();
-        if (result.status === 'ok') {
-            toast.info(result.message);
-            setPaused(result.paused);
-        }
-    };
-    const [showModal, setShowModal] = useState(false);
-    const [inputParams, setInputParams] = useState({
-        nr_households: 10,
-        nr_residents: 10,
-        simulation_years: 30,
-        seed: 0,
-    });
-
-    const [lastParams, setLastParams] = useState(null);
-
-    const openSimulationModal = () => {
-        setShowModal(true);
-    };
-
-    const handleParamChange = (e) => {
-        const { name, value } = e.target;
-        setInputParams((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const startSimulation = async (e) => {
-        if (e) {
-            e.preventDefault();
-        }
-        setShowModal(false);
-        setLastParams(inputParams);
-        const params = {
-            ...inputParams,
-            nr_households: Number(inputParams.nr_households),
-            nr_residents: Number(inputParams.nr_residents),
-            simulation_years: Number(inputParams.simulation_years),
-            seed: Number(inputParams.seed),
-        };
-        const result = await simulationService.startSimulation(params);
-        toast.success(result.message || 'Simulation started');
-    };
-
-    const resetSimulation = async () => {
-        let paramsSource = lastParams;
-
-        if (!paramsSource) {
-            try {
-                const fetchedParamsResponse = await simulationParametersService.fetchParameters();
-                const fetchedParams = fetchedParamsResponse?.config ?? fetchedParamsResponse;
-                paramsSource = {
-                    nr_households: fetchedParams.nr_households,
-                    nr_residents: fetchedParams.nr_residents,
-                    simulation_years: fetchedParams.simulation_years,
-                    seed: fetchedParams.seed,
-                };
-            } catch {
-                toast.error('Could not load previous simulation parameters.');
-                return;
-            }
-        }
-
-        if (!paramsSource) {
-            toast.error('No previous simulation parameters found.');
-            return;
-        }
-
-        const params = {
-            ...paramsSource,
-            nr_households: Number(paramsSource.nr_households),
-            nr_residents: Number(paramsSource.nr_residents),
-            simulation_years: Number(paramsSource.simulation_years),
-            seed: Number(paramsSource.seed),
-        };
-
-        if (
-            Number.isNaN(params.nr_households)
-            || Number.isNaN(params.nr_residents)
-            || Number.isNaN(params.simulation_years)
-            || Number.isNaN(params.seed)
-        ) {
-            toast.error('Previous simulation parameters are invalid.');
-            return;
-        }
-
-        setLastParams(paramsSource);
-        const result = await simulationService.startSimulation(params);
-        toast.info(result.message || 'Simulation reset');
-    };
-
-    /**
-   * Updates the delay between simulation steps by interacting with the controller.
-   * Sets the new delay value in the state.
-   *
-   * @param {React.ChangeEvent<HTMLSelectElement>} e - The change event from the delay dropdown.
-   */
-    const updateDelay = async (e) => {
-        const newDelay = parseInt(e.target.value);
-        setDelay(newDelay);
-
-        await useSimulationRun.setDelay(newDelay);
-    };
-
-    /**
-   * Fetches the initial pause status and delay from the controller when the component is mounted.
-   * Adds a keydown event listener to toggle the pause state when the 'k' key is pressed.
-   */
-    useEffect(() => {
-        const fetchInitialData = async () => {
-            const status = await useSimulationRun().getPauseStatus();
-            setPaused(status.paused);
-
-            const delayRes = await useSimulationRun().getSimulationDelay();
-            setDelay(delayRes.delay);
-        };
-
-        fetchInitialData();
-    }, []);
+        const [helpOpen, setHelpOpen] = useState(false);
+        const showHelp = () => setHelpOpen(true);
+        const helpHtml = `
+                <p>The INSIGHT-model is an Integrated Neighborhood Simulation for Informing Green Housing Transitions.</p>
+                <p>The model combines research insights on:</p>
+                <ul>
+                    <li>Technical building performance before and after renovations.</li>
+                    <li>Anonymized social data gathered through surveys.</li>
+                    <li>Public information about the housing stock in a specific neighborhood.</li>
+                </ul>
+                <p>While the model displays houses on a real-life map, the resident data and assumptions are not linked to the actual location where the houses are plotted.</p>
+                <p>For more information about the project: <a href="https://www.internationalhu.com/research/projects/sustainable-and-social-local-energy-systems" target="_blank" rel="noopener noreferrer">https://www.internationalhu.com/research/projects/sustainable-and-social-local-energy-systems</a></p>
+                <p>Contact information: <a href="mailto:steven.haveman@hu.nl">steven.haveman@hu.nl</a></p>
+                <p>The model has been developed for research purposes in the 'LES-project' - (Sustainable and Social Local Energy Systems project).</p>
+                <p>This project is financed by NSFC and NWO to stimulate collaboration between two countries. Knowledge institutions from both countries will work with societal partners from public, semi-public and private organisations, to increase the societal relevance and impact of their research..</p>
+        `;
 
     return (
         <>
@@ -250,6 +155,10 @@ const OverviewNavbar = ({ title, year }) => {
                         <option value="10">10 sec</option>
                         <option value="0">0 sec</option>
                     </select>
+                    <button className="help-button" onClick={showHelp} title="Help" style={{ marginLeft: 8 }}>
+                        <span className="material-symbols-outlined">help</span>
+                    </button>
+                    <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} html={helpHtml} />
                 </div>
             </div>
         </>

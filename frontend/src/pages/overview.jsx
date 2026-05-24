@@ -91,7 +91,6 @@ function OverviewContent() {
     );
 
     const selectedResidents = selectedHouse ? selectedHouse.residents : [];
-    // const selectedResident = selectedResidents[selectedResidentIndex] || null;
 
     return (
         <>
@@ -155,9 +154,6 @@ function OverviewContent() {
                 <div className="charts-container">
                     <GraphicsView selectedGraphs={selectedGraphs} />
                 </div>
-                {/* <div className="KPI-container">
-                    <KPIWindow />
-                </div> */}
             </div>
         </>
     );

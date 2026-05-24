@@ -20,6 +20,8 @@
 
 .graphics-title-centered {
     align-self: center;
+    margin: -1.0rem 0 0.5rem;
+    padding-top: 0;
 }
 
 .graphics-modal-overlay {
