@@ -1,31 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Filler,
-    Title,
-    Tooltip,
-    Legend,
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Filler, Title, Tooltip, Legend } from 'chart.js';
 import { averageResidentScores } from '../utils/residentStats';
 import ResidentDropdown from './ResidentDropdown.jsx';
+import HomeTrendChart from './HomeTrendChart.jsx';
+import ResidentTrendChart from './ResidentTrendChart.jsx';
 import '../styles/ResidentInfo.css';
+import { getHomeTrends, getResidentTrends } from '../utils/trends';
 
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Filler,
-    Title,
-    Tooltip,
-    Legend,
-);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Title, Tooltip, Legend);
 
 const startYearSimulation = 2024;
 
@@ -36,152 +19,56 @@ const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResi
     useEffect(() => {
         const fetchHistoricalData = async () => {
             try {
-                const response = await fetch(
-                    'http://localhost:5000/households_historical',
-                );
+                const response = await fetch('http://localhost:5000/households_historical');
                 if (response.ok) {
-                    const data = await response.json();
-                    setHistoricalData(data);
+                    setHistoricalData(await response.json());
                 } else {
-                    // Data not available yet (simulation hasn't run or no historical data)
-                    console.warn('No historical data available yet');
+                    console.warn('No historical data available');
                 }
             } catch (error) {
-                console.error('Error fetching historical resident data:', error);
+                console.error('Error fetching historical data:', error);
             } finally {
                 setLoading(false);
             }
         };
-
         fetchHistoricalData();
-    }, []);
+    }, [home, resident]);
 
     if (viewMode === 'resident' && !resident) {
-        return (
-            <div className="select-resident-hint">
-                <h3> Click on a Resident</h3>
-            </div>
-        );
+        return <div className="select-resident-hint"><h3>Click on a Resident</h3></div>;
     }
 
     if (viewMode === 'home' && !home) {
-        return (
-            <div className="select-resident-hint">
-                <h3> Click on a Home</h3>
-            </div>
-        );
+        return <div className="select-resident-hint"><h3>Click on a Home</h3></div>;
     }
 
-    // Extract resident score trends over time
-    const getResidentTrends = () => {
-        if (!historicalData || historicalData.length === 0) {return null;}
-
-        const trends = {
-            years: [],
-            perceived_norm: [],
-            survey_pbc: [],
-            attitude: [],
-        };
-
-        historicalData.forEach((yearData) => {
-            if (yearData.households && Array.isArray(yearData.households)) {
-                const household = yearData.households.find((hh) =>
-                    hh.residents.some((r) => r.unique_id === resident.unique_id),
-                );
-                if (household) {
-                    const residentData = household.residents.find(
-                        (r) => r.unique_id === resident.unique_id,
-                    );
-                    if (residentData) {
-                        trends.years.push((Number(yearData.year) || 0) + startYearSimulation);
-                        trends.perceived_norm.push(residentData.perceived_norm || 0);
-                        trends.survey_pbc.push(residentData.survey_pbc || 0);
-                        trends.attitude.push(
-                            typeof residentData.attitude === 'number'
-                                ? residentData.attitude
-                                : 0,
-                        );
-                    }
-                }
-            }
-        });
-
-        return trends.years.length > 0 ? trends : null;
-    };
-
-    const trends = getResidentTrends();
-    const trendChartData = trends
-        ? {
-            labels: trends.years,
-            datasets: [
-                {
-                    label: 'Perceived Norm',
-                    data: trends.perceived_norm,
-                    borderColor: '#ff7f0e',
-                    backgroundColor: '#ff7f0e33',
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                },
-                {
-                    label: 'Survey PBC',
-                    data: trends.survey_pbc,
-                    borderColor: '#2ca02c',
-                    backgroundColor: '#2ca02c33',
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                },
-                {
-                    label: 'Attitude',
-                    data: trends.attitude,
-                    borderColor: '#d62728',
-                    backgroundColor: '#d6272833',
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                },
-            ],
-        }
-        : null;
+    const homeTrends = getHomeTrends(historicalData, home, startYearSimulation);
+    const trends = getResidentTrends(historicalData, resident, startYearSimulation);
     const decibel = 2;
-    const averageBehaviorScore = averageResidentScores(resident, [
-        'attitude',
-        'perceived_norm',
-        'survey_pbc',
-    ]);
+    const averageBehaviorScore = averageResidentScores(resident, ['attitude', 'perceived_norm', 'survey_pbc']);
     return (
         <div className="resident_info-container">
             <div className="info">
                 {viewMode === 'home' && (
                     <>
                         <h3>Residence Information</h3>
-                        {/* <p><strong>Address:</strong> {home.address}</p> */}
                         <div className="info-list">
                             <div className="info-row">
-                                <span className="info-label">Package level:</span>
-                                <span className="info-value">{resident?.kpi_level ?? '-'}</span>
+                                <span className="info-label">Current KPI Level:</span>
+                                <span className="info-value">{home?.residents?.[0]?.kpi_level || home?.GIS_attributes?.Energielabel || '-'}</span>
                             </div>
-                            {/* <p><strong>Total residents:</strong> {home.residents.length}</p> */}
                             <div className="info-row">
                                 <span className="info-label">Type home:</span>
                                 <span className="info-value">{home.houseType}</span>
                             </div>
                         </div>
+                        {!loading && <HomeTrendChart homeTrends={homeTrends} />}
                     </>
                 )}
 
                 {viewMode === 'resident' && (
                     <>
-                        <ResidentDropdown
-                            residents={residents || []}
-                            selectedResidentIndex={selectedResidentIndex}
-                            onSelect={onResidentChange}
-                            className="inline-selector"
-                        />
+                        <ResidentDropdown residents={residents || []} selectedResidentIndex={selectedResidentIndex} onSelect={onResidentChange} className="inline-selector" />
                         <h3>Resident Details</h3>
                         <div className="info-list">
                             <div className="info-row">
@@ -204,7 +91,6 @@ const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResi
                                 <span className="info-label">Perceived Norm (PN):</span>
                                 <span className="info-value">{resident.perceived_norm.toFixed(decibel)}</span>
                             </div>
-                            {/* <p><strong>Norm Sensitivity:</strong> {resident.norm_sensitivity.toFixed(decibel)}</p> */}
                             <div className="info-row">
                                 <span className="info-label">Perceived Behaviour Control (PBC):</span>
                                 <span className="info-value">{resident.survey_pbc.toFixed(decibel)}</span>
@@ -214,52 +100,7 @@ const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResi
                                 <span className="info-value">{averageBehaviorScore.toFixed(decibel)}</span>
                             </div>
                         </div>
-                        {/* <p><strong>Control Sensitivity:</strong> {typeof resident.control_sensitivity === 'number' ? resident.control_sensitivity.toFixed(decibel) : resident.control_sensitivity}</p> */}
-
-                        {trendChartData && !loading && (
-                            <div className="resident-trends-section">
-                                <hr className="resident-info-divider" />
-                                <h3>Score Development Over Time</h3>
-                                <div className="resident-trend-chart">
-                                    <Line
-                                        data={trendChartData}
-                                        options={{
-                                            responsive: true,
-                                            maintainAspectRatio: false,
-                                            interaction: {
-                                                mode: 'index',
-                                                intersect: false,
-                                            },
-                                            plugins: {
-                                                legend: {
-                                                    position: 'top',
-                                                },
-                                            },
-                                            scales: {
-                                                y: {
-                                                    min: 0,
-                                                    max: 1,
-                                                    beginAtZero: true,
-                                                },
-                                            },
-                                        }}
-                                    />
-                                </div>
-                            </div>
-                        )}
-                        {!trendChartData && !loading && historicalData.length > 0 && (
-                            <div className="resident-trends-section">
-                                <hr className="resident-info-divider" />
-                                <p style={{ fontSize: '0.9rem' }}>
-                                    No historical data found for this resident.
-                                </p>
-                            </div>
-                        )}
-                        {loading && (
-                            <div className="resident-trends-section">
-                                <p style={{ fontSize: '0.9rem' }}>Loading historical data...</p>
-                            </div>
-                        )}
+                        <ResidentTrendChart trends={trends} loading={loading} historicalData={historicalData} />
                     </>
                 )}
             </div>
@@ -269,13 +110,7 @@ const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResi
 
 ResidentInfo.propTypes = {
     viewMode: PropTypes.oneOf(['resident', 'home']),
-    residents: PropTypes.arrayOf(
-        PropTypes.shape({
-            unique_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-            name: PropTypes.string,
-            income: PropTypes.number,
-        }),
-    ),
+    residents: PropTypes.arrayOf(PropTypes.shape({ unique_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), name: PropTypes.string, income: PropTypes.number })),
     selectedResidentIndex: PropTypes.number,
     onResidentChange: PropTypes.func,
     resident: PropTypes.shape({
@@ -292,14 +127,7 @@ ResidentInfo.propTypes = {
     home: PropTypes.shape({
         address: PropTypes.string,
         energyLabel: PropTypes.string,
-        residents: PropTypes.arrayOf(
-            PropTypes.shape({
-                unique_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-                name: PropTypes.string,
-                income: PropTypes.number,
-                address: PropTypes.string,
-            }),
-        ),
+        residents: PropTypes.arrayOf(PropTypes.shape({ unique_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), name: PropTypes.string, income: PropTypes.number, address: PropTypes.string })),
         houseType: PropTypes.string,
     }),
 };
