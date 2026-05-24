@@ -33,6 +33,31 @@
     line-height: 1.4;
 }
 
+.info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    width: 100%;
+}
+
+.info-row {
+    display: grid;
+    grid-template-columns: minmax(170px, 1fr) minmax(120px, auto);
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.info-label {
+    font-weight: 600;
+}
+
+.info-value {
+    text-align: right;
+    justify-self: end;
+}
+
 .resident-trends-section {
     margin-top: 1rem;
     width: 100%;

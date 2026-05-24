@@ -149,37 +149,50 @@ const ResidentInfo = ({ resident, home }) => {
             <div className="info">
                 <h3>Residence Information</h3>
                 {/* <p><strong>Address:</strong> {home.address}</p> */}
-                <p>
-                    <strong>Package level:</strong> {resident.kpi_level}
-                </p>
+                <div className="info-list">
+                    <div className="info-row">
+                        <span className="info-label">Package level:</span>
+                        <span className="info-value">{resident.kpi_level}</span>
+                    </div>
                 {/* <p><strong>Total residents:</strong> {home.residents.length}</p> */}
-                <p>
-                    <strong>Type home:</strong> {home.houseType}
-                </p>
+                    <div className="info-row">
+                        <span className="info-label">Type home:</span>
+                        <span className="info-value">{home.houseType}</span>
+                    </div>
+                </div>
                 <hr className="resident-info-divider" />
                 <h3>Resident Details</h3>
-                <p>
-                    <strong>Name:</strong> {resident.name}
-                </p>
-                <p>
-                    <strong>Income:</strong> €{resident.income + ',-'}
-                </p>
-                <p>
-                    <strong>Cluster Type:</strong> {resident.cluster_type}
-                </p>
-                <p>
-                    <strong>Attitude (Att):</strong> {resident.attitude.toFixed(decibel)}
-                </p>
-                <p>
-                    <strong>Perceived Norm (PN):</strong> {resident.perceived_norm.toFixed(decibel)}
-                </p>
+                <div className="info-list">
+                    <div className="info-row">
+                        <span className="info-label">Name:</span>
+                        <span className="info-value">{resident.name}</span>
+                    </div>
+                    <div className="info-row">
+                        <span className="info-label">Income:</span>
+                        <span className="info-value">€{resident.income + ',-'}</span>
+                    </div>
+                    <div className="info-row">
+                        <span className="info-label">Cluster Type:</span>
+                        <span className="info-value">{resident.cluster_type}</span>
+                    </div>
+                    <div className="info-row">
+                        <span className="info-label">Attitude (Att):</span>
+                        <span className="info-value">{resident.attitude.toFixed(decibel)}</span>
+                    </div>
+                    <div className="info-row">
+                        <span className="info-label">Perceived Norm (PN):</span>
+                        <span className="info-value">{resident.perceived_norm.toFixed(decibel)}</span>
+                    </div>
                 {/* <p><strong>Norm Sensitivity:</strong> {resident.norm_sensitivity.toFixed(decibel)}</p> */}
-                <p>
-                    <strong>Percieved Behaviour Control (PBC):</strong> {resident.survey_pbc.toFixed(decibel)}
-                </p>
-                <p>
-                    <strong>Average Total:</strong> {averageBehaviorScore.toFixed(decibel)}
-                </p>
+                    <div className="info-row">
+                        <span className="info-label">Percieved Behaviour Control (PBC):</span>
+                        <span className="info-value">{resident.survey_pbc.toFixed(decibel)}</span>
+                    </div>
+                    <div className="info-row">
+                        <span className="info-label">Average Total:</span>
+                        <span className="info-value">{averageBehaviorScore.toFixed(decibel)}</span>
+                    </div>
+                </div>
                 {/* <p><strong>Control Sensitivity:</strong> {typeof resident.control_sensitivity === 'number' ? resident.control_sensitivity.toFixed(decibel) : resident.control_sensitivity}</p> */}
 
                 {trendChartData && !loading && (
