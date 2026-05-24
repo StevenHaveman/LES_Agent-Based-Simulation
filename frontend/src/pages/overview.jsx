@@ -5,6 +5,7 @@ import '../styles/overviewpage.css';
 import '../styles/globalPageStyles.css';
 import { OverviewProvider, useOverviewState } from '../state/overviewState.jsx';
 
+import GraphSelector from '../components/GraphSelector.jsx';
 import GraphicsView from '../components/GraphicsView.jsx';
 import MapView from '../components/MapView.jsx';
 import MapFilterMenu from '../components/MapFilterMenu.jsx';
@@ -12,19 +13,26 @@ import SidebarToggle from '../components/SidebarToggle.jsx';
 
 import ResidentNavbar from '../components/ResidentNavbar.jsx';
 import ResidentWindow from '../components/ResidentWindow.jsx';
-import ResidentDropdown from '../components/ResidentDropdown.jsx';
 import AIChatWindow from '../components/AIChatWindow.jsx';
 import OverviewNavbar from '../components/OverviewNavbar.jsx';
-import ResidentInfo from '../components/ResidentInfo.jsx';
 
 import KPIWindow from '../components/KPIWindow.jsx';
 import { useMapData } from '../hooks/useMapData.js';
 import { useSimulationYear } from '../hooks/useSimulationYear.js';
+import { GRAPH_OPTIONS, GRAPH_SLOTS } from '../components/graphOptions.js';
+
+import '@fontsource/montserrat';
 
 const simulationYearStart = 2024;
 
 function OverviewContent() {
     const state = useOverviewState();
+    const [showGraphOptions, setShowGraphOptions] = useState(false);
+    const [selectedGraphs, setSelectedGraphs] = useState([
+        'cluster_behavior_trends',
+        'co2',
+        'kpi_stock'
+    ]);
     const [selectedHouse, setSelectedHouse] = useState(null);
     const [selectedResidentIndex, setSelectedResidentIndex] = useState(0);
     const [selectedLabels, setSelectedLabels] = useState(['A', 'B', 'C', 'D', 'E', 'F', 'G']);
@@ -69,17 +77,25 @@ function OverviewContent() {
         );
     };
 
+    const handleGraphChange = (idx, newKey) => {
+        if (selectedGraphs.includes(newKey)) {return;}
+
+        const newGraphs = [...selectedGraphs];
+        newGraphs[idx] = newKey;
+        setSelectedGraphs(newGraphs);
+    };
+
     const filteredHouses = houses.filter(h =>
         selectedLabels.includes(h.energyLabel) &&
         (selectedWoningTypes.length === 0 || selectedWoningTypes.includes(h.houseType))
     );
 
     const selectedResidents = selectedHouse ? selectedHouse.residents : [];
-    const selectedResident = selectedResidents[selectedResidentIndex] || null;
 
     return (
         <>
-            <OverviewNavbar title="LES agent" year={year + simulationYearStart} />
+            <OverviewNavbar title="INSIGHT: Integrated Neighborhood Simulation for Informing Green Housing Transitions
+ " year={year + simulationYearStart} />
             <div className={`overview-container${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
                 <div className={`sidebar-container${sidebarCollapsed ? ' collapsed' : ''}`}>
                     <SidebarToggle collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(v => !v)} />
@@ -109,16 +125,12 @@ function OverviewContent() {
                 </div> */}
                 <div className="resident-container">
                     <ResidentNavbar />
-                    <ResidentDropdown
-                        residents={selectedResidents}
-                        selectedResidentIndex={selectedResidentIndex}
-                    />
                     <ResidentWindow
                         residents={selectedResidents}
                         selectedResidentIndex={selectedResidentIndex}
                         home={selectedHouse}
+                        onResidentChange={setSelectedResidentIndex}
                     />
-                    <ResidentInfo resident={selectedResident} home={selectedHouse} />
                 </div>
                 {/* <div className="parameters-container"> // TODO: CHANGE LOCATION
                     <SimulationParameters> </SimulationParameters>
@@ -129,12 +141,19 @@ function OverviewContent() {
                 <div className="kpi-container">
                     <KPIWindow />
                 </div>
-                <div className="charts-container">
-                    <GraphicsView />
+                <div className="charts-chooser-container">
+                    <GraphSelector
+                        showOptions={showGraphOptions}
+                        setShowOptions={setShowGraphOptions}
+                        selectedGraphs={selectedGraphs}
+                        handleGraphChange={handleGraphChange}
+                        graphOptions={GRAPH_OPTIONS}
+                        graphSlots={GRAPH_SLOTS}
+                    />
                 </div>
-                {/* <div className="KPI-container">
-                    <KPIWindow />
-                </div> */}
+                <div className="charts-container">
+                    <GraphicsView selectedGraphs={selectedGraphs} />
+                </div>
             </div>
         </>
     );

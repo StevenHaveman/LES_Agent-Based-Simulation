@@ -1,34 +1,38 @@
 import React from 'react';
 import '../styles/GraphicsView.css';
 import Graphic from './Graphic.jsx';
+import PropTypes from 'prop-types';
+import { GRAPH_OPTIONS } from './graphOptions.js';
 
-/**
- * GraphicsView component renders a collection of graphical representations
- * of various data points related to solar panels, heat pumps, and household decisions.
- *
- * @returns {JSX.Element} The rendered GraphicsView component.
- */
-const GraphicsView = () => {
+const GraphicsView = ({ selectedGraphs }) => {
+    const graphItems = selectedGraphs
+        .map((key) => {
+            const option = GRAPH_OPTIONS.find((item) => item.key === key);
+
+            return {
+                key,
+                title: option ? option.label : key,
+            };
+        });
+
     return (
         <div className="graphics-view-container">
             <div className="graphic-wrapper">
-                <button>Options</button>
-                <h2 className="graphics-title-centered">Graphs</h2>
-                <Graphic
-                    title="Performance categories over time"
-                    yAxisKey="energy_label_A"
-                />
-                <Graphic
-                    title="CO2 Emissions"
-                    yAxisKey="co2"
-                />
-                <Graphic
-                    title="CO2 Emissions"
-                    yAxisKey="co2"
-                />
+                <h3 className="graphics-title-centered">Graphs</h3>
+                {graphItems.map((item) => (
+                    <Graphic
+                        key={item.key}
+                        title={item.title}
+                        yAxisKey={item.key}
+                    />
+                ))}
             </div>
         </div>
     );
+};
+
+GraphicsView.propTypes = {
+    selectedGraphs: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 export default GraphicsView;

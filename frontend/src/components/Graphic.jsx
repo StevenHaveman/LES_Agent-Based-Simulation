@@ -1,38 +1,5 @@
-/**
- * Graphic Component
- *
- * This React component displays a simulation graph based on the provided data.
- * It uses the `recharts` library to render a responsive line chart with data points
- * representing the start and end states of a simulation year.
- *
- * Props:
- * - `title` (string): The title of the graph. Defaults to an empty string.
- * - `yAxisKey` (string): The key for the Y-axis data. Valid keys include:
- *   - "solar_panel_price"
- *   - "heat_pump_price"
- *   - "solar_panel_households"
- *   - "solar_panel_positive_decisions"
- *   If an invalid key is provided, the first valid key is used as a fallback.
- *
- * State:
- * - `simulationData` (Array): The fetched simulation data used to populate the graph.
- * - `loading` (boolean): Indicates whether the data is still being fetched.
- *
- * Effects:
- * - Fetches simulation data and polling delay on component mount.
- * - Sets up an interval to periodically fetch simulation data based on the polling delay.
- * - Cleans up the interval on component unmount.
- *
- * Methods:
- * - `fetchData()`: Fetches simulation data from the backend.
- * - `fetchInterval()`: Fetches the polling delay and sets up periodic data fetching.
- *
- * Returns:
- * - A responsive line chart displaying the simulation data for the selected Y-axis key.
- * - A loading message if the data is still being fetched.
- */
-
 import React, { useState, useEffect } from 'react';
+
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -43,7 +10,7 @@ import {
     Filler,
     Title,
     Tooltip,
-    Legend
+    Legend,
 } from 'chart.js';
 
 ChartJS.register(
@@ -55,16 +22,21 @@ ChartJS.register(
     Filler,
     Title,
     Tooltip,
-    Legend
+    Legend,
 );
-
-import { Bar, Line } from 'react-chartjs-2';
 
 import PropTypes from 'prop-types';
 
 import '../styles/Graphic.css';
+
 import { useOverview } from '../hooks/useOverview.js';
 import { useSimulationRun } from '../hooks/useSimulationRun.js';
+
+import EnergyChart from '../charts/EnergyChart';
+import Co2Chart from '../charts/Co2Chart';
+import KpiChart from '../charts/KpiChart';
+import ClusterChart from '../charts/ClusterChart';
+import ClusterTrendChart from '../charts/ClusterTrendChart';
 
 const validKeys = [
     'energy_label_A',
@@ -74,20 +46,76 @@ const validKeys = [
     'energy_label_E',
     'energy_label_F',
     'energy_label_G',
-    'co2'
+    'co2',
+    'kpi_stock',
+    'cluster_behavior_data',
+    'cluster_behavior_trends',
 ];
 
 const delayMs = 1000;
 const defaultSimulationDelaySeconds = 3;
 const simulationYearStart = 2025;
 
+const barPercentageNummer = 1.0;
+const categoryPercentageNummer = 1.0;
+
+const clusterMetrics = [
+    {
+        key: 'average_attitude',
+        label: 'Att',
+        color: '#00ffaa',
+    },
+
+    {
+        key: 'average_perceived_norm',
+        label: 'PN',
+        color: '#ff7801',
+    },
+
+    {
+        key: 'average_pbc',
+        label: 'PBC',
+        color: '#238b23',
+    },
+];
+
+const clusterColors = ['#2ac72a', '#5a5754', '#ff0000'];
+
+const chartOptions = {
+    responsive: true,
+
+    interaction: {
+        mode: 'index',
+        intersect: false,
+    },
+
+    plugins: {
+        legend: {
+            position: 'top',
+        },
+    },
+
+    scales: {
+        x: {
+            stacked: true,
+        },
+
+        y: {
+            stacked: true,
+        },
+    },
+};
+
 const Graphic = ({ title = '', yAxisKey = '' }) => {
     const [simulationData, setSimulationData] = useState([]);
+
     const [loading, setLoading] = useState(true);
 
+    const [selectedClusterMetric, setSelectedClusterMetric] = useState(
+        clusterMetrics[0].key,
+    );
+
     const yKey = validKeys.includes(yAxisKey) ? yAxisKey : validKeys[0];
-    const isEnergyChart = yKey.startsWith('energy_label');
-    const isCo2Chart = yKey === 'co2';
 
     useEffect(() => {
         let intervalId;
@@ -95,17 +123,22 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
         const fetchData = async () => {
             try {
                 const result = await useOverview().getSimulationGraphicResults();
+
                 setSimulationData(result);
+
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching simulation data', error);
+
                 setLoading(false);
             }
         };
 
         const fetchInterval = async () => {
             const res = await useSimulationRun().getSimulationDelay();
-            const delay = parseInt(res.delay || defaultSimulationDelaySeconds) * delayMs;
+
+            const delay =
+                parseInt(res.delay || defaultSimulationDelaySeconds) * delayMs;
 
             await fetchData();
 
@@ -115,7 +148,9 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
         fetchInterval();
 
         return () => {
-            if (intervalId) {clearInterval(intervalId);}
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
         };
     }, []);
 
@@ -124,167 +159,94 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
     }
 
     const uniqueSimulationData = Array.from(
-        new Map(
-            simulationData.map(item => [item.year, item])
-        ).values()
+        new Map(simulationData.map((item) => [item.year, item])).values(),
     );
-    
-    const barPercentageNummer = 1.0;
-    const categoryPercentageNummer = 1.0;
+    const chartComponents = {
+        co2: (
+            <Co2Chart
+                uniqueSimulationData={uniqueSimulationData}
+                simulationYearStart={simulationYearStart}
+            />
+        ),
 
-    const co2ChartData = {
-        labels: uniqueSimulationData.map((_, idx) => simulationYearStart + idx),
+        kpi_stock: (
+            <KpiChart
+                uniqueSimulationData={uniqueSimulationData}
+                simulationYearStart={simulationYearStart}
+                chartOptions={chartOptions}
+                barPercentageNummer={barPercentageNummer}
+                categoryPercentageNummer={categoryPercentageNummer}
+            />
+        ),
 
-        datasets: [
-            {
-                label: 'Baseline Emissions',
-                data: uniqueSimulationData.map(
-                    item => item.co2_data.baseline_emissions
-                ),
+        cluster_behavior_data: (
+            <ClusterChart
+                uniqueSimulationData={uniqueSimulationData}
+                simulationYearStart={simulationYearStart}
+                selectedClusterMetric={selectedClusterMetric}
+                clusterMetrics={clusterMetrics}
+                clusterColors={clusterColors}
+                chartOptions={chartOptions}
+            />
+        ),
 
-                borderColor: '#888888',
-                backgroundColor: '#88888833',
-
-                fill: true,
-
-                tension: 0.3
-            },
-
-            {
-                label: 'Yearly Emissions',
-                data: uniqueSimulationData.map(
-                    item => item.co2_data.yearly_emissions
-                ),
-
-                borderColor: '#1bc04d',
-                backgroundColor: '#22B14C33',
-
-                fill: true,
-
-                tension: 0.3
-            }
-        ]
+        cluster_behavior_trends: (
+            <ClusterTrendChart
+                uniqueSimulationData={uniqueSimulationData}
+                simulationYearStart={simulationYearStart}
+                selectedClusterMetric={selectedClusterMetric}
+                clusterMetrics={clusterMetrics}
+                clusterColors={clusterColors}
+            />
+        ),
     };
 
-    const co2ChartOptions = {
-        responsive: true,
-
-        interaction: {
-            mode: 'index',
-            intersect: false
-        },
-
-        plugins: {
-            legend: {
-                position: 'top'
-            }
-        }
-    };
-
-    const chartData = {
-        labels: uniqueSimulationData.map((_, idx) => simulationYearStart + idx),
-
-        datasets: [
-            {
-                label: 'A',
-                data: uniqueSimulationData.map((item) => item.housing_stock.A),
-                backgroundColor: '#22B14C',
-                barPercentage: barPercentageNummer,
-                categoryPercentage: categoryPercentageNummer,
-            },
-            {
-                label: 'B',
-                data: uniqueSimulationData.map((item) => item.housing_stock.B),
-                backgroundColor: '#B5E61D',
-                barPercentage: barPercentageNummer,
-                categoryPercentage: categoryPercentageNummer,
-            },
-            {
-                label: 'C',
-                data: uniqueSimulationData.map((item) => item.housing_stock.C),
-                backgroundColor: '#FFF200',
-                barPercentage: barPercentageNummer,
-                categoryPercentage: categoryPercentageNummer,
-            },
-            {
-                label: 'D',
-                data: uniqueSimulationData.map((item) => item.housing_stock.D),
-                backgroundColor: '#FFA800',
-                barPercentage: barPercentageNummer,
-                categoryPercentage: categoryPercentageNummer,
-            },
-            {
-                label: 'E',
-                data: uniqueSimulationData.map((item) => item.housing_stock.E),
-                backgroundColor: '#FF3C00',
-                barPercentage: barPercentageNummer,
-                categoryPercentage: categoryPercentageNummer,
-            },
-            {
-                label: 'F',
-                data: uniqueSimulationData.map((item) => item.housing_stock.F),
-                backgroundColor: '#ED1C24',
-                barPercentage: barPercentageNummer,
-                categoryPercentage: categoryPercentageNummer,
-            },
-            {
-                label: 'G',
-                data: uniqueSimulationData.map((item) => item.housing_stock.G),
-                backgroundColor: '#880015',
-                barPercentage: barPercentageNummer,
-                categoryPercentage: categoryPercentageNummer,
-            },
-        ],
-    };
-
-    const chartOptions = {
-        responsive: true,
-
-        interaction: {
-            mode: 'index',
-            intersect: false
-        },
-
-        plugins: {
-            legend: {
-                position: 'top'
-            }
-        },
-
-        scales: {
-            x: {
-                stacked: true
-            },
-            y: {
-                stacked: true
-            }
-        }
-    };
+    const selectedChart = yKey.startsWith('energy_label') ? (
+        <EnergyChart
+            uniqueSimulationData={uniqueSimulationData}
+            simulationYearStart={simulationYearStart}
+            chartOptions={chartOptions}
+            barPercentageNummer={barPercentageNummer}
+            categoryPercentageNummer={categoryPercentageNummer}
+        />
+    ) : (
+        chartComponents[yKey]
+    );
 
     return (
         <div className="graphic-container">
             <h3 className="graphic-title">{title}</h3>
+
+            {/* Cluster dropdown */}
+            {(yKey === 'cluster_behavior_data' ||
+        yKey === 'cluster_behavior_trends') && (
+                <div style={{ marginBottom: '1em' }}>
+                    <label htmlFor="cluster-metric-select">Select metric:&nbsp;</label>
+
+                    <select
+                        id="cluster-metric-select"
+                        value={selectedClusterMetric}
+                        onChange={(e) => setSelectedClusterMetric(e.target.value)}
+                    >
+                        {clusterMetrics.map((metric) => (
+                            <option key={metric.key} value={metric.key}>
+                                {metric.label}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            )}
+
             <div className="graphic-square-wrapper">
-                {isEnergyChart ? (
-                    <Bar
-                        data={chartData}
-                        options={chartOptions}
-                    />
-                ) : isCo2Chart ? (
-                    <Line
-                        data={co2ChartData}
-                        options={co2ChartOptions}
-                    />
-                ) : (<div>Invalid key</div>
-                )}
-            </div> 
+                {selectedChart || <div>Invalid key</div>}
+            </div>
         </div>
     );
 };
 
 Graphic.propTypes = {
     title: PropTypes.string,
-    yAxisKey: PropTypes.string
+    yAxisKey: PropTypes.string,
 };
 
 export default Graphic;

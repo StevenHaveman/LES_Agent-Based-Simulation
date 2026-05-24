@@ -48,7 +48,12 @@ const gLabelIcon = L.icon({
     iconAnchor: iconAnchor
 });
 function getLabelIcon(label) {
-    switch (label) {
+    if (label === undefined || label === null) { return defaultIcon; }
+    const lab = String(label).trim();
+    const upper = lab.toUpperCase();
+
+    // Support both letter labels (A-G) and grouped descriptors
+    switch (upper) {
         case 'A':
             return aLabelIcon;
         case 'B':
@@ -62,6 +67,17 @@ function getLabelIcon(label) {
         case 'F':
             return fLabelIcon;
         case 'G':
+            return gLabelIcon;
+
+        case 'GOOD':
+            return aLabelIcon;
+        case 'OK':
+            return bLabelIcon;
+        case 'MEDIUM':
+            return dLabelIcon;
+        case 'POOR':
+            return eLabelIcon;
+        case 'BAD':
             return gLabelIcon;
         default:
             return defaultIcon;

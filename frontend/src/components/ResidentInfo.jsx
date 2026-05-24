@@ -1,58 +1,135 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Filler, Title, Tooltip, Legend } from 'chart.js';
+import { averageResidentScores } from '../utils/residentStats';
+import ResidentDropdown from './ResidentDropdown.jsx';
+import HomeTrendChart from './HomeTrendChart.jsx';
+import ResidentTrendChart from './ResidentTrendChart.jsx';
 import '../styles/ResidentInfo.css';
+import { getHomeTrends, getResidentTrends } from '../utils/trends';
 
-/**
- * ResidentInfo component displays detailed information about a selected resident,
- * including their name and income. If no resident is selected, it shows a hint message.
- *
- * @param {Object} props - The component props.
- * @param {Object|null} props.resident - The selected resident object containing their details.
- * @param {string} props.resident.name - The name of the resident.
- * @param {number} props.resident.income - The income of the resident.
- * @returns {JSX.Element} The rendered ResidentInfo component.
- */
-const ResidentInfo = ({ resident, home }) => {
-    // If no resident is selected, render a hint message.
-    if (!resident) {return <div className="select-resident-hint">
-        <h3> Click on a Resident</h3>
-    </div>;}
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Title, Tooltip, Legend);
 
-    // Render the resident's information.
+const startYearSimulation = 2024;
+
+const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResidentChange, viewMode = 'resident' }) => {
+    const [historicalData, setHistoricalData] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchHistoricalData = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/households_historical');
+                if (response.ok) {
+                    setHistoricalData(await response.json());
+                } else {
+                    console.warn('No historical data available');
+                }
+            } catch (error) {
+                console.error('Error fetching historical data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchHistoricalData();
+    }, [home, resident]);
+
+    if (viewMode === 'resident' && !resident) {
+        return <div className="select-resident-hint"><h3>Click on a Resident</h3></div>;
+    }
+
+    if (viewMode === 'home' && !home) {
+        return <div className="select-resident-hint"><h3>Click on a Home</h3></div>;
+    }
+
+    const homeTrends = getHomeTrends(historicalData, home, startYearSimulation);
+    const trends = getResidentTrends(historicalData, resident, startYearSimulation);
+    const decibel = 2;
+    const averageBehaviorScore = averageResidentScores(resident, ['attitude', 'perceived_norm', 'survey_pbc']);
     return (
         <div className="resident_info-container">
             <div className="info">
-                <h3>Resident Information</h3>
-                <h3>Address: {home.address}</h3>
-                <h3>Performance categorie: {home.energyLabel}</h3>
-                <h3>Total residents: {home.residents.length}</h3>
-                <h3>Type home: {home.houseType}</h3>
-                <hr className="resident-info-divider" />
-                <h3>Resident Details</h3>
-                <h3>Name: {resident.name}</h3>
-                <h3>Income: €{resident.income + ',-'}</h3>
+                {viewMode === 'home' && (
+                    <>
+                        <h3>Residence Information</h3>
+                        <div className="info-list">
+                            <div className="info-row">
+                                <span className="info-label">Current KPI Level:</span>
+                                <span className="info-value">{home?.residents?.[0]?.kpi_level || home?.GIS_attributes?.Energielabel || '-'}</span>
+                            </div>
+                            <div className="info-row">
+                                <span className="info-label">Type home:</span>
+                                <span className="info-value">{home.houseType}</span>
+                            </div>
+                        </div>
+                        {!loading && <HomeTrendChart homeTrends={homeTrends} />}
+                    </>
+                )}
+
+                {viewMode === 'resident' && (
+                    <>
+                        <ResidentDropdown residents={residents || []} selectedResidentIndex={selectedResidentIndex} onSelect={onResidentChange} className="inline-selector" />
+                        <h3>Resident Details</h3>
+                        <div className="info-list">
+                            <div className="info-row">
+                                <span className="info-label">Name:</span>
+                                <span className="info-value">{resident.name}</span>
+                            </div>
+                            <div className="info-row">
+                                <span className="info-label">Income:</span>
+                                <span className="info-value">€{resident.income + ',-'}</span>
+                            </div>
+                            <div className="info-row">
+                                <span className="info-label">Cluster Type:</span>
+                                <span className="info-value">{resident.cluster_type}</span>
+                            </div>
+                            <div className="info-row">
+                                <span className="info-label">Attitude (Att):</span>
+                                <span className="info-value">{resident.attitude.toFixed(decibel)}</span>
+                            </div>
+                            <div className="info-row">
+                                <span className="info-label">Perceived Norm (PN):</span>
+                                <span className="info-value">{resident.perceived_norm.toFixed(decibel)}</span>
+                            </div>
+                            <div className="info-row">
+                                <span className="info-label">Perceived Behaviour Control (PBC):</span>
+                                <span className="info-value">{resident.survey_pbc.toFixed(decibel)}</span>
+                            </div>
+                            <div className="info-row">
+                                <span className="info-label">Average Total:</span>
+                                <span className="info-value">{averageBehaviorScore.toFixed(decibel)}</span>
+                            </div>
+                        </div>
+                        <ResidentTrendChart trends={trends} loading={loading} historicalData={historicalData} />
+                    </>
+                )}
             </div>
         </div>
     );
 };
 
 ResidentInfo.propTypes = {
+    viewMode: PropTypes.oneOf(['resident', 'home']),
+    residents: PropTypes.arrayOf(PropTypes.shape({ unique_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), name: PropTypes.string, income: PropTypes.number })),
+    selectedResidentIndex: PropTypes.number,
+    onResidentChange: PropTypes.func,
     resident: PropTypes.shape({
+        unique_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
         name: PropTypes.string.isRequired,
         income: PropTypes.number.isRequired,
+        kpi_level: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        perceived_norm: PropTypes.number,
+        survey_pbc: PropTypes.number,
+        cluster_type: PropTypes.string,
+        attitude: PropTypes.number,
         address: PropTypes.string,
     }),
     home: PropTypes.shape({
         address: PropTypes.string,
         energyLabel: PropTypes.string,
-        residents: PropTypes.arrayOf(
-            PropTypes.shape({
-                name: PropTypes.string,
-                income: PropTypes.number,
-                address: PropTypes.string,
-            })
-        ),
+        residents: PropTypes.arrayOf(PropTypes.shape({ unique_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), name: PropTypes.string, income: PropTypes.number, address: PropTypes.string, kpi_level: PropTypes.string })),
         houseType: PropTypes.string,
+        GIS_attributes: PropTypes.shape({ Energielabel: PropTypes.string }),
     }),
 };
 

@@ -89,6 +89,13 @@ const KPIWindow = () => {
 
     const thousandFactor = 1000;
 
+    function formatT(num) {
+        if (Math.abs(num) >= thousandFactor) {
+            return (num / thousandFactor).toFixed(0) + 't';
+        }
+        return num.toString();
+    }
+
     function formatK(num) {
         if (Math.abs(num) >= thousandFactor) {
             return (num / thousandFactor).toFixed(0) + 'k';
@@ -106,12 +113,37 @@ const KPIWindow = () => {
             <h3>Average Income: {Math.round(avg_income)}€</h3>
             <h3>Subjective Norm ({sim_config.subj_norm_level}): {sim_config.subjective_norm}</h3> */}
             <h3>KPI&apos;s</h3>
-            <div>CO2 emissions in 2025: {formatK(Number(kpi.co2_emissions_start_simulation?.toFixed(0)))} kg</div>
-            <div>CO2 emissions in{year !== null ? ` ${year + simulationYearStart}` : ''}: {formatK(Number(kpi.current_co2_emissions?.toFixed(0)))} kg</div>
-            <div>Total CO2 Reduced: {formatK(Number(kpi.total_co2_reduced?.toFixed(0)))} kg</div>
-            <div>Total CO2 Emitted: {formatK(Number(kpi.total_co2_emitted_during_simulation?.toFixed(0)))} kg</div>
-            <div>Total Renovation Spending: {formatK(Number(kpi.total_spending_on_renovation?.toFixed(0)))}€</div>
-            <div>% Houses Ready for Heat Network: {kpi.percentage_houses_ready_for_heat_network?.toFixed(0) ?? 0}%</div>
+            <div className="info-list kpi-list">
+                <div className="info-row">
+                    <span className="info-label">Emissions in 2025:</span>
+                    <span className="info-value">{formatT(Number(kpi.co2_emissions_start_simulation?.toFixed(0)))} CO₂</span>
+                </div>
+
+                <div className="info-row">
+                    <span className="info-label">Emissions in{year !== null ? ` ${year + simulationYearStart}` : ''}:</span>
+                    <span className="info-value">{formatT(Number(kpi.current_co2_emissions?.toFixed(0)))} CO₂</span>
+                </div>
+
+                <div className="info-row">
+                    <span className="info-label">Total CO2 Reduced:</span>
+                    <span className="info-value">{formatT(Number(kpi.total_co2_reduced?.toFixed(0)))} CO₂</span>
+                </div>
+
+                <div className="info-row">
+                    <span className="info-label">Total CO2 Emitted:</span>
+                    <span className="info-value">{formatT(Number(kpi.total_co2_emitted_during_simulation?.toFixed(0)))} CO₂</span>
+                </div>
+
+                <div className="info-row">
+                    <span className="info-label">Total Renovation Spending:</span>
+                    <span className="info-value">{formatK(Number(kpi.total_spending_on_renovation?.toFixed(0)))}€</span>
+                </div>
+
+                <div className="info-row">
+                    <span className="info-label">% Houses Ready for Heat Network:</span>
+                    <span className="info-value">{kpi.percentage_houses_ready_for_heat_network?.toFixed(0) ?? 0}%</span>
+                </div>
+            </div>
         </>
     );
 };

@@ -2,7 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../styles/MapFilterMenu.css';
 
-const energyLabels = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+const energyGroups = [
+    { label: 'Good', values: ['A'] },
+    { label: 'Ok', values: ['B'] },
+    { label: 'Medium', values: ['C'] },
+    { label: 'Poor', values: ['D', 'E'] },
+    { label: 'Bad', values: ['F', 'G'] },
+];
+
 const woningTypes = [
     'Twee-onder-een-kap / rijwoning hoek',
     'Rijwoning tussen',
@@ -12,17 +19,25 @@ const woningTypes = [
 ];
 
 function MapFilterMenu({ selectedLabels, onToggleLabel, selectedWoningTypes, onToggleWoningType }) {
+    
+    const isGroupActive = (values) =>
+        values.every(value => selectedLabels.includes(value));
+
+    const handleGroupToggle = (values) => {
+        values.forEach(value => onToggleLabel(value));
+    };
+
     return (
         <div className="map-filter-menu">
-            <h4>Filter by Energy Label</h4>
+            <h4>Filter by Package level</h4>
             <div className="filter-buttons">
-                {energyLabels.map(label => (
+                {energyGroups.map(group => (
                     <button
-                        key={label}
-                        className={selectedLabels.includes(label) ? 'active' : ''}
-                        onClick={() => onToggleLabel(label)}
+                        key={group.label}
+                        className={isGroupActive(group.values) ? 'active' : ''}
+                        onClick={() => handleGroupToggle(group.values)}
                     >
-                        {label}
+                        {group.label}
                     </button>
                 ))}
             </div>

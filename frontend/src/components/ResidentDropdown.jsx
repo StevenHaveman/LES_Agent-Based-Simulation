@@ -4,18 +4,22 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useOverviewDispatch } from '../state/overviewState.jsx';
 
-const ResidentDropdown = ({ residents, selectedResidentIndex }) => {
+const ResidentDropdown = ({ residents, selectedResidentIndex, onSelect, className = '' }) => {
     // State to track whether the dropdown menu is open or closed.
     const [isOpen, setIsOpen] = useState(false);
     const dispatch = useOverviewDispatch();
 
     const handleResidentClick = (index) => {
-        dispatch({ type: 'SELECT_RESIDENT', payload: index });
+        if (onSelect) {
+            onSelect(index);
+        } else {
+            dispatch({ type: 'SELECT_RESIDENT', payload: index });
+        }
         setIsOpen(false);
     };
 
     return (
-        <div className="dropdown-container">
+        <div className={`dropdown-container ${className}`.trim()}>
             <div className="dropdown">
                 {/* Button to toggle the dropdown menu */}
                 <button className="dropdown-toggle" onClick={() => setIsOpen(!isOpen)}>
@@ -48,6 +52,8 @@ ResidentDropdown.propTypes = {
         })
     ).isRequired,
     selectedResidentIndex: PropTypes.number,
+    onSelect: PropTypes.func,
+    className: PropTypes.string,
 };
 
 export default ResidentDropdown;
