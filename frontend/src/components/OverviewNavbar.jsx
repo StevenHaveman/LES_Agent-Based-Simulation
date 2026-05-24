@@ -3,6 +3,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import PropTypes from 'prop-types';
 import { useSimulationRun } from '../hooks/useSimulationRun.js';
+import simulationParametersService from '../services/SimulationParametersService';
 import simulationService from '../services/SimulationService';
 import '../styles/OverviewNavbar.css';
 
@@ -65,17 +66,48 @@ const OverviewNavbar = ({ title, year }) => {
     };
 
     const resetSimulation = async () => {
-        if (!lastParams) {
+        let paramsSource = lastParams;
+
+        if (!paramsSource) {
+            try {
+                const fetchedParamsResponse = await simulationParametersService.fetchParameters();
+                const fetchedParams = fetchedParamsResponse?.config ?? fetchedParamsResponse;
+                paramsSource = {
+                    nr_households: fetchedParams.nr_households,
+                    nr_residents: fetchedParams.nr_residents,
+                    simulation_years: fetchedParams.simulation_years,
+                    seed: fetchedParams.seed,
+                };
+            } catch (error) {
+                toast.error('Could not load previous simulation parameters.');
+                return;
+            }
+        }
+
+        if (!paramsSource) {
             toast.error('No previous simulation parameters found.');
             return;
         }
+
         const params = {
-            ...lastParams,
-            nr_households: Number(lastParams.nr_households),
-            nr_residents: Number(lastParams.nr_residents),
-            simulation_years: Number(lastParams.simulation_years),
-            seed: Number(lastParams.seed),
+            ...paramsSource,
+            nr_households: Number(paramsSource.nr_households),
+            nr_residents: Number(paramsSource.nr_residents),
+            simulation_years: Number(paramsSource.simulation_years),
+            seed: Number(paramsSource.seed),
         };
+
+        if (
+            Number.isNaN(params.nr_households)
+            || Number.isNaN(params.nr_residents)
+            || Number.isNaN(params.simulation_years)
+            || Number.isNaN(params.seed)
+        ) {
+            toast.error('Previous simulation parameters are invalid.');
+            return;
+        }
+
+        setLastParams(paramsSource);
         const result = await simulationService.startSimulation(params);
         toast.info(result.message || 'Simulation reset');
     };
