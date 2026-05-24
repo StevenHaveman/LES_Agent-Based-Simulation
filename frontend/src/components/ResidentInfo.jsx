@@ -13,6 +13,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { averageResidentScores } from '../utils/residentStats';
+import ResidentDropdown from './ResidentDropdown.jsx';
 import '../styles/ResidentInfo.css';
 
 ChartJS.register(
@@ -28,7 +29,7 @@ ChartJS.register(
 
 const startYearSimulation = 2024;
 
-const ResidentInfo = ({ resident, home }) => {
+const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResidentChange, viewMode = 'resident' }) => {
     const [historicalData, setHistoricalData] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -55,10 +56,18 @@ const ResidentInfo = ({ resident, home }) => {
         fetchHistoricalData();
     }, []);
 
-    if (!resident) {
+    if (viewMode === 'resident' && !resident) {
         return (
             <div className="select-resident-hint">
                 <h3> Click on a Resident</h3>
+            </div>
+        );
+    }
+
+    if (viewMode === 'home' && !home) {
+        return (
+            <div className="select-resident-hint">
+                <h3> Click on a Home</h3>
             </div>
         );
     }
@@ -147,97 +156,111 @@ const ResidentInfo = ({ resident, home }) => {
     return (
         <div className="resident_info-container">
             <div className="info">
-                <h3>Residence Information</h3>
-                {/* <p><strong>Address:</strong> {home.address}</p> */}
-                <div className="info-list">
-                    <div className="info-row">
-                        <span className="info-label">Package level:</span>
-                        <span className="info-value">{resident.kpi_level}</span>
-                    </div>
-                {/* <p><strong>Total residents:</strong> {home.residents.length}</p> */}
-                    <div className="info-row">
-                        <span className="info-label">Type home:</span>
-                        <span className="info-value">{home.houseType}</span>
-                    </div>
-                </div>
-                <hr className="resident-info-divider" />
-                <h3>Resident Details</h3>
-                <div className="info-list">
-                    <div className="info-row">
-                        <span className="info-label">Name:</span>
-                        <span className="info-value">{resident.name}</span>
-                    </div>
-                    <div className="info-row">
-                        <span className="info-label">Income:</span>
-                        <span className="info-value">€{resident.income + ',-'}</span>
-                    </div>
-                    <div className="info-row">
-                        <span className="info-label">Cluster Type:</span>
-                        <span className="info-value">{resident.cluster_type}</span>
-                    </div>
-                    <div className="info-row">
-                        <span className="info-label">Attitude (Att):</span>
-                        <span className="info-value">{resident.attitude.toFixed(decibel)}</span>
-                    </div>
-                    <div className="info-row">
-                        <span className="info-label">Perceived Norm (PN):</span>
-                        <span className="info-value">{resident.perceived_norm.toFixed(decibel)}</span>
-                    </div>
-                {/* <p><strong>Norm Sensitivity:</strong> {resident.norm_sensitivity.toFixed(decibel)}</p> */}
-                    <div className="info-row">
-                        <span className="info-label">Percieved Behaviour Control (PBC):</span>
-                        <span className="info-value">{resident.survey_pbc.toFixed(decibel)}</span>
-                    </div>
-                    <div className="info-row">
-                        <span className="info-label">Average Total:</span>
-                        <span className="info-value">{averageBehaviorScore.toFixed(decibel)}</span>
-                    </div>
-                </div>
-                {/* <p><strong>Control Sensitivity:</strong> {typeof resident.control_sensitivity === 'number' ? resident.control_sensitivity.toFixed(decibel) : resident.control_sensitivity}</p> */}
-
-                {trendChartData && !loading && (
-                    <div className="resident-trends-section">
-                        <hr className="resident-info-divider" />
-                        <h3>Score Development Over Time</h3>
-                        <div className="resident-trend-chart">
-                            <Line
-                                data={trendChartData}
-                                options={{
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    interaction: {
-                                        mode: 'index',
-                                        intersect: false,
-                                    },
-                                    plugins: {
-                                        legend: {
-                                            position: 'top',
-                                        },
-                                    },
-                                    scales: {
-                                        y: {
-                                            min: 0,
-                                            max: 1,
-                                            beginAtZero: true,
-                                        },
-                                    },
-                                }}
-                            />
+                {viewMode === 'home' && (
+                    <>
+                        <h3>Residence Information</h3>
+                        {/* <p><strong>Address:</strong> {home.address}</p> */}
+                        <div className="info-list">
+                            <div className="info-row">
+                                <span className="info-label">Package level:</span>
+                                <span className="info-value">{resident?.kpi_level ?? '-'}</span>
+                            </div>
+                            {/* <p><strong>Total residents:</strong> {home.residents.length}</p> */}
+                            <div className="info-row">
+                                <span className="info-label">Type home:</span>
+                                <span className="info-value">{home.houseType}</span>
+                            </div>
                         </div>
-                    </div>
+                    </>
                 )}
-                {!trendChartData && !loading && historicalData.length > 0 && (
-                    <div className="resident-trends-section">
-                        <hr className="resident-info-divider" />
-                        <p style={{ fontSize: '0.9rem' }}>
-                            No historical data found for this resident.
-                        </p>
-                    </div>
-                )}
-                {loading && (
-                    <div className="resident-trends-section">
-                        <p style={{ fontSize: '0.9rem' }}>Loading historical data...</p>
-                    </div>
+
+                {viewMode === 'resident' && (
+                    <>
+                        <ResidentDropdown
+                            residents={residents || []}
+                            selectedResidentIndex={selectedResidentIndex}
+                            onSelect={onResidentChange}
+                            className="inline-selector"
+                        />
+                        <h3>Resident Details</h3>
+                        <div className="info-list">
+                            <div className="info-row">
+                                <span className="info-label">Name:</span>
+                                <span className="info-value">{resident.name}</span>
+                            </div>
+                            <div className="info-row">
+                                <span className="info-label">Income:</span>
+                                <span className="info-value">€{resident.income + ',-'}</span>
+                            </div>
+                            <div className="info-row">
+                                <span className="info-label">Cluster Type:</span>
+                                <span className="info-value">{resident.cluster_type}</span>
+                            </div>
+                            <div className="info-row">
+                                <span className="info-label">Attitude (Att):</span>
+                                <span className="info-value">{resident.attitude.toFixed(decibel)}</span>
+                            </div>
+                            <div className="info-row">
+                                <span className="info-label">Perceived Norm (PN):</span>
+                                <span className="info-value">{resident.perceived_norm.toFixed(decibel)}</span>
+                            </div>
+                            {/* <p><strong>Norm Sensitivity:</strong> {resident.norm_sensitivity.toFixed(decibel)}</p> */}
+                            <div className="info-row">
+                                <span className="info-label">Percieved Behaviour Control (PBC):</span>
+                                <span className="info-value">{resident.survey_pbc.toFixed(decibel)}</span>
+                            </div>
+                            <div className="info-row">
+                                <span className="info-label">Average Total:</span>
+                                <span className="info-value">{averageBehaviorScore.toFixed(decibel)}</span>
+                            </div>
+                        </div>
+                        {/* <p><strong>Control Sensitivity:</strong> {typeof resident.control_sensitivity === 'number' ? resident.control_sensitivity.toFixed(decibel) : resident.control_sensitivity}</p> */}
+
+                        {trendChartData && !loading && (
+                            <div className="resident-trends-section">
+                                <hr className="resident-info-divider" />
+                                <h3>Score Development Over Time</h3>
+                                <div className="resident-trend-chart">
+                                    <Line
+                                        data={trendChartData}
+                                        options={{
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            interaction: {
+                                                mode: 'index',
+                                                intersect: false,
+                                            },
+                                            plugins: {
+                                                legend: {
+                                                    position: 'top',
+                                                },
+                                            },
+                                            scales: {
+                                                y: {
+                                                    min: 0,
+                                                    max: 1,
+                                                    beginAtZero: true,
+                                                },
+                                            },
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                        {!trendChartData && !loading && historicalData.length > 0 && (
+                            <div className="resident-trends-section">
+                                <hr className="resident-info-divider" />
+                                <p style={{ fontSize: '0.9rem' }}>
+                                    No historical data found for this resident.
+                                </p>
+                            </div>
+                        )}
+                        {loading && (
+                            <div className="resident-trends-section">
+                                <p style={{ fontSize: '0.9rem' }}>Loading historical data...</p>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>
@@ -245,6 +268,16 @@ const ResidentInfo = ({ resident, home }) => {
 };
 
 ResidentInfo.propTypes = {
+    viewMode: PropTypes.oneOf(['resident', 'home']),
+    residents: PropTypes.arrayOf(
+        PropTypes.shape({
+            unique_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+            name: PropTypes.string,
+            income: PropTypes.number,
+        }),
+    ),
+    selectedResidentIndex: PropTypes.number,
+    onResidentChange: PropTypes.func,
     resident: PropTypes.shape({
         unique_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
         name: PropTypes.string.isRequired,
@@ -255,7 +288,7 @@ ResidentInfo.propTypes = {
         cluster_type: PropTypes.string,
         attitude: PropTypes.number,
         address: PropTypes.string,
-    }).isRequired,
+    }),
     home: PropTypes.shape({
         address: PropTypes.string,
         energyLabel: PropTypes.string,
@@ -268,7 +301,7 @@ ResidentInfo.propTypes = {
             }),
         ),
         houseType: PropTypes.string,
-    }).isRequired,
+    }),
 };
 
 export default ResidentInfo;

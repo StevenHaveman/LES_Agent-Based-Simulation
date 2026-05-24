@@ -3,25 +3,22 @@
     align-items: center;
     justify-content: flex-start;
     grid-row: 1 / 3;
-    grid-column: 1 / 6;
+    grid-column: 1 / 11;
     background-color: #f7e7cf;
-
-
 }
 
-.info-tab-resident, .AI-chat-resident {
+.info-tab-resident, .AI-chat-resident, .home-tab-resident {
     background-color: #f7e7cf;
-    width: 150px;
+    width: 33.33%;
     text-align: left;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-
-
 }
 
 .info-tab-resident.selected,
-.AI-chat-resident.selected {
+.AI-chat-resident.selected,
+.home-tab-resident.selected {
     background-color: #e6caa3;
 }

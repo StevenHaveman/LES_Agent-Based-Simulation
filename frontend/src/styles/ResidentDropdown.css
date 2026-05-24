@@ -10,6 +10,14 @@
 
 }
 
+.dropdown-container.inline-selector {
+    justify-content: flex-start;
+    background-color: transparent;
+    padding: 0.2rem 0 0.6rem 0;
+    grid-row: auto;
+    grid-column: auto;
+}
+
 .dropdown {
     position: relative;
 }

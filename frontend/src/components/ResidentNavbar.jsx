@@ -11,11 +11,8 @@ const ResidentNavbar = () => {
      * otherwise, it opens the tab.
      */
     const toggleInfoTab = () => {
-        if (state.residentWindow === 'info-resident') {
-            dispatch({ type: 'SET_RESIDENT_WINDOW', payload: '' });
-        } else {
-            dispatch({ type: 'SET_RESIDENT_WINDOW', payload: 'info-resident' });
-        }
+        dispatch({ type: 'SET_RESIDENT_WINDOW', payload: 'info-resident' });
+        dispatch({ type: 'SET_CHAT_WINDOW', payload: '' });
     };
 
     /**
@@ -23,11 +20,12 @@ const ResidentNavbar = () => {
      * otherwise, it opens the tab.
      */
     const toggleAiTab = () => {
-        if (state.chatWindow === 'ai') {
-            dispatch({ type: 'SET_CHAT_WINDOW', payload: '' });
-        } else {
-            dispatch({ type: 'SET_CHAT_WINDOW', payload: 'ai' });
-        }
+        dispatch({ type: 'SET_CHAT_WINDOW', payload: 'ai' });
+    };
+
+    const toggleHomeTab = () => {
+        dispatch({ type: 'SET_RESIDENT_WINDOW', payload: 'info-home' });
+        dispatch({ type: 'SET_CHAT_WINDOW', payload: '' });
     };
 
     return (
@@ -37,14 +35,20 @@ const ResidentNavbar = () => {
                 className={`info-tab-resident${state.residentWindow === 'info-resident' ? ' selected' : ''}`}
                 onClick={toggleInfoTab}
             >
-                <h4>Info</h4>
+                <h4>Resident details</h4>
             </div>
             {/* AI chat tab button */}
             <div
                 className={`AI-chat-resident${state.chatWindow === 'ai' ? ' selected' : ''}`}
                 onClick={toggleAiTab}
             >
-                <h4>AI-Chat</h4>
+                <h4>AI chat</h4>
+            </div>
+            <div
+                className={`home-tab-resident${state.residentWindow === 'info-home' ? ' selected' : ''}`}
+                onClick={toggleHomeTab}
+            >
+                <h4>Home details</h4>
             </div>
         </div>
     );

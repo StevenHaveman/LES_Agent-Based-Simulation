@@ -13,10 +13,8 @@ import SidebarToggle from '../components/SidebarToggle.jsx';
 
 import ResidentNavbar from '../components/ResidentNavbar.jsx';
 import ResidentWindow from '../components/ResidentWindow.jsx';
-import ResidentDropdown from '../components/ResidentDropdown.jsx';
 import AIChatWindow from '../components/AIChatWindow.jsx';
 import OverviewNavbar from '../components/OverviewNavbar.jsx';
-import ResidentInfo from '../components/ResidentInfo.jsx';
 
 import KPIWindow from '../components/KPIWindow.jsx';
 import { useMapData } from '../hooks/useMapData.js';
@@ -128,16 +126,12 @@ function OverviewContent() {
                 </div> */}
                 <div className="resident-container">
                     <ResidentNavbar />
-                    <ResidentDropdown
-                        residents={selectedResidents}
-                        selectedResidentIndex={selectedResidentIndex}
-                    />
                     <ResidentWindow
                         residents={selectedResidents}
                         selectedResidentIndex={selectedResidentIndex}
                         home={selectedHouse}
+                        onResidentChange={setSelectedResidentIndex}
                     />
-                    <ResidentInfo resident={selectedResident} home={selectedHouse} />
                 </div>
                 {/* <div className="parameters-container"> // TODO: CHANGE LOCATION
                     <SimulationParameters> </SimulationParameters>
