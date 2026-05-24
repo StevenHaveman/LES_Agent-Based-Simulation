@@ -168,5 +168,22 @@ body {
 }
 
 .charts-chooser-container {
-    grid-column: 80 / 11;
+    grid-column: 15 / 20;
+    grid-row: 1 / 2;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding: 12px;
+    box-sizing: border-box;
+    z-index: 2000;
+}
+
+.map-container {
+    position: relative;
+    z-index: 0;
+}
+
+#map {
+    position: relative;
+    z-index: 0;
 }

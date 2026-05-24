@@ -38,7 +38,7 @@
 .graphics-options-modal {
     background: #fff;
     border: 1px solid #ccc;
-    padding: 2em;
+    padding: 1rem 2em 2em;
     border-radius: 8px;
     min-width: 320px;
     box-shadow: 0 4px 24px rgba(0,0,0,0.2);
@@ -47,6 +47,7 @@
 
 .graphics-modal-title {
     margin-top: 0;
+    margin-bottom: 1rem;
 }
 
 .graphics-modal-row {
