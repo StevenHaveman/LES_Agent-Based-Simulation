@@ -13,7 +13,7 @@ const GraphSelector = ({
     return (
         <>
             <button title="Choose your graphs" onClick={() => setShowOptions((value) => !value)}>
-                <span class="material-symbols-outlined">settings</span>
+                <span className="material-symbols-outlined">settings</span>
             </button>
 
             {showOptions && (

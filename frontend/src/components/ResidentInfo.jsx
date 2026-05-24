@@ -127,8 +127,9 @@ ResidentInfo.propTypes = {
     home: PropTypes.shape({
         address: PropTypes.string,
         energyLabel: PropTypes.string,
-        residents: PropTypes.arrayOf(PropTypes.shape({ unique_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), name: PropTypes.string, income: PropTypes.number, address: PropTypes.string })),
+        residents: PropTypes.arrayOf(PropTypes.shape({ unique_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), name: PropTypes.string, income: PropTypes.number, address: PropTypes.string, kpi_level: PropTypes.string })),
         houseType: PropTypes.string,
+        GIS_attributes: PropTypes.shape({ Energielabel: PropTypes.string }),
     }),
 };
 

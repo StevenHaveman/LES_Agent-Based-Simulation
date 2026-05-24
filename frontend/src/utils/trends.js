@@ -1,18 +1,19 @@
 export const KPI_RANK = { bad: 1, poor: 2, medium: 3, ok: 4, good: 5 };
 export const RANK_KPI = { 1: 'Bad', 2: 'Poor', 3: 'Medium', 4: 'Ok', 5: 'Good' };
+export const startYearSimulationValue = 2024;
 
 export function normalizeString(value) {
-    if (value === undefined || value === null) return null;
+    if (value === undefined || value === null) {return null;}
     return String(value).trim().toLowerCase();
 }
 
-export function getHomeTrends(historicalData, home, startYearSimulation = 2024) {
-    if (!historicalData || historicalData.length === 0 || !home) return null;
+export function getHomeTrends(historicalData, home, startYearSimulation = startYearSimulationValue) {
+    if (!historicalData || historicalData.length === 0 || !home) {return null;}
 
     const trends = { years: [], kpi_level: [], avg_income: [] };
 
     historicalData.forEach((yearData) => {
-        if (!yearData.households || !Array.isArray(yearData.households)) return;
+        if (!yearData.households || !Array.isArray(yearData.households)) {return;}
 
         let household = null;
         if (home.id !== undefined && home.id !== null) {
@@ -31,7 +32,7 @@ export function getHomeTrends(historicalData, home, startYearSimulation = 2024) 
             const ids = home.residents.map(r => String(r.unique_id));
             household = yearData.households.find(hh => hh.residents && hh.residents.some(r => ids.includes(String(r.unique_id))));
         }
-        if (!household) return;
+        if (!household) {return;}
 
         const computedYear = (Number(yearData.year) || 0) + startYearSimulation;
         trends.years.push(computedYear);
@@ -72,21 +73,21 @@ export function getHomeTrends(historicalData, home, startYearSimulation = 2024) 
     return trends.years.length > 0 ? trends : null;
 }
 
-export function getResidentTrends(historicalData, resident, startYearSimulation = 2024) {
-    if (!historicalData || historicalData.length === 0 || !resident) return null;
+export function getResidentTrends(historicalData, resident, startYearSimulation = startYearSimulationValue) {
+    if (!historicalData || historicalData.length === 0 || !resident) {return null;}
 
     const trends = { years: [], perceived_norm: [], survey_pbc: [], attitude: [] };
 
     historicalData.forEach((yearData) => {
-        if (!yearData.households || !Array.isArray(yearData.households)) return;
+        if (!yearData.households || !Array.isArray(yearData.households)) {return;}
 
         const household = yearData.households.find((hh) =>
             hh.residents && hh.residents.some((r) => String(r.unique_id) === String(resident.unique_id))
         );
-        if (!household) return;
+        if (!household) {return;}
 
         const residentData = household.residents.find((r) => String(r.unique_id) === String(resident.unique_id));
-        if (!residentData) return;
+        if (!residentData) {return;}
 
         trends.years.push((Number(yearData.year) || 0) + startYearSimulation);
         trends.perceived_norm.push(residentData.perceived_norm || 0);

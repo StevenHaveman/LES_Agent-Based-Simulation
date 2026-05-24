@@ -91,7 +91,7 @@ function OverviewContent() {
     );
 
     const selectedResidents = selectedHouse ? selectedHouse.residents : [];
-    const selectedResident = selectedResidents[selectedResidentIndex] || null;
+    // const selectedResident = selectedResidents[selectedResidentIndex] || null;
 
     return (
         <>

@@ -78,7 +78,7 @@ const OverviewNavbar = ({ title, year }) => {
                     simulation_years: fetchedParams.simulation_years,
                     seed: fetchedParams.seed,
                 };
-            } catch (error) {
+            } catch {
                 toast.error('Could not load previous simulation parameters.');
                 return;
             }

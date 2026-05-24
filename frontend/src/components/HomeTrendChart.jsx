@@ -4,7 +4,7 @@ import { Line } from 'react-chartjs-2';
 import { KPI_RANK, RANK_KPI } from '../utils/trends';
 
 const HomeTrendChart = ({ homeTrends }) => {
-    if (!homeTrends) return null;
+    if (!homeTrends) {return null;}
 
     try {
         const homeChartData = {
@@ -13,10 +13,10 @@ const HomeTrendChart = ({ homeTrends }) => {
                 {
                     label: 'Household KPI Level',
                     data: (homeTrends.kpi_level || []).map(level => {
-                        if (level === null || level === undefined) return null;
+                        if (level === null || level === undefined) {return null;}
                         if (typeof level === 'string') {
                             const normalized = level.trim().toLowerCase();
-                            if (KPI_RANK[normalized]) return KPI_RANK[normalized];
+                            if (KPI_RANK[normalized]) {return KPI_RANK[normalized];}
                         }
                         const n = Number(level);
                         return Number.isFinite(n) ? n : null;
@@ -31,7 +31,7 @@ const HomeTrendChart = ({ homeTrends }) => {
                 {
                     label: 'Avg Income (€)',
                     data: (homeTrends.avg_income || []).map(v => {
-                        if (v === null || v === undefined) return null;
+                        if (v === null || v === undefined) {return null;}
                         const n = Number(v);
                         return Number.isFinite(n) ? n : null;
                     }),
