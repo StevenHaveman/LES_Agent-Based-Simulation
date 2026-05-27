@@ -35,11 +35,11 @@ const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResi
     }, [home, resident]);
 
     if (viewMode === 'resident' && !resident) {
-        return <div className="select-resident-hint"><h3>Click on a Resident</h3></div>;
+        return <div className="select-resident-hint"><h3>Click on a Building</h3></div>; //TODO change to click on a resident, but for now we want to show the home trends when no resident is selected, so we ask to click on a home instead of a resident
     }
 
     if (viewMode === 'home' && !home) {
-        return <div className="select-resident-hint"><h3>Click on a Home</h3></div>;
+        return <div className="select-resident-hint"><h3>Click on a Building</h3></div>;
     }
 
     const homeTrends = getHomeTrends(historicalData, home, startYearSimulation);

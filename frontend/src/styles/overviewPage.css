@@ -170,7 +170,7 @@ body {
 }
 
 .charts-chooser-container {
-    grid-column: 15 / 20;
+    grid-column: 19 / 20;
     grid-row: 1 / 2;
     display: flex;
     justify-content: flex-end;
