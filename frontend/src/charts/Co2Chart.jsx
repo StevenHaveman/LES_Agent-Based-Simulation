@@ -14,7 +14,7 @@ const Co2Chart = ({
 
         datasets: [
             {
-                label: 'Baseline Emissions',
+                label: 'Original Baseline Emissions',
 
                 data: uniqueSimulationData.map(
                     item => item.co2_data.baseline_emissions
@@ -28,7 +28,7 @@ const Co2Chart = ({
             },
 
             {
-                label: 'Yearly Emissions',
+                label: 'Current Emissions',
 
                 data: uniqueSimulationData.map(
                     item => item.co2_data.yearly_emissions

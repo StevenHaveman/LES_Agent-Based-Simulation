@@ -29,7 +29,7 @@ function MapFilterMenu({ selectedLabels, onToggleLabel, selectedWoningTypes, onT
 
     return (
         <div className="map-filter-menu">
-            <h4>Filter by Package level</h4>
+            <h4>Filter by Building Performance Category</h4>
             <div className="filter-buttons">
                 {energyGroups.map(group => (
                     <button
@@ -41,7 +41,7 @@ function MapFilterMenu({ selectedLabels, onToggleLabel, selectedWoningTypes, onT
                     </button>
                 ))}
             </div>
-            <h4>Filter by Woning Type</h4>
+            <h4>Filter by Building Type</h4>
             <div className="filter-buttons">
                 {woningTypes.map(type => (
                     <button

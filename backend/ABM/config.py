@@ -53,17 +53,17 @@ configs = {
         'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
         'cluster_profiles': {
                     0: {
-                        "cluster_type": "engaged",
+                        "cluster_type": "Engaged",
                         "attitude": 0.81,
                         "pbc": 0.73,
                     },
                     1: {
-                        "cluster_type": "neutral",
+                        "cluster_type": "Passive",
                         "attitude": 0.60,
                         "pbc": 0.48,
                     },
                     2: {
-                        "cluster_type": "resistant",
+                        "cluster_type": "Skeptic",
                         "attitude": 0.22,
                         "pbc": 0.18,
                     }
@@ -124,17 +124,17 @@ configs = {
         'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
         'cluster_profiles': {
             0: {
-                "cluster_type": "engaged",
+                "cluster_type": "Engaged",
                 "attitude": 0.81,
                 "pbc": 0.73,
             },
             1: {
-                "cluster_type": "neutral",
+                "cluster_type": "Passive",
                 "attitude": 0.60,
                 "pbc": 0.48,
             },
             2: {
-                "cluster_type": "resistant",
+                "cluster_type": "Skeptic",
                 "attitude": 0.22,
                 "pbc": 0.18,
             }
@@ -183,17 +183,17 @@ configs = {
         'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
         'cluster_profiles': {
             0: {
-                "cluster_type": "engaged",
+                "cluster_type": "Engaged",
                 "attitude": 0.81,
                 "pbc": 0.73,
             },
             1: {
-                "cluster_type": "neutral",
+                "cluster_type": "Passive",
                 "attitude": 0.60,
                 "pbc": 0.48,
             },
             2: {
-                "cluster_type": "resistant",
+                "cluster_type": "Skeptic",
                 "attitude": 0.22,
                 "pbc": 0.18,
             }
