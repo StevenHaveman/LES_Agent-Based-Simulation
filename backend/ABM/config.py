@@ -197,7 +197,7 @@ configs = {
                 "attitude": 0.22,
                 "pbc": 0.18,
             }
-        }, 
+        },
 
         # Weights for RAA components in intention calculation (can be adjusted to test different influence scenarios)
         'weight_attitude': 1.0,
