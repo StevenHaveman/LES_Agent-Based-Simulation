@@ -54,18 +54,21 @@ configs = {
         'cluster_profiles': {
                     0: {
                         "cluster_type": "Engaged",
-                        "attitude": 0.81,
-                        "pbc": 0.73,
+                        "attitude": 0.83,
+                        "pbc": 0.76,
+                        "action": 0.80,
                     },
                     1: {
                         "cluster_type": "Passive",
                         "attitude": 0.60,
-                        "pbc": 0.48,
+                        "pbc": 0.49,
+                        "action": 0.55,
                     },
                     2: {
                         "cluster_type": "Skeptic",
-                        "attitude": 0.22,
-                        "pbc": 0.18,
+                        "attitude": 0.23,
+                        "pbc": 0.14,
+                        "action": 0.13,
                     }
                 },
 
@@ -123,22 +126,25 @@ configs = {
         'control_sensitivity': None,
         'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
         'cluster_profiles': {
-            0: {
-                "cluster_type": "Engaged",
-                "attitude": 0.81,
-                "pbc": 0.73,
-            },
-            1: {
-                "cluster_type": "Passive",
-                "attitude": 0.60,
-                "pbc": 0.48,
-            },
-            2: {
-                "cluster_type": "Skeptic",
-                "attitude": 0.22,
-                "pbc": 0.18,
-            }
-        },
+                    0: {
+                        "cluster_type": "Engaged",
+                        "attitude": 0.83,
+                        "pbc": 0.76,
+                        "action": 0.80,
+                    },
+                    1: {
+                        "cluster_type": "Passive",
+                        "attitude": 0.60,
+                        "pbc": 0.49,
+                        "action": 0.55,
+                    },
+                    2: {
+                        "cluster_type": "Skeptic",
+                        "attitude": 0.23,
+                        "pbc": 0.14,
+                        "action": 0.13,
+                    }
+                },
         
         # Weights for RAA components in intention calculation (can be adjusted to test different influence scenarios)
         'weight_attitude': 1.0,
@@ -182,23 +188,25 @@ configs = {
         'control_sensitivity': None,
         'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
         'cluster_profiles': {
-            0: {
-                "cluster_type": "Engaged",
-                "attitude": 0.81,
-                "pbc": 0.73,
-            },
-            1: {
-                "cluster_type": "Passive",
-                "attitude": 0.60,
-                "pbc": 0.48,
-            },
-            2: {
-                "cluster_type": "Skeptic",
-                "attitude": 0.22,
-                "pbc": 0.18,
-            }
-        },
-
+                    0: {
+                        "cluster_type": "Engaged",
+                        "attitude": 0.83,
+                        "pbc": 0.76,
+                        "action": 0.80,
+                    },
+                    1: {
+                        "cluster_type": "Passive",
+                        "attitude": 0.60,
+                        "pbc": 0.49,
+                        "action": 0.55,
+                    },
+                    2: {
+                        "cluster_type": "Skeptic",
+                        "attitude": 0.23,
+                        "pbc": 0.14,
+                        "action": 0.13,
+                    }
+                },
         # Weights for RAA components in intention calculation (can be adjusted to test different influence scenarios)
         'weight_attitude': 1.0,
         'weight_norm': 1.0,
