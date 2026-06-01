@@ -21,10 +21,17 @@
   margin-bottom: 0.75rem;
 }
 
-.cluster-legend-row {
+.cluster-legend-list {
   display: flex;
-  gap: 0.75rem;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: flex-start;
+}
+
+.cluster-legend-item {
+  display: flex;
   align-items: center;
+  gap: 0.5rem;
 }
 
 .cluster-dot {
@@ -36,7 +43,7 @@
 
 .cluster-dot-passive,
 .cluster-dot-skeptic {
-  margin-left: 12px;
+  margin-left: 0;
 }
 
 .cluster-dot-engaged {

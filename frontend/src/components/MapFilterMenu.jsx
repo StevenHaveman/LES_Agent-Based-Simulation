@@ -70,13 +70,19 @@ function MapFilterMenu({ selectedLabels, onToggleLabel, selectedWoningTypes, onT
             {clusterMode && (
                 <div className="cluster-mode-section">
                     <div className="cluster-legend">
-                        <div className="cluster-legend-row">
-                            <span className="cluster-dot cluster-dot-engaged" />
-                            <span>Engaged</span>
-                            <span className="cluster-dot cluster-dot-passive" />
-                            <span>Passive</span>
-                            <span className="cluster-dot cluster-dot-skeptic" />
-                            <span>Skeptic</span>
+                        <div className="cluster-legend-list">
+                            <div className="cluster-legend-item">
+                                <span className="cluster-dot cluster-dot-engaged" />
+                                <span>Engaged</span>
+                            </div>
+                            <div className="cluster-legend-item">
+                                <span className="cluster-dot cluster-dot-passive" />
+                                <span>Passive</span>
+                            </div>
+                            <div className="cluster-legend-item">
+                                <span className="cluster-dot cluster-dot-skeptic" />
+                                <span>Skeptic</span>
+                            </div>
                         </div>
                     </div>
 

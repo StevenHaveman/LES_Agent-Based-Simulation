@@ -107,6 +107,7 @@ const KPIWindow = () => {
     const simulationYearStart = 2024;
     return (
         <>
+            <div className="kpi-window">
             {/* <h3>Solar Panels: {Math.round((counted_solar_data_hh / house_hold_data.length) * percentFactor)}%</h3>
             <h3>Heat Pumps: {Math.round((counted_heat_pump_data_hh / house_hold_data.length) * percentFactor)}%</h3>
             <h3>Fully Converted: {Math.round((counted_full_data_hh / house_hold_data.length) * percentFactor)}%</h3>
@@ -143,6 +144,7 @@ const KPIWindow = () => {
                     <span className="info-label">% Houses Ready for Heat Network:</span>
                     <span className="info-value">{kpi.percentage_houses_ready_for_heat_network?.toFixed(0) ?? 0}%</span>
                 </div>
+            </div>
             </div>
         </>
     );
