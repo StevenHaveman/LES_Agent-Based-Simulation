@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import getLabelIcon from '../utils/getLabelIcon';
+import '../styles/MapView.css';
 
 const latitude = 52.091831;
 const longitude = 4.388425;
@@ -13,7 +14,7 @@ const maxNativeZoomLevel = 19;
 const radiusMeters = 4;
 const radiusWeight = 4;
 
-const MapView = ({ houses, onHouseClick, selectedHouse }) => {
+const MapView = ({ houses, onHouseClick, selectedHouse, clusterMode = false }) => {
     const mapRef = useRef(null);
     const markersRef = useRef([]);
     const selectedCircleRef = useRef(null);
@@ -72,16 +73,41 @@ const MapView = ({ houses, onHouseClick, selectedHouse }) => {
         };
 
         houses.forEach(house => {
-            const icon = getLabelIcon(getHouseLabel(house));
-            const marker = L.marker([house.lat, house.lng], { icon }).addTo(mapRef.current);
-            const address = house.address || '';
-            const street = address.split(/\s\d/)[0].trim();
-            const streetInfo = streetIncomeMap[street];
-            if (streetInfo && streetInfo.avgIncome) {
-                marker.bindTooltip(`Street: ${street}<br/>Avg. income: €${streetInfo.avgIncome}`, { direction: 'top' });
+            let marker;
+            if (clusterMode) {
+                const clusterCounts = {};
+                (house.residents || []).forEach(r => {
+                    const t = r.cluster_type || 'Unknown';
+                    clusterCounts[t] = (clusterCounts[t] || 0) + 1;
+                });
+                const majority = Object.keys(clusterCounts).sort((a, b) => (clusterCounts[b] || 0) - (clusterCounts[a] || 0))[0];
+                const colorMap = {
+                    Engaged: '#2ac72a',
+                    Passive: '#5a5754',
+                    Skeptic: '#ff0000',
+                    Unknown: '#888'
+                };
+
+                const color = colorMap[majority] || '#888';
+                const html = `<div class="cluster-marker-dot" style="--cluster-color:${color}"></div>`;
+                const icon = L.divIcon({ html, className: '', iconSize: [18, 18], iconAnchor: [9, 9] });
+                marker = L.marker([house.lat, house.lng], { icon }).addTo(mapRef.current);
+
+                const clusters = Object.entries(clusterCounts).map(([k, v]) => `${k}: ${v}`).join('<br/>') || 'No residents';
+                marker.bindTooltip(clusters, { direction: 'top' });
             } else {
-                marker.bindTooltip('No residents');
+                const icon = getLabelIcon(getHouseLabel(house));
+                marker = L.marker([house.lat, house.lng], { icon }).addTo(mapRef.current);
+                const address = house.address || '';
+                const street = address.split(/\s\d/)[0].trim();
+                const streetInfo = streetIncomeMap[street];
+                if (streetInfo && streetInfo.avgIncome) {
+                    marker.bindTooltip(`Street: ${street}<br/>Avg. income: €${streetInfo.avgIncome}`, { direction: 'top' });
+                } else {
+                    marker.bindTooltip('No residents');
+                }
             }
+
             if (onHouseClick) {
                 marker.on('click', () => onHouseClick(house));
             }
@@ -102,7 +128,7 @@ const MapView = ({ houses, onHouseClick, selectedHouse }) => {
         }
     }, [houses, onHouseClick, streetIncomeMap, selectedHouse]);
 
-    return <div id="map" style={{ height: '100%', width: '100%' }} />;
+    return <div id="map" className="map-root" />;
 };
 
 MapView.propTypes = {
@@ -118,6 +144,7 @@ MapView.propTypes = {
         lat: PropTypes.number.isRequired,
         lng: PropTypes.number.isRequired,
     }),
+    clusterMode: PropTypes.bool,
 };
 
 export default MapView;

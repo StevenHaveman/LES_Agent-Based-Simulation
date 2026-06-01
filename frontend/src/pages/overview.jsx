@@ -5,7 +5,6 @@ import '../styles/overviewpage.css';
 import '../styles/globalPageStyles.css';
 import { OverviewProvider, useOverviewState } from '../state/overviewState.jsx';
 
-import GraphSelector from '../components/GraphSelector.jsx';
 import GraphicsView from '../components/GraphicsView.jsx';
 import MapView from '../components/MapView.jsx';
 import MapFilterMenu from '../components/MapFilterMenu.jsx';
@@ -44,6 +43,12 @@ function OverviewContent() {
         'Maisonnette',
     ]);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+    const [clusterMode, setClusterMode] = useState(false);
+    const [selectedClusterTypes, setSelectedClusterTypes] = useState([
+        'Engaged',
+        'Passive',
+        'Skeptic',
+    ]);
     const houses = useMapData();
     const year = useSimulationYear();
 
@@ -77,6 +82,18 @@ function OverviewContent() {
         );
     };
 
+    const handleToggleClusterMode = (value) => {
+        setClusterMode(!!value);
+    };
+
+    const handleToggleClusterType = (type) => {
+        setSelectedClusterTypes(prev =>
+            prev.includes(type)
+                ? prev.filter(t => t !== type)
+                : [...prev, type]
+        );
+    };
+
     const handleGraphChange = (idx, newKey) => {
         if (selectedGraphs.includes(newKey)) {return;}
 
@@ -87,7 +104,8 @@ function OverviewContent() {
 
     const filteredHouses = houses.filter(h =>
         selectedLabels.includes(h.energyLabel) &&
-        (selectedWoningTypes.length === 0 || selectedWoningTypes.includes(h.houseType))
+        (selectedWoningTypes.length === 0 || selectedWoningTypes.includes(h.houseType)) &&
+        (!clusterMode || selectedClusterTypes.length === 0 || (h.residents || []).some(r => selectedClusterTypes.includes(r.cluster_type)))
     );
 
     const selectedResidents = selectedHouse ? selectedHouse.residents : [];
@@ -105,6 +123,10 @@ function OverviewContent() {
                             onToggleLabel={handleToggleLabel}
                             selectedWoningTypes={selectedWoningTypes}
                             onToggleWoningType={handleToggleWoningType}
+                            clusterMode={clusterMode}
+                            onToggleClusterMode={handleToggleClusterMode}
+                            selectedClusterTypes={selectedClusterTypes}
+                            onToggleClusterType={handleToggleClusterType}
                         />
                     )}
                 </div>
@@ -116,7 +138,7 @@ function OverviewContent() {
                         />
                     ) : (
                         <>
-                            <MapView houses={filteredHouses} onHouseClick={handleHouseClick} selectedHouse={selectedHouse} />
+                            <MapView houses={filteredHouses} onHouseClick={handleHouseClick} selectedHouse={selectedHouse} clusterMode={clusterMode} />
                         </>
                     )}
                 </div>
@@ -141,18 +163,15 @@ function OverviewContent() {
                 <div className="kpi-container">
                     <KPIWindow />
                 </div>
-                <div className="charts-chooser-container">
-                    <GraphSelector
+                <div className="charts-container">
+                    <GraphicsView
+                        selectedGraphs={selectedGraphs}
                         showOptions={showGraphOptions}
                         setShowOptions={setShowGraphOptions}
-                        selectedGraphs={selectedGraphs}
                         handleGraphChange={handleGraphChange}
                         graphOptions={GRAPH_OPTIONS}
                         graphSlots={GRAPH_SLOTS}
                     />
-                </div>
-                <div className="charts-container">
-                    <GraphicsView selectedGraphs={selectedGraphs} />
                 </div>
             </div>
         </>

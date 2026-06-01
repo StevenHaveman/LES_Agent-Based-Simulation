@@ -112,7 +112,7 @@ const KPIWindow = () => {
             <h3>Fully Converted: {Math.round((counted_full_data_hh / house_hold_data.length) * percentFactor)}%</h3>
             <h3>Average Income: {Math.round(avg_income)}€</h3>
             <h3>Subjective Norm ({sim_config.subj_norm_level}): {sim_config.subjective_norm}</h3> */}
-            <h3>KPI&apos;s</h3>
+            <h3>Neighborhood KPI&apos;s</h3>
             <div className="info-list kpi-list">
                 <div className="info-row">
                     <span className="info-label">Emissions in 2025:</span>

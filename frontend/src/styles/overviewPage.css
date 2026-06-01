@@ -16,7 +16,7 @@ body {
     display: grid;
     height: 100vh;
     width: 100vw;
-    grid-template: repeat(10, 1fr) / 220px repeat(19, 1fr);
+    grid-template: repeat(10, 1fr) / minmax(40px, 220px) repeat(19, 1fr);
     transition: grid-template-columns 0.2s;
 }
 
@@ -69,8 +69,7 @@ body {
     grid-row: 7 / 11;
     display: grid;
     grid-template:  repeat(20, 1fr) / repeat(10, 1fr);
-    background-color: #f8f7f2
-
+    background-color: #f8f7f2;
 }
 
 .resident-container{
@@ -78,8 +77,8 @@ body {
     grid-row: 0 / 20;
     display: grid;
     grid-template:  repeat(20, 1fr) / repeat(10, 1fr);
-    background-color: #f8f7f2
-
+    border: 1px solid black;
+    background-color: #f8f7f2;
 }
 
 .parameters-container{
@@ -141,6 +140,7 @@ body {
     justify-content: center;
     align-items: center;
     border: 1px solid black;
+    background-color: #f8f7f2;
     padding: 20px;
     box-sizing: border-box;
 }
@@ -153,6 +153,7 @@ body {
     justify-content: center;
     align-items: center;
     border: 1px solid black;
+    background-color: #f8f7f2;
     padding: 20px;
     box-sizing: border-box;
     min-height: 0;
@@ -165,8 +166,9 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 12px;
     box-sizing: border-box;
+    overflow: auto;
 }
 
 .charts-chooser-container {
