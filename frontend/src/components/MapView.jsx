@@ -11,15 +11,38 @@ const zoomLevel = 16;
 const maxZoomLevel = 22;
 const maxNativeZoomLevel = 19;
 
-const radiusMeters = 4;
 const radiusWeight = 4;
+const selectedCircleTargetPixels = 10;
+const minCircleRadiusMeters = 0.5;
+const maxCircleRadiusMeters = 25;
+
+const meterPerPixelAtZoom0 = 156543.03392;
+const pi = 180;
+const twoToThePowerOfZoom = 2;
+
+const getZoomScaledRadiusMeters = (map, lat) => {
+    if (!map || typeof lat !== 'number') {
+        return minCircleRadiusMeters;
+    }
+
+    const zoom = map.getZoom();
+    const metersPerPixel = (meterPerPixelAtZoom0 * Math.cos((lat * Math.PI) / pi)) / (twoToThePowerOfZoom ** zoom);
+    const radius = selectedCircleTargetPixels * metersPerPixel;
+
+    return Math.max(minCircleRadiusMeters, Math.min(maxCircleRadiusMeters, radius));
+};
 
 const MapView = ({ houses, onHouseClick, selectedHouse, clusterMode = false }) => {
     const mapRef = useRef(null);
     const markersRef = useRef([]);
     const selectedCircleRef = useRef(null);
+    const selectedHouseRef = useRef(null);
     const iconSizeNumber = 18;
     const iconAnchorNumber = 9;
+
+    useEffect(() => {
+        selectedHouseRef.current = selectedHouse;
+    }, [selectedHouse]);
 
     useEffect(() => {
         if (!mapRef.current) {
@@ -32,6 +55,30 @@ const MapView = ({ houses, onHouseClick, selectedHouse, clusterMode = false }) =
             if (mapRef.current) {
                 mapRef.current.remove();
                 mapRef.current = null;
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!mapRef.current) {
+            return;
+        }
+
+        const handleZoomChange = () => {
+            const currentHouse = selectedHouseRef.current;
+            if (!selectedCircleRef.current || !currentHouse) {
+                return;
+            }
+
+            selectedCircleRef.current.setRadius(
+                getZoomScaledRadiusMeters(mapRef.current, currentHouse.lat)
+            );
+        };
+
+        mapRef.current.on('zoomend', handleZoomChange);
+        return () => {
+            if (mapRef.current) {
+                mapRef.current.off('zoomend', handleZoomChange);
             }
         };
     }, []);
@@ -118,7 +165,7 @@ const MapView = ({ houses, onHouseClick, selectedHouse, clusterMode = false }) =
 
         if (selectedHouse && selectedHouse.lat && selectedHouse.lng) {
             selectedCircleRef.current = L.circle([selectedHouse.lat, selectedHouse.lng], {
-                radius: radiusMeters,
+                radius: getZoomScaledRadiusMeters(mapRef.current, selectedHouse.lat),
                 color: 'blue',
                 weight: radiusWeight,
                 fill: true,
@@ -128,7 +175,7 @@ const MapView = ({ houses, onHouseClick, selectedHouse, clusterMode = false }) =
                 pane: 'markerPane',
             }).addTo(mapRef.current);
         }
-    }, [houses, onHouseClick, streetIncomeMap, selectedHouse]);
+    }, [houses, onHouseClick, streetIncomeMap, selectedHouse, clusterMode]);
 
     return <div id="map" className="map-root" />;
 };
