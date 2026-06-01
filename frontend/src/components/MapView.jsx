@@ -18,6 +18,8 @@ const MapView = ({ houses, onHouseClick, selectedHouse, clusterMode = false }) =
     const mapRef = useRef(null);
     const markersRef = useRef([]);
     const selectedCircleRef = useRef(null);
+    const iconSizeNumber = 18;
+    const iconAnchorNumber = 9;
 
     useEffect(() => {
         if (!mapRef.current) {
@@ -90,7 +92,7 @@ const MapView = ({ houses, onHouseClick, selectedHouse, clusterMode = false }) =
 
                 const color = colorMap[majority] || '#888';
                 const html = `<div class="cluster-marker-dot" style="--cluster-color:${color}"></div>`;
-                const icon = L.divIcon({ html, className: '', iconSize: [18, 18], iconAnchor: [9, 9] });
+                const icon = L.divIcon({ html, className: '', iconSize: [iconSizeNumber, iconSizeNumber], iconAnchor: [iconAnchorNumber, iconAnchorNumber] });
                 marker = L.marker([house.lat, house.lng], { icon }).addTo(mapRef.current);
 
                 const clusters = Object.entries(clusterCounts).map(([k, v]) => `${k}: ${v}`).join('<br/>') || 'No residents';

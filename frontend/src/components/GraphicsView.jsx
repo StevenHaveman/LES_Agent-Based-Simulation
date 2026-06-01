@@ -5,13 +5,15 @@ import PropTypes from 'prop-types';
 import { GRAPH_OPTIONS } from './graphOptions.js';
 import GraphSelector from './GraphSelector.jsx';
 
+const graphSlotsTotal = 3;
+
 const GraphicsView = ({
     selectedGraphs,
     showOptions,
     setShowOptions,
     handleGraphChange,
     graphOptions = GRAPH_OPTIONS,
-    graphSlots = 3,
+    graphSlots = graphSlotsTotal,
 }) => {
     const graphItems = selectedGraphs
         .map((key) => {

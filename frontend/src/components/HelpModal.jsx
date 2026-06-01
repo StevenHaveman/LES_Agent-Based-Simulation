@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import './HelpModal.css';
 
 export default function HelpModal({ open, onClose, text, html }) {
-    if (!open) return null;
+    if (!open) {return null;}
 
     return (
         <div className="help-overlay" role="dialog" aria-label="Help" aria-modal="true">
