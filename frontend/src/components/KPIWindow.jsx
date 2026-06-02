@@ -105,6 +105,9 @@ const KPIWindow = () => {
 
     const kpi = kpi_data || {};
     const simulationYearStart = 2024;
+    const totalCo2ReducedPercent = kpi.co2_emissions_start_simulation
+        ? (Number(kpi.total_co2_reduced || 0) / Number(kpi.co2_emissions_start_simulation)) * 100
+        : 0;
     return (
         <>
             <div className="kpi-window">
@@ -127,7 +130,7 @@ const KPIWindow = () => {
 
                 <div className="info-row">
                     <span className="info-label">Total CO2 Reduced:</span>
-                    <span className="info-value">{formatT(Number(kpi.total_co2_reduced?.toFixed(0)))} CO₂</span>
+                    <span className="info-value">{totalCo2ReducedPercent.toFixed(0)}%</span>
                 </div>
 
                 <div className="info-row">

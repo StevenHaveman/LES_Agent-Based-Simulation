@@ -11,7 +11,7 @@ const HomeTrendChart = ({ homeTrends }) => {
             labels: homeTrends.years || [],
             datasets: [
                 {
-                    label: 'Household KPI Level',
+                    label: 'Household Performance category',
                     data: (homeTrends.kpi_level || []).map(level => {
                         if (level === null || level === undefined) {return null;}
                         if (typeof level === 'string') {
