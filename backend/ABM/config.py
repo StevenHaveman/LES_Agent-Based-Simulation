@@ -47,10 +47,10 @@ configs = {
         'raise_income': [1.00, 1.01, 1.02, 1.03, 1.04, 1.05], # Random increase in income per year
         'decision_threshold': 0.5, # Decision threshold for investing in sustainable energy
         'attitude': None,
-        'attitude_sensitivity': None,
-        'subj_norm_sensitivity': None,
-        'control_sensitivity': None,
-        'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
+        'attitude_sensitivity': 1,
+        'subj_norm_sensitivity': 1,
+        'control_sensitivity': 1,
+        'intention_threshold': 0.7, # Decision threshold for forming intentions to invest in sustainable energy
         'cluster_profiles': {
                     0: {
                         "cluster_type": "Engaged",
@@ -121,10 +121,10 @@ configs = {
         'raise_income': [1.00, 1.01, 1.02, 1.03, 1.04, 1.05], # Random increase in income per year
         'decision_threshold': 0.5, # Decision threshold for investing in sustainable energy
         'attitude': None,
-        'attitude_sensitivity': None,
-        'norm_sensitivity': None,
-        'control_sensitivity': None,
-        'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
+        'attitude_sensitivity': 1,
+        'norm_sensitivity': 1,
+        'control_sensitivity': 1,
+        'intention_threshold': 0.7, # Decision threshold for forming intentions to invest in sustainable energy
         'cluster_profiles': {
                     0: {
                         "cluster_type": "Engaged",
@@ -183,10 +183,10 @@ configs = {
         'raise_income': [1.00, 1.01, 1.02, 1.03, 1.04, 1.05],
         'decision_threshold': 0.5,
         'attitude': None,
-        'attitude_sensitivity': None,
-        'norm_sensitivity': None,
-        'control_sensitivity': None,
-        'intention_threshold': 0.0, # Decision threshold for forming intentions to invest in sustainable energy
+        'attitude_sensitivity': 1,
+        'norm_sensitivity': 1,
+        'control_sensitivity': 1,
+        'intention_threshold': 0.7, # Decision threshold for forming intentions to invest in sustainable energy
         'cluster_profiles': {
                     0: {
                         "cluster_type": "Engaged",

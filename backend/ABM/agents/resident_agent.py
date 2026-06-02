@@ -64,7 +64,10 @@ class Resident(Agent):
         }
 
 
-    def calc_intention(self): # New voor RAA model
+
+
+    #1. INTENTION (RAA – resident level) ## TODO 
+    def calc_intention(self): 
         """
         Calculates the intention to adopt each sustainability package based on attitude,
         subjective norm, and perceived behavioral control, applying the respective sensitivities and weights from the configuration.
@@ -72,8 +75,6 @@ class Resident(Agent):
         for package in self.environment.sustainability_packages:
             if self.package_decisions.get(package.name, False):
                 continue
-
-
 
             # make the the attitude, subjective norm, and behavioral control components for the agent and package, applying the respective modifiers
             attitude_part = self.attitude * self.attitude_sensitivity

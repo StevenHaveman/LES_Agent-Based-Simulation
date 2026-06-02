@@ -68,6 +68,7 @@ class Household(Agent):
     def get_household_income(self):
         return sum(res.income for res in self.residents)
     
+    # 3. ACTUAL CONTROL
     def calculate_actual_control(self):
 
         household_income = self.get_household_income()
@@ -123,13 +124,15 @@ class Household(Agent):
 
             actual_control_score = self.actual_control[package.name]
 
+            print(self.actual_control)
+
             if actual_control_score < self.config.get("actual_control_threshold", 0.7):
                 continue
 
-            #2 ACTION SCORE
+            #4. ACTION SCORE
             final_score = (
                 0.5 * avg_intention +
-                0.3 * support_score +
+                0.3 * support_score + # Remove support score.
                 0.2 * actual_control_score
             )
 
@@ -143,6 +146,7 @@ class Household(Agent):
                 best_rank = target_rank
                 best_package = package
 
+        # 5. ACTION (Y/N)
         if (best_package and best_score >= self.config['household_decision_threshold']):
 
             if (self.active_package is not None and self.active_package.name == best_package.name):
@@ -183,6 +187,7 @@ class Household(Agent):
 
         pass
 
+    # 2. Action score. 
     def get_household_action_score(self):
         if not self.residents:
             return 0
