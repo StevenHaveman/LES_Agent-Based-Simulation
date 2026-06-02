@@ -37,14 +37,14 @@ const ResidentNavbar = () => {
                 className={`home-tab-resident${state.residentWindow === 'info-home' ? ' selected' : ''}`}
                 onClick={toggleHomeTab}
             >
-                <h4>Selected Building details</h4>
+                <h4 className="tab-label">Selected Building details</h4>
             </div>
             {/* Info tab button */}
             <div
                 className={`info-tab-resident${state.residentWindow === 'info-resident' ? ' selected' : ''}`}
                 onClick={toggleInfoTab}
             >
-                <h4>Selected Resident details</h4>
+                <h4 className="tab-label">Selected Resident details</h4>
             </div>
             {/* AI chat tab button */}
             <div

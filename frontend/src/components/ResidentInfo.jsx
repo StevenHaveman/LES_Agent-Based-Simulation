@@ -46,7 +46,8 @@ const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResi
     const trends = getResidentTrends(historicalData, resident, startYearSimulation);
     const decibel = 2;
     const averageBehaviorScore = averageResidentScores(resident, ['attitude', 'perceived_norm', 'survey_pbc']);
-    const actionScore = typeof resident?.action_score === 'number' ? resident.action_score : averageBehaviorScore;
+    const parsedAction = Number(resident?.action_score);
+    const actionScore = Number.isFinite(parsedAction) ? parsedAction : 0;
     return (
         <div className="resident_info-container">
             <div className="info">
