@@ -16,8 +16,12 @@ body {
     display: grid;
     height: 100vh;
     width: 100vw;
-    grid-template: repeat(10, 1fr) / 220px repeat(19, 1fr);
+    grid-template: repeat(10, 1fr) / minmax(40px, 220px) repeat(19, 1fr);
     transition: grid-template-columns 0.2s;
+    transform: scale(0.85);
+    transform-origin: top left;
+    width: 108.695652vw;
+    height: 108.695652vh;
 }
 
 .overview-container.sidebar-collapsed {
@@ -69,8 +73,7 @@ body {
     grid-row: 7 / 11;
     display: grid;
     grid-template:  repeat(20, 1fr) / repeat(10, 1fr);
-    background-color: #f8f7f2
-
+    background-color: #f8f7f2;
 }
 
 .resident-container{
@@ -78,8 +81,8 @@ body {
     grid-row: 0 / 20;
     display: grid;
     grid-template:  repeat(20, 1fr) / repeat(10, 1fr);
-    background-color: #f8f7f2
-
+    border: 1px solid black;
+    background-color: #f8f7f2;
 }
 
 .parameters-container{
@@ -135,28 +138,30 @@ body {
 
 .municipality-container {
     grid-column: 2 / 11;
-    grid-row: 2 / 8;
+    grid-row: 2 / 11;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     border: 1px solid black;
+    background-color: #f8f7f2;
     padding: 20px;
     box-sizing: border-box;
 }
 
 .kpi-container {
     grid-column: 11 / 15;
-    grid-row: 2 / 8;
+    grid-row: 2 / 11;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: stretch;
     border: 1px solid black;
+    background-color: #f8f7f2;
     padding: 20px;
     box-sizing: border-box;
     min-height: 0;
-    overflow:visible;
+    overflow-y: auto;
 }
 .charts-container {
     grid-column: 15 / 21;
@@ -165,8 +170,9 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 12px;
     box-sizing: border-box;
+    overflow: auto;
 }
 
 .charts-chooser-container {

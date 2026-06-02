@@ -561,6 +561,7 @@ class Environment(Model):
                     "unique_id": resident.unique_id,
                     "kpi_level": household.current_kpi_level,
                     "attitude": getattr(resident, "attitude", None),
+                    "action_score": getattr(resident, "action_score", 0),
                     "perceived_norm": getattr(resident, "perceived_norm", None),
                     "norm_sensitivity": getattr(resident, "norm_sensitivity", None),
                     "survey_pbc": getattr(resident, "survey_pbc", None),

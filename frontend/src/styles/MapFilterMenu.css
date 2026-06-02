@@ -12,3 +12,52 @@
   background: #3a7e54;
   color: #fff;
 }
+
+.cluster-mode-section {
+  margin-top: 0.75rem;
+}
+
+.cluster-legend {
+  margin-bottom: 0.75rem;
+}
+
+.cluster-legend-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: flex-start;
+}
+
+.cluster-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cluster-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 7px;
+  display: inline-block;
+}
+
+.cluster-dot-passive,
+.cluster-dot-skeptic {
+  margin-left: 0;
+}
+
+.cluster-dot-engaged {
+  background: #16dd16;
+}
+
+.cluster-dot-passive {
+  background: #4d4d4d;
+}
+
+.cluster-dot-skeptic {
+  background: #ff0000;
+}
+
+.cluster-filter-title {
+  margin: 0 0 0.5rem 0;
+}

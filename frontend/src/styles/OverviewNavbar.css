@@ -29,6 +29,8 @@
     min-width: 80px;
     display: flex;
     justify-content: flex-start;
+    gap: 0.8rem;
+    align-items: center;
 }
 
 .overview-logo {
@@ -78,7 +80,8 @@
 .pause-button,
 .delay-select,
 .start-button,
-.reset-button {
+.reset-button,
+.help-button {
     padding: 3px 3px;
     font-size: 0.9rem;
     border: 1px solid black;
@@ -94,7 +97,8 @@
 }
 
 .pause-button:hover,
-.delay-select:hover {
+.delay-select:hover,
+.help-button:hover {
     background-color: #8c7b3a;
 }
 
@@ -119,10 +123,13 @@
   'opsz' 48
 }
 
-.pause-button .material-symbols-outlined {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.35rem;
-        line-height: 1;
+.pause-button .material-symbols-outlined,
+.help-button .material-symbols-outlined,
+.start-button .material-symbols-outlined,
+.reset-button .material-symbols-outlined {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    line-height: 1;
 }

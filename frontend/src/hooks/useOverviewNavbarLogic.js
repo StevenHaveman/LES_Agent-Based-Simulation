@@ -28,7 +28,7 @@ export default function useOverviewNavbarLogic() {
     };
 
     const startSimulation = async (e) => {
-        if (e) e.preventDefault();
+        if (e) {e.preventDefault();}
         setShowModal(false);
         setLastParams(inputParams);
         const params = {

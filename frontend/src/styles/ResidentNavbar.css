@@ -8,6 +8,10 @@
     height: 75%;
 }
 
+.tab-label {
+    text-align: center;
+}
+
 .info-tab-resident, .AI-chat-resident, .home-tab-resident {
     background-color: #f7e7cf;
     width: 33.33%;

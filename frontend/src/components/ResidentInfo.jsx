@@ -46,6 +46,8 @@ const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResi
     const trends = getResidentTrends(historicalData, resident, startYearSimulation);
     const decibel = 2;
     const averageBehaviorScore = averageResidentScores(resident, ['attitude', 'perceived_norm', 'survey_pbc']);
+    const parsedAction = Number(resident?.action_score);
+    const actionScore = Number.isFinite(parsedAction) ? parsedAction : 0;
     return (
         <div className="resident_info-container">
             <div className="info">
@@ -54,7 +56,7 @@ const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResi
                         <h3>Residence Information</h3>
                         <div className="info-list">
                             <div className="info-row">
-                                <span className="info-label">Current KPI Level:</span>
+                                <span className="info-label">Current Performance category:</span>
                                 <span className="info-value">{home?.residents?.[0]?.kpi_level || home?.GIS_attributes?.Energielabel || '-'}</span>
                             </div>
                             <div className="info-row">
@@ -83,6 +85,7 @@ const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResi
                                 <span className="info-label">Cluster Type:</span>
                                 <span className="info-value">{resident.cluster_type}</span>
                             </div>
+                            <hr className="resident-info-divider" />
                             <div className="info-row">
                                 <span className="info-label">Attitude (Att):</span>
                                 <span className="info-value">{resident.attitude.toFixed(decibel)}</span>
@@ -98,6 +101,10 @@ const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResi
                             <div className="info-row">
                                 <span className="info-label">Average Total:</span>
                                 <span className="info-value">{averageBehaviorScore.toFixed(decibel)}</span>
+                            </div>
+                            <div className="info-row">
+                                <span className="info-label">Action Score:</span>
+                                <span className="info-value">{actionScore.toFixed(decibel)}</span>
                             </div>
                         </div>
                         <ResidentTrendChart trends={trends} loading={loading} historicalData={historicalData} />
@@ -120,6 +127,7 @@ ResidentInfo.propTypes = {
         kpi_level: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
         perceived_norm: PropTypes.number,
         survey_pbc: PropTypes.number,
+        action_score: PropTypes.number,
         cluster_type: PropTypes.string,
         attitude: PropTypes.number,
         address: PropTypes.string,
