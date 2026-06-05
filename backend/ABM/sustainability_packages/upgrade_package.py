@@ -62,6 +62,10 @@ class UpgradePackage:
         - normalized score between 0 and 1
         """
 
+
+        # TODO Normaliseer affordability en ROI op basis van realistische min/max waarden in de dataset, 
+        # zodat ze op dezelfde schaal worden gebracht voor de berekening van de totale score. 
+        # Dit voorkomt dat een van de componenten onevenredig zwaar weegt in de uiteindelijke score.
         affordability = income / self.price if self.price > 0 else 0
         roi = 1 / self.break_even_in_years if self.break_even_in_years else 0
 

@@ -68,6 +68,7 @@ class Environment(Model):
         self.gis_data = utilities.load_gis_data("data/AmstelHeuvelWijk2_TableToExcel.xlsx")
         self.residents = []  # gewone Python-lijst voor filteren/gemak
         self.survey_data = utilities.load_survey_data("data/survey_data.xlsx")
+        self.survey_cluster_profiles = utilities.load_survey_cluster_profiles("data/survey_cluster_profiles.xlsx")
         self.income_distribution = (utilities.calculate_income_distribution(self.survey_data))
         self.street_groups = {} # Build street groups based on GIS data, this will be used for calculating street-level norms and for the heatmap visualization.
         self.yearly_stats = []
@@ -78,7 +79,8 @@ class Environment(Model):
         # Initialize households, residents, streets, and social norms
 
         self.create_household_agents()
-        self.create_resident_agents(nr_residents=1)
+        # self.create_resident_agents(nr_residents=1)
+        self.create_residents_from_survey_profiles(nr_residents=1)
         # self.generate_streets()
         self.build_street_groups()
         self.calculate_total_co2() 
@@ -108,6 +110,67 @@ class Environment(Model):
 
 
 
+                for package_name, installed in hh.package_installations.items():
+                    if installed:
+                        resident.package_decisions[package_name] = True
+
+                hh.residents.append(resident)
+                self.residents.append(resident)
+
+                id_counter += 1
+
+    def create_residents_from_survey_profiles(self, nr_residents=1):
+
+        id_counter = 0
+
+        for hh in self.households:
+
+            house_type = hh.gis_attributes["Woning type"]
+
+            # filter dataset op woningtype
+            cluster_df = self.survey_cluster_profiles[
+                self.survey_cluster_profiles["house_type"] == house_type
+            ]
+
+            # fallback als woningtype niet bestaat
+            if cluster_df.empty:
+                cluster_df = self.survey_cluster_profiles
+
+            for _ in range(nr_residents):
+
+                # 1. kies random cluster uit beschikbare rijen
+                row = cluster_df.sample(1).iloc[0]
+                cluster_type = row["cluster_type"]
+
+                # 2. pak survey profiel binnen zelfde cluster + house_type
+                subset = self.survey_cluster_profiles[
+                    (self.survey_cluster_profiles["house_type"] == house_type)
+                    & (self.survey_cluster_profiles["cluster_type"] == cluster_type)
+                ]
+
+                if subset.empty:
+                    subset = self.survey_cluster_profiles[
+                        self.survey_cluster_profiles["cluster_type"] == cluster_type
+                    ]
+
+                if subset.empty:
+                    subset = self.survey_cluster_profiles
+
+                survey_profile = subset.sample(1).iloc[0]
+
+                # 3. create resident
+                resident = Resident(id_counter, self, hh, survey_profile)
+
+                resident.attitude = survey_profile["attitude_score"]
+                resident.survey_pbc = survey_profile["pbc_score"]
+                resident.action_score = survey_profile["action_score"]
+
+                if "income" in survey_profile:
+                    resident.income = survey_profile["income"]
+                else:
+                    resident.income = utilities.generate_income(self.income_distribution)
+
+                # package sync
                 for package_name, installed in hh.package_installations.items():
                     if installed:
                         resident.package_decisions[package_name] = True
@@ -303,7 +366,7 @@ class Environment(Model):
             "cluster_behavior_data": self.collect_cluster_behavior_data()
         }
 
-        print(data["cluster_behavior_data"])
+        # print(data["cluster_behavior_data"])
         self.yearly_stats.append(data)
 
         return data

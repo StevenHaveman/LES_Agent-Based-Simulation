@@ -27,9 +27,9 @@ class Resident(Agent):
         self.household = household
         self.environment = model
         self.cluster_type = survey_profile["cluster_type"] # This is the cluster type from the survey profiles, which can be used for analysis and potentially for influencing behavior in more complex ways in the future.
-        self.action_score = survey_profile["action"] # This is the action score from the survey profiles, which can be used for analysis and potentially for influencing behavior in more complex ways in the future.
+        self.action_score = survey_profile["action_score"] # This is the action score from the survey profiles, which can be used for analysis and potentially for influencing behavior in more complex ways in the future.
         # Survey-based profile for attitude.
-        self.attitude = survey_profile["attitude"]
+        self.attitude = survey_profile["attitude_score"]
 
         # salary = self.calc_salary()
         self.decision_threshold = self.config['decision_threshold']
@@ -40,7 +40,7 @@ class Resident(Agent):
 
         # BEHAVIORAL CONTROL (PBC)
         # Survey-based perceived behavioral control (PBC) from cluster profiles
-        self.survey_pbc = survey_profile["pbc"]
+        self.survey_pbc = survey_profile["pbc_score"]
 
         # INTENTION SYSTEM
         self.intentions = {p.name: 0.0 for p in self.environment.sustainability_packages}
