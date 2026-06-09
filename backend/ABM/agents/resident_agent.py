@@ -43,7 +43,10 @@ class Resident(Agent):
         self.survey_pbc = survey_profile["pbc_score"]
 
         # INTENTION SYSTEM
-        self.intentions = {p.name: 0.0 for p in self.environment.sustainability_packages}
+        self.intentions = 0.0
+
+        # resident is open to renvovation.
+        self.wants_to_renovate = False
 
         # self.intention_threshold = self.config.get('intention_threshold',self.decision_threshold)
         self.intention_threshold = 0.7 # This is a new parameter that determines how high the intention needs to be for the resident to decide to adopt a package. We can experiment with different values for this to see how it affects adoption rates.
@@ -67,35 +70,37 @@ class Resident(Agent):
 
 
     #1. INTENTION (RAA – resident level) ## TODO 
-    def calc_intention(self): 
+    def calc_intention(self):
         """
-        Calculates the intention to adopt each sustainability package based on attitude,
-        subjective norm, and perceived behavioral control, applying the respective sensitivities and weights from the configuration.
+        Calculates the resident's intention based on
+        attitude, perceived norm and PBC.
         """
-        for package in self.environment.sustainability_packages:
-            if self.package_decisions.get(package.name, False):
-                continue
 
-            # make the the attitude, subjective norm, and behavioral control components for the agent and package, applying the respective modifiers
-            attitude_part = self.attitude * self.attitude_sensitivity
-            norm_part = (self.perceived_norm * self.norm_sensitivity * package.norm_influence_strength)  # package-specific influence strength on norms
+        attitude_part = self.attitude * self.attitude_sensitivity
 
-            # # Perceived behavioral control (survey-based perception only)
-            control_part = self.survey_pbc * self.control_sensitivity
+        norm_part = (
+            self.perceived_norm
+            * self.norm_sensitivity
+        )
 
-            # get the weights for each component from the config, or default to 1.0 if not specified
-            w_att = self.config.get("weight_attitude", 1.0)
-            w_norm = self.config.get("weight_norm", 1.0)
-            w_control = self.config.get("weight_control", 1.0)
+        control_part = (
+            self.survey_pbc
+            * self.control_sensitivity
+        )
 
-            # Calculate total weight for normalization
-            total_weight = w_att + w_norm + w_control
+        w_att = self.config.get("weight_attitude", 1.0)
+        w_norm = self.config.get("weight_norm", 1.0)
+        w_control = self.config.get("weight_control", 1.0)
 
-            # Calculate intention as a weighted average of the three components
-            intention = (w_att * attitude_part + w_norm * norm_part + w_control * control_part) / total_weight
+        total_weight = w_att + w_norm + w_control
 
-            # update the intention for this package
-            self.intentions[package.name] = intention
+        self.intention = (
+            w_att * attitude_part +
+            w_norm * norm_part +
+            w_control * control_part
+        ) / total_weight
+
+        return self.intention
 
 
     def collect_resident_data(self):
@@ -143,27 +148,23 @@ class Resident(Agent):
         if not all(self.package_decisions.get(p.name, False)
                 for p in self.environment.sustainability_packages):
 
-            # Calculate psychological drivers
+            # Calculate intention
             self.calc_intention()
 
-            # Resident expresses support (no feasibility check here))
-            for package in self.environment.sustainability_packages:
+            # Resident expresses support for renovation
+            self.wants_to_renovate = (
+                self.intention >= self.intention_threshold
+            )
 
-                if self.package_decisions.get(package.name, False):
-                    continue
+            # gradual learning / social adaptation
+            self.attitude += 0.01 * (1 - self.attitude)
+            self.survey_pbc += 0.01 * (1 - self.survey_pbc)
 
-                intention = self.intentions[package.name]
-
-                # intention threshold check (RAA decision rule)
-                if intention > self.intention_threshold:
-                    self.package_decisions[package.name] = True
-
-                    self.environment.decided_residents_this_step_per_package[package.name] = \
-                        self.environment.decided_residents_this_step_per_package.get(package.name, 0) + 1
-
-        # after decision-making
-        self.attitude += 0.01 * (1 - self.attitude)
-        self.survey_pbc += 0.01 * (1 - self.survey_pbc)
-
-        # income dynamics (keeps agent evolving over time)
-        # self.income = int(round(self.income * np.random.choice(self.config['raise_income']), -1))
+            # optional income dynamics
+            # self.income = int(
+            #     round(
+            #         self.income *
+            #         np.random.choice(self.config['raise_income']),
+            #         -1
+            #     )
+            # )
