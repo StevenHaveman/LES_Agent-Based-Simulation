@@ -68,25 +68,19 @@ class Household(Agent):
     def get_household_income(self):
         return sum(res.income for res in self.residents)
     
+    # 3. ACTUAL CONTROL
     def calculate_actual_control(self):
-        """
-        Calculates actual control / feasibility for each package.
-        Based on household-level constraints such as:
-        - income
-        - package cost
-        - ROI
-        - energy label
-        - feasibility
-        """
 
         household_income = self.get_household_income()
+        action_score = self.get_household_action_score()
 
         for package in self.model.sustainability_packages:
 
             self.actual_control[package.name] = (
                 package.calculate_behavioral_influence(
-                    household_income,
-                    self
+                    income=household_income,
+                    household=self,
+                    action_score=action_score
                 )
             )
 
@@ -97,13 +91,10 @@ class Household(Agent):
 
 
     def choose_household_package(self):
-        """
-        Determines which sustainability package to install based on the support of residents and the household's decision threshold.
-        """
 
         if not self.residents:
             return
-        
+
         if self.renovation_cooldown > 0:
             return
 
@@ -112,7 +103,7 @@ class Household(Agent):
         best_rank = 0
 
         for package in self.model.sustainability_packages:
-            
+
             if package.baseline_level != self.current_kpi_level:
                 continue
 
@@ -121,51 +112,60 @@ class Household(Agent):
                 if res.package_decisions.get(package.name, False)
             )
 
-            # Resident support score
             support_score = supporters / len(self.residents)
 
-            actual_control_score = (self.actual_control[package.name])
+            avg_intention = sum(
+                res.intentions[package.name] for res in self.residents
+            ) / len(self.residents)
 
-            # TODO PUT IT IN CONFIG
-            # Combine support and actual control into final score for package selection, using weights (e.g., 70% support, 30% actual control).
-            score = (0.7 * support_score + 0.3 * actual_control_score)
+            #INTENTION GATE
+            if avg_intention < self.config.get("intention_threshold", 0.7):
+                continue
+
+            actual_control_score = self.actual_control[package.name]
+
+            print(self.actual_control)
+
+            if actual_control_score < self.config.get("actual_control_threshold", 0.7):
+                continue
+
+            #4. ACTION SCORE
+            final_score = (
+                0.5 * avg_intention +
+                0.3 * support_score + # Remove support score.
+                0.2 * actual_control_score
+            )
 
             target_rank = self.LEVEL_RANK[package.target_level]
-            
-            # choose the package with:
-            # 1. highest support
-            # 2. if support is equal, the one with the highest target level
+
             if (
-                score > best_score or
-                (score == best_score and target_rank > best_rank)
+                final_score > best_score or
+                (final_score == best_score and target_rank > best_rank)
             ):
-                best_score = score
+                best_score = final_score
                 best_rank = target_rank
                 best_package = package
 
-        # Install the best package if it meets the household decision threshold
+        # 5. ACTION (Y/N)
         if (best_package and best_score >= self.config['household_decision_threshold']):
 
-            # If the best package is already active, do nothing.
             if (self.active_package is not None and self.active_package.name == best_package.name):
                 return
-            
-            # turn off the currently active package if there is one.
+
             if self.active_package is not None:
-                # print(f"Household {self.unique_id} is switching from current kpi level {self.current_kpi_level} package {self.active_package.name} to target level {best_package.target_level} package {best_package.name} with support score {best_score:.2f}")
                 self.package_installations[self.active_package.name] = False
 
-            # install new package
-            self.renovation_cooldown = self.config.get("renovation_cooldown", 0) # Set cooldown after installing a package to prevent rapid switching
+            self.renovation_cooldown = self.config.get("renovation_cooldown", 0)
             self.package_installations[best_package.name] = True
             self.active_package = best_package
             self.renovation_costs_spend += best_package.price
 
-            # KPI + label update
             self.current_kpi_level = best_package.target_level
-            self.gis_attributes["Energielabel"] = (self.convert_kpi_level_to_energy_label(self.current_kpi_level))
+            self.gis_attributes["Energielabel"] = (
+                self.convert_kpi_level_to_energy_label(self.current_kpi_level)
+            )
 
-            self.current_co2_emissions = best_package.co2_output # Update current CO2 emissions to the new level after installing the package.
+            self.current_co2_emissions = best_package.co2_output
 
     def get_initial_co2_emissions(self):
         """Estimates the initial annual CO2 emissions of the household based on its energy label and other GIS attributes.
@@ -187,6 +187,12 @@ class Household(Agent):
 
         pass
 
+    # 2. Action score. 
+    def get_household_action_score(self):
+        if not self.residents:
+            return 0
+        return sum(r.action_score for r in self.residents) / len(self.residents)
+    
     def step(self):
         """
         Step function for the household.

@@ -48,25 +48,34 @@ class UpgradePackage:
 
         return affordable and no_backwards_step
 
-    def calculate_behavioral_influence(self, income, household):
+    def calculate_behavioral_influence(self, income, household, action_score):
         """
-        Calculates perceived behavioral control (PBC).
+        Calculates actual control / feasibility score (0-1) for a renovation package.
 
-        Based on:
-        - affordability
-        - break-even attractiveness
+        Inputs:
+        - income: household income
+        - affordability: ability to pay for the package
+        - ROI: financial attractiveness
+        - action_score: survey-based behavioral signal (external driver)
+
+        Output:
+        - normalized score between 0 and 1
         """
 
-        # Avoid divide by zero
-        if not self.price or self.price <= 0:
-            return 0
 
-        affordability = income / self.price
+        # TODO Normaliseer affordability en ROI op basis van realistische min/max waarden in de dataset, 
+        # zodat ze op dezelfde schaal worden gebracht voor de berekening van de totale score. 
+        # Dit voorkomt dat een van de componenten onevenredig zwaar weegt in de uiteindelijke score.
+        affordability = income / self.price if self.price > 0 else 0
         roi = 1 / self.break_even_in_years if self.break_even_in_years else 0
 
-        score = 0.7 * affordability + 0.3 * roi
+        score = (
+            0.4 * affordability +
+            0.4 * roi +
+            0.2 * action_score
+        )
 
-        return min(max(score, 0), 1)
+        return max(0, min(score, 1))
     
 
     def calc_co2_savings(self, household):

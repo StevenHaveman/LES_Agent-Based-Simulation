@@ -66,6 +66,12 @@ def load_gis_data(gis_data_path: str):
     # Clean the data by dropping rows with missing critical GIS attributes (e.g., 'bouwjaar', 'woning type', 'WoonplaatsNaam').
     df_clean = df.dropna(subset=['Bouwjaar', 'Woning type', 'WoonplaatsNaam', 'Energielabel'])
 
+    apartment_types = ["Appartement","Flatwoning (overig)","Maisonnette"]
+    row_house_types = ["Rijwoning tussen", "Twee-onder-een-kap / rijwoning hoek"]
+
+    df_clean["Woning type"] = df_clean["Woning type"].replace({woning: "Apartment" for woning in apartment_types})
+    df_clean["Woning type"] = df_clean["Woning type"].replace({woning: "Row House" for woning in row_house_types})
+
     return df_clean[["OBJECTID","Oppervlakte","Huisnummer","Postcode","OpenbareRuimteNaam","WoonplaatsNaam","Energielabel","Bouwjaar","Latitude","Longitude", "Woning type"]]
 
 def load_package_data(package_data_path: str):
@@ -93,6 +99,15 @@ def load_survey_data(survey_data_path: str):
     """Loads survey data from a specified file path."""
 
     df = pd.DataFrame(pd.read_excel(survey_data_path))
+
+    df.columns = df.columns.str.strip()
+
+    return df
+
+def load_survey_cluster_profiles(survey_cluster_profiles_path: str):
+    """Loads survey cluster profiles from a specified file path."""
+
+    df = pd.DataFrame(pd.read_excel(survey_cluster_profiles_path))
 
     df.columns = df.columns.str.strip()
 
