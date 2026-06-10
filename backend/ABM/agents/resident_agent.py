@@ -161,10 +161,4 @@ class Resident(Agent):
             self.survey_pbc += 0.01 * (1 - self.survey_pbc)
 
             # optional income dynamics
-            # self.income = int(
-            #     round(
-            #         self.income *
-            #         np.random.choice(self.config['raise_income']),
-            #         -1
-            #     )
-            # )
+            # self.income = int(round(self.income * np.random.choice(self.config['raise_income']), -1))
