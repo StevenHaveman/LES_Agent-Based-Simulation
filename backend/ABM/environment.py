@@ -456,8 +456,35 @@ class Environment(Model):
     
     def collect_cluster_behavior_data(self):
         """
-        Collects behavioral statistics per resident cluster.
+        Collect behavioral statistics per cluster.
+
+        Returns:
+        - average attitude / norm / pbc (voor line charts)
+        - distributions (voor histogram/bar charts)
         """
+
+        def create_buckets():
+            return {
+                "0.0-0.2": 0,
+                "0.2-0.4": 0,
+                "0.4-0.6": 0,
+                "0.6-0.8": 0,
+                "0.8-1.0": 0
+            }
+
+        def add_to_bucket(buckets, value):
+            value = max(0, min(1, value))
+
+            if value < 0.2:
+                buckets["0.0-0.2"] += 1
+            elif value < 0.4:
+                buckets["0.2-0.4"] += 1
+            elif value < 0.6:
+                buckets["0.4-0.6"] += 1
+            elif value < 0.8:
+                buckets["0.6-0.8"] += 1
+            else:
+                buckets["0.8-1.0"] += 1
 
         cluster_data = {}
 
@@ -465,34 +492,76 @@ class Environment(Model):
 
             cluster = resident.cluster_type
 
-            # create cluster if not exists
             if cluster not in cluster_data:
                 cluster_data[cluster] = {
                     "attitudes": [],
                     "perceived_norms": [],
                     "pbc_scores": [],
+
+                    "attitude_distribution": create_buckets(),
+                    "perceived_norm_distribution": create_buckets(),
+                    "pbc_distribution": create_buckets(),
+
                     "count": 0
                 }
 
-            cluster_data[cluster]["attitudes"].append(resident.attitude)
-            cluster_data[cluster]["perceived_norms"].append(resident.perceived_norm)
-            cluster_data[cluster]["pbc_scores"].append(resident.survey_pbc)
+            attitude = resident.attitude
+            norm = resident.perceived_norm
+            pbc = resident.survey_pbc
+
+            cluster_data[cluster]["attitudes"].append(attitude)
+            cluster_data[cluster]["perceived_norms"].append(norm)
+            cluster_data[cluster]["pbc_scores"].append(pbc)
+
+            add_to_bucket(
+                cluster_data[cluster]["attitude_distribution"],
+                attitude
+            )
+
+            add_to_bucket(
+                cluster_data[cluster]["perceived_norm_distribution"],
+                norm
+            )
+
+            add_to_bucket(
+                cluster_data[cluster]["pbc_distribution"],
+                pbc
+            )
+
             cluster_data[cluster]["count"] += 1
 
-        # calculate averages
         result = {}
 
         for cluster, values in cluster_data.items():
 
             result[cluster] = {
-                "average_attitude": np.mean(values["attitudes"]) if values["attitudes"] else 0,
+                # bestaande line chart data
+                "average_attitude":
+                    float(np.mean(values["attitudes"]))
+                    if values["attitudes"] else 0,
 
-                "average_perceived_norm": np.mean(values["perceived_norms"]) if values["perceived_norms"] else 0,
+                "average_perceived_norm":
+                    float(np.mean(values["perceived_norms"]))
+                    if values["perceived_norms"] else 0,
 
-                "average_pbc": np.mean(values["pbc_scores"]) if values["pbc_scores"] else 0,
+                "average_pbc":
+                    float(np.mean(values["pbc_scores"]))
+                    if values["pbc_scores"] else 0,
 
-                "resident_count": values["count"]
+                # nieuwe distributies
+                "attitude_distribution":
+                    values["attitude_distribution"],
+
+                "perceived_norm_distribution":
+                    values["perceived_norm_distribution"],
+
+                "pbc_distribution":
+                    values["pbc_distribution"],
+
+                "resident_count":
+                    values["count"]
             }
+            print(f"Cluster {cluster} behavior data: {result[cluster]}")
 
         return result
 

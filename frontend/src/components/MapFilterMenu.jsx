@@ -11,11 +11,8 @@ const energyGroups = [
 ];
 
 const woningTypes = [
-    'Twee-onder-een-kap / rijwoning hoek',
-    'Rijwoning tussen',
-    'Flatwoning (overig)',
-    'Appartement',
-    'Maisonnette',
+    'Row House',
+    'Apartment'
 ];
 
 function MapFilterMenu({ selectedLabels, onToggleLabel, selectedWoningTypes, onToggleWoningType, clusterMode, onToggleClusterMode, selectedClusterTypes, onToggleClusterType }) {

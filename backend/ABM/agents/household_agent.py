@@ -89,7 +89,6 @@ class Household(Agent):
             # print(f"Household {self.unique_id} is in renovation cooldown for {self.renovation_cooldown} more years.")
             self.renovation_cooldown = max(0, self.renovation_cooldown - 1)
 
-
     def choose_household_package(self):
 
         if not self.residents:
@@ -98,74 +97,114 @@ class Household(Agent):
         if self.renovation_cooldown > 0:
             return
 
+        avg_intention = (
+            sum(res.intention for res in self.residents)
+            / len(self.residents)
+        )
+
+        support_score = (
+            sum(
+                1
+                for res in self.residents
+                if res.wants_to_renovate
+            )
+            / len(self.residents)
+        )
+
+        if avg_intention < self.config.get(
+            "intention_threshold",
+            0.7
+        ):
+            return
+
         best_package = None
         best_score = 0
         best_rank = 0
 
         for package in self.model.sustainability_packages:
 
+            # alleen upgrades vanaf huidige niveau
             if package.baseline_level != self.current_kpi_level:
                 continue
 
-            supporters = sum(
-                1 for res in self.residents
-                if res.package_decisions.get(package.name, False)
-            )
+            actual_control_score = self.actual_control[
+                package.name
+            ]
 
-            support_score = supporters / len(self.residents)
-
-            avg_intention = sum(
-                res.intentions[package.name] for res in self.residents
-            ) / len(self.residents)
-
-            #INTENTION GATE
-            if avg_intention < self.config.get("intention_threshold", 0.7):
+            if actual_control_score < self.config.get(
+                "actual_control_threshold",
+                0.7
+            ):
                 continue
 
-            actual_control_score = self.actual_control[package.name]
-
-            print(self.actual_control)
-
-            if actual_control_score < self.config.get("actual_control_threshold", 0.7):
-                continue
-
-            #4. ACTION SCORE
             final_score = (
                 0.5 * avg_intention +
-                0.3 * support_score + # Remove support score.
+                0.3 * support_score +
                 0.2 * actual_control_score
             )
 
-            target_rank = self.LEVEL_RANK[package.target_level]
+            target_rank = self.LEVEL_RANK[
+                package.target_level
+            ]
 
             if (
-                final_score > best_score or
-                (final_score == best_score and target_rank > best_rank)
+                final_score > best_score
+                or (
+                    final_score == best_score
+                    and target_rank > best_rank
+                )
             ):
                 best_score = final_score
                 best_rank = target_rank
                 best_package = package
 
-        # 5. ACTION (Y/N)
-        if (best_package and best_score >= self.config['household_decision_threshold']):
+        if (
+            best_package
+            and best_score >= self.config[
+                "household_decision_threshold"
+            ]
+        ):
 
-            if (self.active_package is not None and self.active_package.name == best_package.name):
+            if (
+                self.active_package is not None
+                and self.active_package.name
+                == best_package.name
+            ):
                 return
 
             if self.active_package is not None:
-                self.package_installations[self.active_package.name] = False
+                self.package_installations[
+                    self.active_package.name
+                ] = False
 
-            self.renovation_cooldown = self.config.get("renovation_cooldown", 0)
-            self.package_installations[best_package.name] = True
-            self.active_package = best_package
-            self.renovation_costs_spend += best_package.price
-
-            self.current_kpi_level = best_package.target_level
-            self.gis_attributes["Energielabel"] = (
-                self.convert_kpi_level_to_energy_label(self.current_kpi_level)
+            self.renovation_cooldown = self.config.get(
+                "renovation_cooldown",
+                0
             )
 
-            self.current_co2_emissions = best_package.co2_output
+            self.package_installations[
+                best_package.name
+            ] = True
+
+            self.active_package = best_package
+
+            self.renovation_costs_spend += (
+                best_package.price
+            )
+
+            self.current_kpi_level = (
+                best_package.target_level
+            )
+
+            self.gis_attributes["Energielabel"] = (
+                self.convert_kpi_level_to_energy_label(
+                    self.current_kpi_level
+                )
+            )
+
+            self.current_co2_emissions = (
+                best_package.co2_output
+            )
 
     def get_initial_co2_emissions(self):
         """Estimates the initial annual CO2 emissions of the household based on its energy label and other GIS attributes.
