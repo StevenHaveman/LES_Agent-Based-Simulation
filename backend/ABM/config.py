@@ -73,7 +73,7 @@ configs = {
                 },
 
         # Data collection parameters
-        'collect_data': True, # Whether to collect data for analysis
+        'collect_data': False, # Whether to collect data for analysis
         'data_save_folder': 'data/' # Folder to save collected data
     },
 
@@ -152,7 +152,7 @@ configs = {
         'weight_control': 1.0,
 
         # Data collection parameters
-        'collect_data': True, # Whether to collect data for analysis
+        'collect_data': False, # Whether to collect data for analysis
         'data_save_folder': 'data/' # Folder to save collected data
     },
 
@@ -213,7 +213,7 @@ configs = {
         'weight_control': 1.0,
 
         # Data collection parameters
-        'collect_data': True, # Whether to collect data for analysis
+        'collect_data': False, # Whether to collect data for analysis
         'data_save_folder': 'data/' # Folder to save collected data
     }
 }
