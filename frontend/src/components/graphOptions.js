@@ -5,7 +5,7 @@ export const GRAPH_OPTIONS = [
     // { key: 'cluster_behavior_data', label: 'Cluster behavior data' },
     { key: 'cluster_behavior_trends', label: 'Cluster averages over time' },
     { key: 'behavior_metrics', label: 'Behavior Metrics' },
-    { key: 'histogram', label: 'Histogram' },
+    { key: 'histogram', label: 'Population Distribution Chart' },
 ];
 
 export const GRAPH_SLOTS = 3;

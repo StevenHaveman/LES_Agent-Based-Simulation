@@ -19,7 +19,7 @@ const createHistogram = (values, binCount = 10) => {
             const start = (i / binCount).toFixed(1);
             const end = ((i + 1) / binCount).toFixed(1);
 
-            return `${start}-${end}`;
+            return ((i + 0.5) / binCount).toFixed(1);
         }),
 
         counts: bins
