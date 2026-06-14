@@ -51,8 +51,8 @@ const HistogramChart = ({ households }) => {
             {
                 label: 'Attitude',
                 data: attitudeHistogram.counts,
-                borderColor: '#00ffaa',
-                backgroundColor: '#00ffaa22',
+                borderColor: '#d62728',
+                backgroundColor: '#d6272833',
                 tension: 0.4,
                 fill: false,
             },
@@ -60,8 +60,8 @@ const HistogramChart = ({ households }) => {
             {
                 label: 'Perceived Norm',
                 data: normHistogram.counts,
-                borderColor: '#ff7801',
-                backgroundColor: '#ff780122',
+                borderColor: '#2ca02c',
+                backgroundColor: '#2ca02c33',
                 tension: 0.4,
                 fill: false,
             },
@@ -69,8 +69,8 @@ const HistogramChart = ({ households }) => {
             {
                 label: 'Perceived Behavioral Control',
                 data: pbcHistogram.counts,
-                borderColor: '#238b23',
-                backgroundColor: '#238b2322',
+                borderColor: '#ff7f0e',
+                backgroundColor: '#ff7f0e33',
                 tension: 0.4,
                 fill: false,
             },

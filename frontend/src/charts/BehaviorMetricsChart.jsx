@@ -28,8 +28,8 @@ const BehaviorMetricsChart = ({
                         item.cluster_behavior_data?.[clusterKey]
                             ?.average_attitude ?? 0
                 ),
-                borderColor: '#c2185b',
-                backgroundColor: '#c2185b33',
+                borderColor: '#d62728',
+                backgroundColor: '#d6272833',
                 tension: 0.4,
             },
             {
@@ -39,8 +39,8 @@ const BehaviorMetricsChart = ({
                         item.cluster_behavior_data?.[clusterKey]
                             ?.average_perceived_norm ?? 0
                 ),
-                borderColor: '#4caf50',
-                backgroundColor: '#4caf5033',
+                borderColor: '#2ca02c',
+                backgroundColor: '#2ca02c33',
                 tension: 0.4,
             },
             {
@@ -50,8 +50,8 @@ const BehaviorMetricsChart = ({
                         item.cluster_behavior_data?.[clusterKey]
                             ?.average_pbc ?? 0
                 ),
-                borderColor: '#2196f3',
-                backgroundColor: '#2196f333',
+                borderColor: '#ff7f0e',
+                backgroundColor: '#ff7f0e33',
                 tension: 0.4,
             },
         ],

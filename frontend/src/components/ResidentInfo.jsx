@@ -95,7 +95,7 @@ const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResi
                                 <span className="info-value">{resident.perceived_norm.toFixed(decibel)}</span>
                             </div>
                             <div className="info-row">
-                                <span className="info-label">Perceived Behaviour Control (PBC):</span>
+                                <span className="info-label">Perceived Behavior Control (PBC):</span>
                                 <span className="info-value">{resident.survey_pbc.toFixed(decibel)}</span>
                             </div>
                             <div className="info-row">
