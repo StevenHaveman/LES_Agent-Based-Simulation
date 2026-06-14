@@ -50,38 +50,26 @@ const KPIWindow = () => {
     const [loading, set_loading] = React.useState(true);
     const year = useSimulationYear();
 
-    React.useEffect(function () {
-        let interval_id;
-
+    React.useEffect(() => {
         async function fetch_data() {
             try {
-                set_house_hold_data(await useOverview().fetchHouseholds(undefined));
+                set_house_hold_data(await useOverview().fetchHouseholds());
                 set_sim_config(await useOverview().fetchSimulationConfig());
                 set_kpi_data(await useOverview().fetchKPIData());
             } catch (error) {
-                console.error('error fetching household or KPI data:', error);
+                console.error(
+                    'error fetching household or KPI data:',
+                    error
+                );
             }
+
             set_loading(false);
         }
 
-        async function start_fetch_loop() {
-            const delayTime = 3;
-            const delayMs = 1000;
-
-            const result = await useSimulationRun().getSimulationDelay();
-            const delay_in_ms = (parseInt(result?.delay) || delayTime) * delayMs;
-
-            await fetch_data();
-
-            interval_id = setInterval(fetch_data, delay_in_ms);
+        if (year !== null) {
+            fetch_data();
         }
-
-        start_fetch_loop();
-
-        return function () {
-            if (interval_id) {clearInterval(interval_id);}
-        };
-    }, []);
+    }, [year]);
 
     if (loading) {
         return <div><h3>Loading...</h3></div>;

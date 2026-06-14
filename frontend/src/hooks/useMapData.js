@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import overviewService from '../services/OverviewService';
 
-const intervalTime = 3000; // 1000 is 1 second
+import { useSimulationYear } from './useSimulationYear';
 
 export const useMapData = () => {
     const [houses, setHouses] = useState([]);
+    const year = useSimulationYear();
 
     useEffect(() => {
         const fetchHouseholds = async () => {
@@ -27,10 +28,11 @@ export const useMapData = () => {
                 console.error('Failed to load houses', err);
             }
         };
-        fetchHouseholds();
-        const interval = setInterval(fetchHouseholds, intervalTime);
-        return () => clearInterval(interval);
-    }, []);
+
+        if (year !== null) {
+            fetchHouseholds();
+        }
+    }, [year]);
 
     return houses;
 };

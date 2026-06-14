@@ -36,18 +36,15 @@ function OverviewContent() {
     const [selectedResidentIndex, setSelectedResidentIndex] = useState(0);
     const [selectedLabels, setSelectedLabels] = useState(['A', 'B', 'C', 'D', 'E', 'F', 'G']);
     const [selectedWoningTypes, setSelectedWoningTypes] = useState([
-        'Twee-onder-een-kap / rijwoning hoek',
-        'Rijwoning tussen',
-        'Flatwoning (overig)',
-        'Appartement',
-        'Maisonnette',
+        'Row House',
+        'Apartment',
     ]);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
     const [clusterMode, setClusterMode] = useState(false);
     const [selectedClusterTypes, setSelectedClusterTypes] = useState([
-        'Engaged',
-        'Passive',
-        'Skeptic',
+        'engaged',
+        'neutral',
+        'resistant',
     ]);
     const houses = useMapData();
     const year = useSimulationYear();

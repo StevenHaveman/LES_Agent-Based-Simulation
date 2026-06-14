@@ -131,10 +131,10 @@ const MapView = ({ houses, onHouseClick, selectedHouse, clusterMode = false }) =
                 });
                 const majority = Object.keys(clusterCounts).sort((a, b) => (clusterCounts[b] || 0) - (clusterCounts[a] || 0))[0];
                 const colorMap = {
-                    Engaged: '#2ac72a',
-                    Passive: '#5a5754',
-                    Skeptic: '#ff0000',
-                    Unknown: '#888'
+                    engaged: '#2ac72a',
+                    neutral: '#5a5754',
+                    resistant: '#ff0000',
+                    unknown: '#fffaa4'
                 };
 
                 const color = colorMap[majority] || '#888';

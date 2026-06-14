@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import {
     Chart as ChartJS,
@@ -37,6 +37,8 @@ import Co2Chart from '../charts/Co2Chart';
 import KpiChart from '../charts/KpiChart';
 import ClusterChart from '../charts/ClusterChart';
 import ClusterTrendChart from '../charts/ClusterTrendChart';
+import BehaviorMetricsChart from '../charts/BehaviorMetricsChart';
+import HistogramChart from '../charts/HistogramChart';
 
 const validKeys = [
     'energy_label_A',
@@ -50,6 +52,8 @@ const validKeys = [
     'kpi_stock',
     'cluster_behavior_data',
     'cluster_behavior_trends',
+    'behavior_metrics',
+    'histogram'
 ];
 
 const delayMs = 1000;
@@ -110,10 +114,13 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
     const [simulationData, setSimulationData] = useState([]);
 
     const [loading, setLoading] = useState(true);
+    const [households, setHouseholds] = useState([]);
 
     const [selectedClusterMetric, setSelectedClusterMetric] = useState(
         clusterMetrics[0].key,
     );
+
+    const lastYearRef = useRef(null);
 
     const yKey = validKeys.includes(yAxisKey) ? yAxisKey : validKeys[0];
 
@@ -123,8 +130,18 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
         const fetchData = async () => {
             try {
                 const result = await useOverview().getSimulationGraphicResults();
+                
+                const householdData =
+                await useOverview().fetchHouseholds();
+                setHouseholds(householdData);
 
-                setSimulationData(result);
+                const latestYear = result[result.length - 1]?.year;
+
+                if (latestYear !== lastYearRef.current) {
+                    lastYearRef.current = latestYear;
+
+                    setSimulationData(result);
+                }
 
                 setLoading(false);
             } catch (error) {
@@ -141,7 +158,6 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
                 parseInt(res.delay || defaultSimulationDelaySeconds) * delayMs;
 
             await fetchData();
-
             intervalId = setInterval(fetchData, delay);
         };
 
@@ -197,6 +213,19 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
                 selectedClusterMetric={selectedClusterMetric}
                 clusterMetrics={clusterMetrics}
                 clusterColors={clusterColors}
+            />
+        ),
+
+        behavior_metrics: (
+            <BehaviorMetricsChart
+                uniqueSimulationData={uniqueSimulationData}
+                simulationYearStart={simulationYearStart}
+            />
+        ),
+
+        histogram: (
+            <HistogramChart
+                households={households}
             />
         ),
     };
