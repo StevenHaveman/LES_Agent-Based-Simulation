@@ -4,10 +4,12 @@ import { useOverview } from '../hooks/useOverview.js';
 import PropTypes from 'prop-types';
 
 const KPIWindow = ({ year }) => {
+    /* eslint-disable */
     const [house_hold_data, set_house_hold_data] = React.useState([]);
     const [sim_config, set_sim_config] = React.useState([]);
     const [kpi_data, set_kpi_data] = React.useState(null);
     const [loading, set_loading] = React.useState(true);
+    /* eslint-enable */
 
     React.useEffect(() => {
         async function fetch_data() {

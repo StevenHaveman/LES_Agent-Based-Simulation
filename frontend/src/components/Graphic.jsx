@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 
 import {
     Chart as ChartJS,
@@ -53,8 +53,6 @@ const validKeys = [
     'histogram',
 ];
 
-const delayMs = 1000;
-const defaultSimulationDelaySeconds = 3;
 const simulationYearStart = 2025;
 
 const barPercentageNummer = 1.0;
@@ -267,6 +265,8 @@ const Graphic = ({
 Graphic.propTypes = {
     title: PropTypes.string,
     yAxisKey: PropTypes.string,
+    simulationData: PropTypes.arrayOf(PropTypes.object),
+    households: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default Graphic;

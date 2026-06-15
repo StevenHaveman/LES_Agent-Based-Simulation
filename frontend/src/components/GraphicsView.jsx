@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React from 'react';
 import '../styles/GraphicsView.css';
 import Graphic from './Graphic.jsx';
 import PropTypes from 'prop-types';
@@ -41,8 +41,11 @@ const GraphicsView = ({
         };
 
         const start = async () => {
+            const seconds = 6;
+            const multiplier = 1000;
+
             const res = await useSimulationRun().getSimulationDelay();
-            const delay = (parseInt(res.delay) || 6) * 1000;
+            const delay = (parseInt(res.delay) || seconds) * multiplier;
 
             await fetchData();
 

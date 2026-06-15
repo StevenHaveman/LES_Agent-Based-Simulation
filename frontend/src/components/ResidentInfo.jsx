@@ -239,6 +239,9 @@ ResidentInfo.propTypes = {
         cluster_type: PropTypes.string,
         attitude: PropTypes.number,
         address: PropTypes.string,
+        intention: PropTypes.number,
+        wants_to_renovate: PropTypes.bool,
+        intention_threshold: PropTypes.number,
     }),
     home: PropTypes.shape({
         address: PropTypes.string,
