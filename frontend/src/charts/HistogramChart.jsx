@@ -38,7 +38,7 @@ const HistogramChart = ({ households, selectedClusters }) => {
         },
         {
             key: 'survey_pbc',
-            label: 'Subjective Norm',
+            label: 'Perceived Behavioral Control',
             color: '#ff7f0e',
         },
     ];
@@ -86,9 +86,17 @@ const HistogramChart = ({ households, selectedClusters }) => {
 
                 scales: {
                     x: {
+                        title: {
+                            display: true,
+                            text: 'Behavioral Score',
+                        },
                         stacked: false,
                     },
                     y: {
+                        title: {
+                            display: true,
+                            text: 'Number of Residents',
+                        },
                         beginAtZero: true,
                     },
                 },
