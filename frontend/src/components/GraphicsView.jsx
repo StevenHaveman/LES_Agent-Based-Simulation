@@ -42,8 +42,7 @@ const GraphicsView = ({
 
         const start = async () => {
             const res = await useSimulationRun().getSimulationDelay();
-
-            const delay = (parseInt(res.delay) || 3) * 1000;
+            const delay = (parseInt(res.delay) || 6) * 1000;
 
             await fetchData();
 
