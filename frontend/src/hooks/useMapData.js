@@ -1,11 +1,8 @@
 import { useEffect, useState } from 'react';
 import overviewService from '../services/OverviewService';
 
-import { useSimulationYear } from './useSimulationYear';
-
-export const useMapData = () => {
+export const useMapData = (year) => {
     const [houses, setHouses] = useState([]);
-    const year = useSimulationYear();
 
     useEffect(() => {
         const fetchHouseholds = async () => {

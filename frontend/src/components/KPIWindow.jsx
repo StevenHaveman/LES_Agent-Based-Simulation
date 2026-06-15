@@ -1,53 +1,13 @@
 import React from 'react';
 import '../styles/KPIWindow.css';
 import { useOverview } from '../hooks/useOverview.js';
-import { useSimulationYear } from '../hooks/useSimulationYear.js';
+import PropTypes from 'prop-types';
 
-const KPIWindow = () => {
-    // eslint-disable-next-line no-unused-vars
+const KPIWindow = ({ year }) => {
     const [house_hold_data, set_house_hold_data] = React.useState([]);
-    /**
-     * @type {[{
-     *   CO2_electricity: number,
-     *   CO2_gas: number,
-     *   attitude: number | null,
-     *   attitude_mod: number | null,
-     *   behavioral_mod: number | null,
-     *   decision_threshold: number,
-     *   energy_generation_range: number[],
-     *   energy_price: number,
-     *   gas_price: number,
-     *   heat_pump_price: number,
-     *   heatpump_price_increase: number[],
-     *   household_decision_threshold: number,
-     *   initial_heatpump_chance: number,
-     *   initial_solarpanel_chance: number,
-     *   max_nr_houses: number,
-     *   median_income: number,
-     *   min_nr_houses: number,
-     *   nr_households: number,
-     *   nr_residents: number,
-     *   raise_income: number[],
-     *   seed: number,
-     *   sigma_normal: number,
-     *   simulation_years: number,
-     *   solar_panel_amount_options: number[],
-     *   solar_panel_price: number,
-     *   solarpanel_price_increase: number[],
-     *   subj_norm_level: string,
-     *   subj_norm_mod: number | null,
-     *   subjective_norm: number,
-     *   yearly_energy_usage: number[],
-     *   yearly_gas_usage: number[],
-     *   yearly_heatpump_usage: number[]
-     * }}, Function]
-     */
-
-    // eslint-disable-next-line no-unused-vars
     const [sim_config, set_sim_config] = React.useState([]);
     const [kpi_data, set_kpi_data] = React.useState(null);
     const [loading, set_loading] = React.useState(true);
-    const year = useSimulationYear();
 
     React.useEffect(() => {
         async function fetch_data() {
@@ -140,6 +100,10 @@ const KPIWindow = () => {
             </div>
         </>
     );
+};
+
+KPIWindow.propTypes = {
+    year: PropTypes.number,
 };
 
 export default KPIWindow;

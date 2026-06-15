@@ -47,8 +47,9 @@ function OverviewContent() {
         'neutral',
         'resistant',
     ]);
-    const houses = useMapData();
+    
     const year = useSimulationYear();
+    const houses = useMapData(year);
 
     useEffect(() => {
         if (selectedHouse && houses.length > 0) {
@@ -159,7 +160,7 @@ function OverviewContent() {
                     <MunicipalityWindow />
                 </div>
                 <div className="kpi-container">
-                    <KPIWindow />
+                    <KPIWindow year={year + simulationYearStart} />
                 </div>
                 <div className="charts-container">
                     <GraphicsView
