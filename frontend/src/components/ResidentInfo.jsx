@@ -63,6 +63,11 @@ const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResi
                                 <span className="info-label">Type home:</span>
                                 <span className="info-value">{home.houseType}</span>
                             </div>
+                            <hr className="resident-info-divider" />
+                            <div className="info-row">
+                                <span className="info-label">Action Score:</span>
+                                <span className="info-value">{actionScore.toFixed(decibel)}</span>
+                            </div>
                         </div>
                         {!loading && <HomeTrendChart homeTrends={homeTrends} />}
                     </>
@@ -101,10 +106,6 @@ const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResi
                             <div className="info-row">
                                 <span className="info-label">Average Total:</span>
                                 <span className="info-value">{averageBehaviorScore.toFixed(decibel)}</span>
-                            </div>
-                            <div className="info-row">
-                                <span className="info-label">Action Score:</span>
-                                <span className="info-value">{actionScore.toFixed(decibel)}</span>
                             </div>
                         </div>
                         <ResidentTrendChart trends={trends} loading={loading} historicalData={historicalData} />

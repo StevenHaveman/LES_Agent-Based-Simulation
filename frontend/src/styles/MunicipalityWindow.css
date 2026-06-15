@@ -1,0 +1,26 @@
+.interventions-section {
+    justify-items: center;
+}
+
+.intervention-buttons {
+    display: flex;
+    gap: 0.75rem;
+    /* flex-direction: column; */
+}
+
+.intervention-button {
+    flex: 1;
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* .intervention-buttons {
+
+}
+
+.intervention-button {
+    
+} */

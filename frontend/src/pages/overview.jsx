@@ -16,6 +16,7 @@ import AIChatWindow from '../components/AIChatWindow.jsx';
 import OverviewNavbar from '../components/OverviewNavbar.jsx';
 
 import KPIWindow from '../components/KPIWindow.jsx';
+import MunicipalityWindow from '../components/MunicipalityWindow.jsx';
 import { useMapData } from '../hooks/useMapData.js';
 import { useSimulationYear } from '../hooks/useSimulationYear.js';
 import { GRAPH_OPTIONS, GRAPH_SLOTS } from '../components/graphOptions.js';
@@ -155,7 +156,7 @@ function OverviewContent() {
                     <SimulationParameters> </SimulationParameters>
                 </div> */}
                 <div className="municipality-container">
-                    Control center (coming soon)
+                    <MunicipalityWindow />
                 </div>
                 <div className="kpi-container">
                     <KPIWindow />

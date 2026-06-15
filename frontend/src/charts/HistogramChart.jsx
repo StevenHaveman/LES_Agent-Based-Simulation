@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Line } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 
 const createHistogram = (values, binCount = 10) => {
     const bins = Array(binCount).fill(0);
@@ -51,34 +51,29 @@ const HistogramChart = ({ households }) => {
             {
                 label: 'Attitude',
                 data: attitudeHistogram.counts,
+                backgroundColor: '#d6272855',
                 borderColor: '#d62728',
-                backgroundColor: '#d6272833',
-                tension: 0.4,
-                fill: false,
+                borderWidth: 1,
             },
-
             {
                 label: 'Perceived Norm',
                 data: normHistogram.counts,
+                backgroundColor: '#2ca02c55',
                 borderColor: '#2ca02c',
-                backgroundColor: '#2ca02c33',
-                tension: 0.4,
-                fill: false,
+                borderWidth: 1,
             },
-
             {
                 label: 'Perceived Behavioral Control',
                 data: pbcHistogram.counts,
+                backgroundColor: '#ff7f0e55',
                 borderColor: '#ff7f0e',
-                backgroundColor: '#ff7f0e33',
-                tension: 0.4,
-                fill: false,
-            },
-        ],
+                borderWidth: 1,
+            }
+        ]
     };
 
     return (
-        <Line
+        <Bar
             data={data}
             options={{
                 responsive: true,
@@ -90,23 +85,14 @@ const HistogramChart = ({ households }) => {
                     }
                 },
 
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Value Range (0-1)'
-                        }
-                    },
-
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Residents'
-                        },
-
-                        beginAtZero: true
-                    }
-                }
+scales: {
+    x: {
+        stacked: false
+    },
+    y: {
+        beginAtZero: true
+    }
+}
             }}
         />
     );
