@@ -5,18 +5,23 @@ const MunicipalityWindow = () => {
     return (
         <>
             <div className="municipality-window">
-                <div className="interventions-section">
-                    <h2>Municipality Interventions</h2>
-                    <div className="intervention-buttons">
+                <div className="interventions-container">
+                    <div className="intervention-group">
+                        <h3>Boost Options</h3>
+
+                        <button className="intervention-button">Financial Subsidy</button>
 
                         <button className="intervention-button">
-                            Sustainability Information Campaign
+                            Sustainability Campaign
                         </button>
 
-                        <button className="intervention-button">
-                            Renovation Information Campaign
-                        </button>
-          
+                        <button className="intervention-button">Renovation Campaign</button>
+                    </div>
+
+                    <div className="intervention-group">
+                        <h3>Regulation Options</h3>
+
+                        <button className="intervention-button">Announce Heat Grid</button>
                     </div>
                 </div>
             </div>
