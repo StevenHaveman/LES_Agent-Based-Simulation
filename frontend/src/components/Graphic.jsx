@@ -1,59 +1,59 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 
 import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    PointElement,
-    LineElement,
-    Filler,
-    Title,
-    Tooltip,
-    Legend,
-} from 'chart.js';
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+  Filler,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 
 ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    PointElement,
-    LineElement,
-    Filler,
-    Title,
-    Tooltip,
-    Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+  Filler,
+  Title,
+  Tooltip,
+  Legend,
 );
 
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
-import '../styles/Graphic.css';
+import "../styles/Graphic.css";
 
-import { useOverview } from '../hooks/useOverview.js';
-import { useSimulationRun } from '../hooks/useSimulationRun.js';
+import { useOverview } from "../hooks/useOverview.js";
+import { useSimulationRun } from "../hooks/useSimulationRun.js";
 
-import EnergyChart from '../charts/EnergyChart';
-import Co2Chart from '../charts/Co2Chart';
-import KpiChart from '../charts/KpiChart';
-import ClusterChart from '../charts/ClusterChart';
-import ClusterTrendChart from '../charts/ClusterTrendChart';
-import BehaviorMetricsChart from '../charts/BehaviorMetricsChart';
-import HistogramChart from '../charts/HistogramChart';
+import EnergyChart from "../charts/EnergyChart";
+import Co2Chart from "../charts/Co2Chart";
+import KpiChart from "../charts/KpiChart";
+import ClusterChart from "../charts/ClusterChart";
+import ClusterTrendChart from "../charts/ClusterTrendChart";
+import BehaviorMetricsChart from "../charts/BehaviorMetricsChart";
+import HistogramChart from "../charts/HistogramChart";
 
 const validKeys = [
-    'energy_label_A',
-    'energy_label_B',
-    'energy_label_C',
-    'energy_label_D',
-    'energy_label_E',
-    'energy_label_F',
-    'energy_label_G',
-    'co2',
-    'kpi_stock',
-    'cluster_behavior_data',
-    'cluster_behavior_trends',
-    'behavior_metrics',
-    'histogram',
+  "energy_label_A",
+  "energy_label_B",
+  "energy_label_C",
+  "energy_label_D",
+  "energy_label_E",
+  "energy_label_F",
+  "energy_label_G",
+  "co2",
+  "kpi_stock",
+  "cluster_behavior_data",
+  "cluster_behavior_trends",
+  "behavior_metrics",
+  "histogram",
 ];
 
 const delayMs = 1000;
@@ -64,263 +64,272 @@ const barPercentageNummer = 1.0;
 const categoryPercentageNummer = 1.0;
 
 const clusterMetrics = [
-    {
-        key: 'average_attitude',
-        label: 'Attitude',
-        color: '#00ffaa',
-    },
+  {
+    key: "average_attitude",
+    label: "Attitude",
+    color: "#00ffaa",
+  },
 
-    {
-        key: 'average_perceived_norm',
-        label: 'Perceived Norm',
-        color: '#ff7801',
-    },
+  {
+    key: "average_perceived_norm",
+    label: "Perceived Norm",
+    color: "#ff7801",
+  },
 
-    {
-        key: 'average_pbc',
-        label: 'Perceived Behavioral Control',
-        color: '#238b23',
-    },
+  {
+    key: "average_pbc",
+    label: "Perceived Behavioral Control",
+    color: "#238b23",
+  },
 ];
 
-const clusterColors = ['#2ac72a', '#5a5754', '#ff0000'];
+const clusterColors = ["#2ac72a", "#5a5754", "#ff0000"];
 
 const chartOptions = {
-    responsive: true,
+  responsive: true,
 
-    interaction: {
-        mode: 'index',
-        intersect: false,
+  interaction: {
+    mode: "index",
+    intersect: false,
+  },
+
+  plugins: {
+    legend: {
+      position: "top",
+    },
+  },
+
+  scales: {
+    x: {
+      stacked: true,
     },
 
-    plugins: {
-        legend: {
-            position: 'top',
-        },
+    y: {
+      stacked: true,
     },
-
-    scales: {
-        x: {
-            stacked: true,
-        },
-
-        y: {
-            stacked: true,
-        },
-    },
+  },
 };
 
-const Graphic = ({ title = '', yAxisKey = '' }) => {
-    const [simulationData, setSimulationData] = useState([]);
+const Graphic = ({ title = "", yAxisKey = "" }) => {
+  const [simulationData, setSimulationData] = useState([]);
 
-    const [loading, setLoading] = useState(true);
-    const [households, setHouseholds] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [households, setHouseholds] = useState([]);
 
-    const [selectedClusterMetric, setSelectedClusterMetric] = useState(
-        clusterMetrics[0].key,
-    );
+  const [selectedClusterMetric, setSelectedClusterMetric] = useState(
+    clusterMetrics[0].key,
+  );
 
-    const [selectedClusters, setSelectedClusters] = useState([
-        'engaged',
-        'neutral',
-        'resistant',
-    ]);
+  const [selectedClusters, setSelectedClusters] = useState([
+    "engaged",
+    "neutral",
+    "resistant",
+  ]);
 
-    const lastYearRef = useRef(null);
+  const lastYearRef = useRef(null);
 
-    const yKey = validKeys.includes(yAxisKey) ? yAxisKey : validKeys[0];
+  const fetchingRef = useRef(false);
 
-    useEffect(() => {
-        let intervalId;
+  const yKey = validKeys.includes(yAxisKey) ? yAxisKey : validKeys[0];
 
-        const fetchData = async () => {
-            try {
-                const result = await useOverview().getSimulationGraphicResults();
+  useEffect(() => {
+    let intervalId;
 
-                const householdData = await useOverview().fetchHouseholds();
-                setHouseholds(householdData);
+    const fetchData = async () => {
+      if (fetchingRef.current) {
+        return;
+      }
+      fetchingRef.current = true;
+      try {
+        const result = await useOverview().getSimulationGraphicResults();
 
-                const latestYear = result[result.length - 1]?.year;
+        const latestYear = result[result.length - 1]?.year;
 
-                if (latestYear !== lastYearRef.current) {
-                    lastYearRef.current = latestYear;
+        if (latestYear !== lastYearRef.current) {
+          lastYearRef.current = latestYear;
 
-                    setSimulationData(result);
-                }
+          setSimulationData(result);
 
-                setLoading(false);
-            } catch (error) {
-                console.error('Error fetching simulation data', error);
+          const householdData = await useOverview().fetchHouseholds();
 
-                setLoading(false);
-            }
-        };
+          setHouseholds(householdData);
+        }
 
-        const fetchInterval = async () => {
-            const res = await useSimulationRun().getSimulationDelay();
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching simulation data", error);
 
-            const delay =
-                parseInt(res.delay || defaultSimulationDelaySeconds) * delayMs;
-
-            await fetchData();
-            intervalId = setInterval(fetchData, delay);
-        };
-
-        fetchInterval();
-
-        return () => {
-            if (intervalId) {
-                clearInterval(intervalId);
-            }
-        };
-    }, []);
-
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    const uniqueSimulationData = Array.from(
-        new Map(simulationData.map((item) => [item.year, item])).values(),
-    );
-    const chartComponents = {
-        co2: (
-            <Co2Chart
-                uniqueSimulationData={uniqueSimulationData}
-                simulationYearStart={simulationYearStart}
-            />
-        ),
-
-        kpi_stock: (
-            <KpiChart
-                uniqueSimulationData={uniqueSimulationData}
-                simulationYearStart={simulationYearStart}
-                chartOptions={chartOptions}
-                barPercentageNummer={barPercentageNummer}
-                categoryPercentageNummer={categoryPercentageNummer}
-            />
-        ),
-
-        cluster_behavior_data: (
-            <ClusterChart
-                uniqueSimulationData={uniqueSimulationData}
-                simulationYearStart={simulationYearStart}
-                selectedClusterMetric={selectedClusterMetric}
-                clusterMetrics={clusterMetrics}
-                clusterColors={clusterColors}
-                chartOptions={chartOptions}
-            />
-        ),
-
-        cluster_behavior_trends: (
-            <ClusterTrendChart
-                uniqueSimulationData={uniqueSimulationData}
-                simulationYearStart={simulationYearStart}
-                selectedClusterMetric={selectedClusterMetric}
-                clusterMetrics={clusterMetrics}
-                clusterColors={clusterColors}
-            />
-        ),
-
-        behavior_metrics: (
-            <BehaviorMetricsChart
-                uniqueSimulationData={uniqueSimulationData}
-                simulationYearStart={simulationYearStart}
-            />
-        ),
-
-        histogram: (
-            <HistogramChart
-                households={households}
-                selectedClusters={selectedClusters}
-            />
-        ),
+        setLoading(false);
+      } finally {
+        fetchingRef.current = false;
+      }
     };
 
-    const selectedChart = yKey.startsWith('energy_label') ? (
-        <EnergyChart
-            uniqueSimulationData={uniqueSimulationData}
-            simulationYearStart={simulationYearStart}
-            chartOptions={chartOptions}
-            barPercentageNummer={barPercentageNummer}
-            categoryPercentageNummer={categoryPercentageNummer}
-        />
-    ) : (
-        chartComponents[yKey]
-    );
+    const fetchInterval = async () => {
+      const res = await useSimulationRun().getSimulationDelay();
 
-    const toggleCluster = (cluster) => {
-        setSelectedClusters((prev) =>
-            prev.includes(cluster)
-                ? prev.filter((c) => c !== cluster)
-                : [...prev, cluster],
-        );
+      const delay =
+        parseInt(res.delay || defaultSimulationDelaySeconds) * delayMs;
+
+      await fetchData();
+      intervalId = setInterval(fetchData, delay);
     };
 
-    return (
-        <div className="graphic-container">
-            <h3 className="graphic-title">{title}</h3>
+    fetchInterval();
 
-            {/* Cluster dropdown */}
-            {(yKey === 'cluster_behavior_data' ||
-        yKey === 'cluster_behavior_trends') && (
-                <div style={{ marginBottom: '1em' }}>
-                    <label htmlFor="cluster-metric-select">Select metric:</label>
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, []);
 
-                    <select
-                        id="cluster-metric-select"
-                        value={selectedClusterMetric}
-                        onChange={(e) => setSelectedClusterMetric(e.target.value)}
-                    >
-                        {clusterMetrics.map((metric) => (
-                            <option key={metric.key} value={metric.key}>
-                                {metric.label}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-            )}
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-            {yKey === 'histogram' && (
-                <div style={{ marginBottom: '1rem' }}>
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={selectedClusters.includes('engaged')}
-                            onChange={() => toggleCluster('engaged')}
-                        />
-                        Engaged
-                    </label>
+  const uniqueSimulationData = Array.from(
+    new Map(simulationData.map((item) => [item.year, item])).values(),
+  );
+  const chartComponents = {
+    co2: (
+      <Co2Chart
+        uniqueSimulationData={uniqueSimulationData}
+        simulationYearStart={simulationYearStart}
+      />
+    ),
 
-                    <label style={{ marginLeft: '1rem' }}>
-                        <input
-                            type="checkbox"
-                            checked={selectedClusters.includes('neutral')}
-                            onChange={() => toggleCluster('neutral')}
-                        />
-                        Neutral
-                    </label>
+    kpi_stock: (
+      <KpiChart
+        uniqueSimulationData={uniqueSimulationData}
+        simulationYearStart={simulationYearStart}
+        chartOptions={chartOptions}
+        barPercentageNummer={barPercentageNummer}
+        categoryPercentageNummer={categoryPercentageNummer}
+      />
+    ),
 
-                    <label style={{ marginLeft: '1rem' }}>
-                        <input
-                            type="checkbox"
-                            checked={selectedClusters.includes('resistant')}
-                            onChange={() => toggleCluster('resistant')}
-                        />
-                        Resistant
-                    </label>
-                </div>
-            )}
+    cluster_behavior_data: (
+      <ClusterChart
+        uniqueSimulationData={uniqueSimulationData}
+        simulationYearStart={simulationYearStart}
+        selectedClusterMetric={selectedClusterMetric}
+        clusterMetrics={clusterMetrics}
+        clusterColors={clusterColors}
+        chartOptions={chartOptions}
+      />
+    ),
 
-            <div className="graphic-square-wrapper">
-                {selectedChart || <div>Invalid key</div>}
-            </div>
+    cluster_behavior_trends: (
+      <ClusterTrendChart
+        uniqueSimulationData={uniqueSimulationData}
+        simulationYearStart={simulationYearStart}
+        selectedClusterMetric={selectedClusterMetric}
+        clusterMetrics={clusterMetrics}
+        clusterColors={clusterColors}
+      />
+    ),
+
+    behavior_metrics: (
+      <BehaviorMetricsChart
+        uniqueSimulationData={uniqueSimulationData}
+        simulationYearStart={simulationYearStart}
+      />
+    ),
+
+    histogram: (
+      <HistogramChart
+        households={households}
+        selectedClusters={selectedClusters}
+      />
+    ),
+  };
+
+  const selectedChart = yKey.startsWith("energy_label") ? (
+    <EnergyChart
+      uniqueSimulationData={uniqueSimulationData}
+      simulationYearStart={simulationYearStart}
+      chartOptions={chartOptions}
+      barPercentageNummer={barPercentageNummer}
+      categoryPercentageNummer={categoryPercentageNummer}
+    />
+  ) : (
+    chartComponents[yKey]
+  );
+
+  const toggleCluster = (cluster) => {
+    setSelectedClusters((prev) =>
+      prev.includes(cluster)
+        ? prev.filter((c) => c !== cluster)
+        : [...prev, cluster],
+    );
+  };
+
+  return (
+    <div className="graphic-container">
+      <h3 className="graphic-title">{title}</h3>
+
+      {/* Cluster dropdown */}
+      {(yKey === "cluster_behavior_data" ||
+        yKey === "cluster_behavior_trends") && (
+        <div style={{ marginBottom: "1em" }}>
+          <label htmlFor="cluster-metric-select">Select metric:</label>
+
+          <select
+            id="cluster-metric-select"
+            value={selectedClusterMetric}
+            onChange={(e) => setSelectedClusterMetric(e.target.value)}
+          >
+            {clusterMetrics.map((metric) => (
+              <option key={metric.key} value={metric.key}>
+                {metric.label}
+              </option>
+            ))}
+          </select>
         </div>
-    );
+      )}
+
+      {yKey === "histogram" && (
+        <div style={{ marginBottom: "1rem" }}>
+          <label>
+            <input
+              type="checkbox"
+              checked={selectedClusters.includes("engaged")}
+              onChange={() => toggleCluster("engaged")}
+            />
+            Engaged
+          </label>
+
+          <label style={{ marginLeft: "1rem" }}>
+            <input
+              type="checkbox"
+              checked={selectedClusters.includes("neutral")}
+              onChange={() => toggleCluster("neutral")}
+            />
+            Neutral
+          </label>
+
+          <label style={{ marginLeft: "1rem" }}>
+            <input
+              type="checkbox"
+              checked={selectedClusters.includes("resistant")}
+              onChange={() => toggleCluster("resistant")}
+            />
+            Resistant
+          </label>
+        </div>
+      )}
+
+      <div className="graphic-square-wrapper">
+        {selectedChart || <div>Invalid key</div>}
+      </div>
+    </div>
+  );
 };
 
 Graphic.propTypes = {
-    title: PropTypes.string,
-    yAxisKey: PropTypes.string,
+  title: PropTypes.string,
+  yAxisKey: PropTypes.string,
 };
 
 export default Graphic;

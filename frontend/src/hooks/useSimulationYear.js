@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import overviewService from '../services/OverviewService';
 
-const delayMs = 1000;
+const delayMs = 4000;
 
 export const useSimulationYear = () => {
     const [year, setYear] = useState(null);

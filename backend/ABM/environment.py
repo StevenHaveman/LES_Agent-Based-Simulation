@@ -698,6 +698,9 @@ class Environment(Model):
                     "norm_sensitivity": getattr(resident, "norm_sensitivity", None),
                     "survey_pbc": getattr(resident, "survey_pbc", None),
                     "control_sensitivity": getattr(resident, "control_sensitivity", None)
+                    # "intention": getattr(resident, "intention", None),
+                    # "intention_threshold": getattr(resident, "intention_threshold", None),
+                    # "wants_to_renovate": getattr(resident, "wants_to_renovate", None)
                 }
                 for pkg_name in [p.name for p in self.sustainability_packages]:
                     res_data[f"{pkg_name}_decision"] = resident.package_decisions.get(pkg_name, False)
