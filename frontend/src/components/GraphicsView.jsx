@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import '../styles/GraphicsView.css';
 import Graphic from './Graphic.jsx';
 import PropTypes from 'prop-types';
 import { GRAPH_OPTIONS } from './graphOptions.js';
 import GraphSelector from './GraphSelector.jsx';
+import { useOverview } from '../hooks/useOverview.js';
+import { useSimulationRun } from '../hooks/useSimulationRun.js';
 
 const graphSlotsTotal = 3;
 
@@ -15,15 +17,52 @@ const GraphicsView = ({
     graphOptions = GRAPH_OPTIONS,
     graphSlots = graphSlotsTotal,
 }) => {
-    const graphItems = selectedGraphs
-        .map((key) => {
-            const option = GRAPH_OPTIONS.find((item) => item.key === key);
+    const [simulationData, setSimulationData] = React.useState([]);
+    const [households, setHouseholds] = React.useState([]);
+    const lastYearRef = React.useRef(null);
 
-            return {
-                key,
-                title: option ? option.label : key,
-            };
-        });
+    React.useEffect(() => {
+        let intervalId;
+
+        const fetchData = async () => {
+            const result = await useOverview().getSimulationGraphicResults();
+
+            const latestYear = result[result.length - 1]?.year;
+
+            if (latestYear !== lastYearRef.current) {
+                lastYearRef.current = latestYear;
+
+                setSimulationData(result);
+
+                const householdData = await useOverview().fetchHouseholds();
+
+                setHouseholds(householdData);
+            }
+        };
+
+        const start = async () => {
+            const res = await useSimulationRun().getSimulationDelay();
+
+            const delay = (parseInt(res.delay) || 3) * 1000;
+
+            await fetchData();
+
+            intervalId = setInterval(fetchData, delay);
+        };
+
+        start();
+
+        return () => clearInterval(intervalId);
+    }, []);
+
+    const graphItems = selectedGraphs.map((key) => {
+        const option = GRAPH_OPTIONS.find((item) => item.key === key);
+
+        return {
+            key,
+            title: option ? option.label : key,
+        };
+    });
 
     return (
         <div className="graphics-view-container">
@@ -47,6 +86,8 @@ const GraphicsView = ({
                         key={item.key}
                         title={item.title}
                         yAxisKey={item.key}
+                        simulationData={simulationData}
+                        households={households}
                     />
                 ))}
             </div>
