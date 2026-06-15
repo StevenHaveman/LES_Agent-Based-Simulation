@@ -132,7 +132,7 @@ const Graphic = ({ title = '', yAxisKey = '' }) => {
                 const result = await useOverview().getSimulationGraphicResults();
                 
                 const householdData =
-                await useOverview().fetchHouseholds();
+                    await useOverview().fetchHouseholds();
                 setHouseholds(householdData);
 
                 const latestYear = result[result.length - 1]?.year;

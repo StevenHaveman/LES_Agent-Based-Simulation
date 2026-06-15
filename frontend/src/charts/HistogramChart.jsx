@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Bar } from 'react-chartjs-2';
 
+/* eslint-disable */
+// Bins are the x axis for the histogram
 const createHistogram = (values, binCount = 10) => {
     const bins = Array(binCount).fill(0);
 
@@ -13,7 +15,6 @@ const createHistogram = (values, binCount = 10) => {
 
         bins[index]++;
     });
-
     return {
         labels: bins.map((_, i) => {
             const start = (i / binCount).toFixed(1);
@@ -25,7 +26,7 @@ const createHistogram = (values, binCount = 10) => {
         counts: bins
     };
 };
-
+/* eslint-enable */
 const HistogramChart = ({ households }) => {
 
     const attitudeValues = households.flatMap(
@@ -85,14 +86,14 @@ const HistogramChart = ({ households }) => {
                     }
                 },
 
-scales: {
-    x: {
-        stacked: false
-    },
-    y: {
-        beginAtZero: true
-    }
-}
+                scales: {
+                    x: {
+                        stacked: false
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                }
             }}
         />
     );
