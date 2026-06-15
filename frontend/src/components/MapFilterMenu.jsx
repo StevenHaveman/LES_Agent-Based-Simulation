@@ -12,7 +12,7 @@ const energyGroups = [
 
 const woningTypes = [
     'Row House',
-    'Apartment'
+    'Apartment',
 ];
 
 function MapFilterMenu({ selectedLabels, onToggleLabel, selectedWoningTypes, onToggleWoningType, clusterMode, onToggleClusterMode, selectedClusterTypes, onToggleClusterType }) {
@@ -73,12 +73,12 @@ function MapFilterMenu({ selectedLabels, onToggleLabel, selectedWoningTypes, onT
                                 <span>Engaged</span>
                             </div>
                             <div className="cluster-legend-item">
-                                <span className="cluster-dot cluster-dot-passive" />
-                                <span>Passive</span>
+                                <span className="cluster-dot cluster-dot-neutral" />
+                                <span>Neutral</span>
                             </div>
                             <div className="cluster-legend-item">
-                                <span className="cluster-dot cluster-dot-skeptic" />
-                                <span>Skeptic</span>
+                                <span className="cluster-dot cluster-dot-resistant" />
+                                <span>Resistant</span>
                             </div>
                         </div>
                     </div>
@@ -86,7 +86,7 @@ function MapFilterMenu({ selectedLabels, onToggleLabel, selectedWoningTypes, onT
                     <div>
                         <h5 className="cluster-filter-title">Filter by Cluster Type</h5>
                         <div className="filter-buttons">
-                            {['Engaged', 'Passive', 'Skeptic'].map(type => (
+                            {['engaged', 'neutral', 'resistant'].map(type => (
                                 <button
                                     key={type}
                                     className={selectedClusterTypes.includes(type) ? 'active' : ''}

@@ -41,8 +41,8 @@
   display: inline-block;
 }
 
-.cluster-dot-passive,
-.cluster-dot-skeptic {
+.cluster-dot-neutral,
+.cluster-dot-resistant {
   margin-left: 0;
 }
 
@@ -50,11 +50,11 @@
   background: #16dd16;
 }
 
-.cluster-dot-passive {
-  background: #4d4d4d;
+.cluster-dot-neutral {
+  background: #5a5754;
 }
 
-.cluster-dot-skeptic {
+.cluster-dot-resistant {
   background: #ff0000;
 }
 

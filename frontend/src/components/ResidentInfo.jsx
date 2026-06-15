@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Filler, Title, Tooltip, Legend } from 'chart.js';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Filler,
+    Title,
+    Tooltip,
+    Legend,
+} from 'chart.js';
 import { averageResidentScores } from '../utils/residentStats';
 import ResidentDropdown from './ResidentDropdown.jsx';
 import HomeTrendChart from './HomeTrendChart.jsx';
@@ -8,18 +18,36 @@ import ResidentTrendChart from './ResidentTrendChart.jsx';
 import '../styles/ResidentInfo.css';
 import { getHomeTrends, getResidentTrends } from '../utils/trends';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Title, Tooltip, Legend);
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Filler,
+    Title,
+    Tooltip,
+    Legend,
+);
 
 const startYearSimulation = 2024;
 
-const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResidentChange, viewMode = 'resident' }) => {
+const ResidentInfo = ({
+    resident,
+    home,
+    residents,
+    selectedResidentIndex,
+    onResidentChange,
+    viewMode = 'resident',
+}) => {
     const [historicalData, setHistoricalData] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchHistoricalData = async () => {
             try {
-                const response = await fetch('http://localhost:5000/households_historical');
+                const response = await fetch(
+                    'http://localhost:5000/households_historical',
+                );
                 if (response.ok) {
                     setHistoricalData(await response.json());
                 } else {
@@ -35,17 +63,33 @@ const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResi
     }, [home, resident]);
 
     if (viewMode === 'resident' && !resident) {
-        return <div className="select-resident-hint"><h3>Click on a Building</h3></div>; //TODO change to click on a resident, but for now we want to show the home trends when no resident is selected, so we ask to click on a home instead of a resident
+        return (
+            <div className="select-resident-hint">
+                <h3>Click on a Building</h3>
+            </div>
+        ); //TODO change to click on a resident, but for now we want to show the home trends when no resident is selected, so we ask to click on a home instead of a resident
     }
 
     if (viewMode === 'home' && !home) {
-        return <div className="select-resident-hint"><h3>Click on a Building</h3></div>;
+        return (
+            <div className="select-resident-hint">
+                <h3>Click on a Building</h3>
+            </div>
+        );
     }
 
     const homeTrends = getHomeTrends(historicalData, home, startYearSimulation);
-    const trends = getResidentTrends(historicalData, resident, startYearSimulation);
+    const trends = getResidentTrends(
+        historicalData,
+        resident,
+        startYearSimulation,
+    );
     const decibel = 2;
-    const averageBehaviorScore = averageResidentScores(resident, ['attitude', 'perceived_norm', 'survey_pbc']);
+    const averageBehaviorScore = averageResidentScores(resident, [
+        'attitude',
+        'perceived_norm',
+        'survey_pbc',
+    ]);
     const parsedAction = Number(resident?.action_score);
     const actionScore = Number.isFinite(parsedAction) ? parsedAction : 0;
     return (
@@ -56,13 +100,55 @@ const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResi
                         <h3>Residence Information</h3>
                         <div className="info-list">
                             <div className="info-row">
-                                <span className="info-label">Current Performance category:</span>
-                                <span className="info-value">{home?.residents?.[0]?.kpi_level || home?.GIS_attributes?.Energielabel || '-'}</span>
+                                <span className="info-label">
+                                    Current Performance category:
+                                </span>
+                                <span className="info-value">
+                                    {home?.residents?.[0]?.kpi_level ||
+                    home?.GIS_attributes?.Energielabel ||
+                    '-'}
+                                </span>
                             </div>
                             <div className="info-row">
                                 <span className="info-label">Type home:</span>
                                 <span className="info-value">{home.houseType}</span>
                             </div>
+                            <hr className="resident-info-divider" />
+                            <div className="info-row">
+                                <span className="info-label">Action Score:</span>
+                                <span className="info-value">
+                                    {actionScore.toFixed(decibel)}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="info-row">
+                            <span className="info-label">Perceived Norm :</span>
+
+                            <span className="info-value">
+                                {resident.perceived_norm?.toFixed(decibel)}
+                            </span>
+                        </div>
+                        <div className="info-row">
+                            <span className="info-label">Perceived Behavior Control :</span>
+
+                            <span className="info-value">
+                                {resident.survey_pbc?.toFixed(decibel)}
+                            </span>
+                        </div>
+                        <div className="info-row">
+                            <span className="info-label">Total Intention Score:</span>
+
+                            <span className="info-value">
+                                {resident.intention?.toFixed(decibel)}
+                            </span>
+                        </div>
+
+                        <div className="info-row">
+                            <span className="info-label">Intention Above Threshold:</span>
+
+                            <span className="info-value">
+                                {resident.wants_to_renovate ? 'Yes' : 'No'}
+                            </span>
                         </div>
                         {!loading && <HomeTrendChart homeTrends={homeTrends} />}
                     </>
@@ -70,7 +156,12 @@ const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResi
 
                 {viewMode === 'resident' && (
                     <>
-                        <ResidentDropdown residents={residents || []} selectedResidentIndex={selectedResidentIndex} onSelect={onResidentChange} className="inline-selector" />
+                        <ResidentDropdown
+                            residents={residents || []}
+                            selectedResidentIndex={selectedResidentIndex}
+                            onSelect={onResidentChange}
+                            className="inline-selector"
+                        />
                         <h3>Resident Details</h3>
                         <div className="info-list">
                             <div className="info-row">
@@ -88,26 +179,36 @@ const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResi
                             <hr className="resident-info-divider" />
                             <div className="info-row">
                                 <span className="info-label">Attitude (Att):</span>
-                                <span className="info-value">{resident.attitude.toFixed(decibel)}</span>
+                                <span className="info-value">
+                                    {resident.attitude.toFixed(decibel)}
+                                </span>
                             </div>
                             <div className="info-row">
                                 <span className="info-label">Perceived Norm (PN):</span>
-                                <span className="info-value">{resident.perceived_norm.toFixed(decibel)}</span>
+                                <span className="info-value">
+                                    {resident.perceived_norm.toFixed(decibel)}
+                                </span>
                             </div>
                             <div className="info-row">
-                                <span className="info-label">Perceived Behaviour Control (PBC):</span>
-                                <span className="info-value">{resident.survey_pbc.toFixed(decibel)}</span>
+                                <span className="info-label">
+                                    Perceived Behavior Control (PBC):
+                                </span>
+                                <span className="info-value">
+                                    {resident.survey_pbc.toFixed(decibel)}
+                                </span>
                             </div>
                             <div className="info-row">
                                 <span className="info-label">Average Total:</span>
-                                <span className="info-value">{averageBehaviorScore.toFixed(decibel)}</span>
-                            </div>
-                            <div className="info-row">
-                                <span className="info-label">Action Score:</span>
-                                <span className="info-value">{actionScore.toFixed(decibel)}</span>
+                                <span className="info-value">
+                                    {averageBehaviorScore.toFixed(decibel)}
+                                </span>
                             </div>
                         </div>
-                        <ResidentTrendChart trends={trends} loading={loading} historicalData={historicalData} />
+                        <ResidentTrendChart
+                            trends={trends}
+                            loading={loading}
+                            historicalData={historicalData}
+                        />
                     </>
                 )}
             </div>
@@ -117,11 +218,18 @@ const ResidentInfo = ({ resident, home, residents, selectedResidentIndex, onResi
 
 ResidentInfo.propTypes = {
     viewMode: PropTypes.oneOf(['resident', 'home']),
-    residents: PropTypes.arrayOf(PropTypes.shape({ unique_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), name: PropTypes.string, income: PropTypes.number })),
+    residents: PropTypes.arrayOf(
+        PropTypes.shape({
+            unique_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+            name: PropTypes.string,
+            income: PropTypes.number,
+        }),
+    ),
     selectedResidentIndex: PropTypes.number,
     onResidentChange: PropTypes.func,
     resident: PropTypes.shape({
-        unique_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+        unique_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+            .isRequired,
         name: PropTypes.string.isRequired,
         income: PropTypes.number.isRequired,
         kpi_level: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -131,11 +239,22 @@ ResidentInfo.propTypes = {
         cluster_type: PropTypes.string,
         attitude: PropTypes.number,
         address: PropTypes.string,
+        intention: PropTypes.number,
+        wants_to_renovate: PropTypes.bool,
+        intention_threshold: PropTypes.number,
     }),
     home: PropTypes.shape({
         address: PropTypes.string,
         energyLabel: PropTypes.string,
-        residents: PropTypes.arrayOf(PropTypes.shape({ unique_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), name: PropTypes.string, income: PropTypes.number, address: PropTypes.string, kpi_level: PropTypes.string })),
+        residents: PropTypes.arrayOf(
+            PropTypes.shape({
+                unique_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+                name: PropTypes.string,
+                income: PropTypes.number,
+                address: PropTypes.string,
+                kpi_level: PropTypes.string,
+            }),
+        ),
         houseType: PropTypes.string,
         GIS_attributes: PropTypes.shape({ Energielabel: PropTypes.string }),
     }),
