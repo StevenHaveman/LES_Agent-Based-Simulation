@@ -3,7 +3,7 @@
     flex-direction: column;
     align-items: center;
     height: 100%;
-    width: var(--graphic-width, 350px);
+    width: var(--graphic-width, 450px);
     margin-left: auto;
     margin-right: auto;
     box-sizing: border-box;
