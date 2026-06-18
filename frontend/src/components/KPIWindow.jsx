@@ -80,12 +80,12 @@ const KPIWindow = ({ year }) => {
                     </div>
 
                     <div className="info-row">
-                        <span className="info-label">Total CO2 Reduced:</span>
+                        <span className="info-label">Total CO₂ Reduced:</span>
                         <span className="info-value">{totalCo2ReducedPercent.toFixed(0)}%</span>
                     </div>
 
                     <div className="info-row">
-                        <span className="info-label">Total CO2 Emitted:</span>
+                        <span className="info-label">Total CO₂ Emitted:</span>
                         <span className="info-value">{formatT(Number(kpi.total_co2_emitted_during_simulation?.toFixed(0)))} CO₂</span>
                     </div>
 
