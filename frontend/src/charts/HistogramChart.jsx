@@ -1,29 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Bar } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 
 /* eslint-disable */
-// Bins are the x axis for the histogram
 const createHistogram = (values, binCount = 5) => {
-  const bins = Array(binCount).fill(0);
+    const bins = Array(binCount).fill(0);
 
-  values.forEach((value) => {
-    const index = Math.min(Math.floor(value * binCount), binCount - 1);
+    values.forEach((value) => {
+        const index = Math.min(
+            Math.floor(value * binCount),
+            binCount - 1
+        );
 
-    bins[index]++;
-  });
-  return {
-    labels: bins.map((_, i) => {
-      const start = (i / binCount).toFixed(1);
-      const end = ((i + 1) / binCount).toFixed(1);
+        bins[index]++;
+    });
 
-      return ((i + 0.5) / binCount).toFixed(1);
-    }),
-
-    counts: bins,
-  };
+    return {
+        labels: bins.map((_, i) =>
+            ((i + 0.5) / binCount).toFixed(1)
+        ),
+        counts: bins,
+    };
 };
 /* eslint-enable */
+
 const HistogramChart = ({ households, selectedClusters }) => {
     const metrics = [
         {
@@ -50,8 +50,10 @@ const HistogramChart = ({ households, selectedClusters }) => {
             const values = households.flatMap(
                 (h) =>
                     h.residents
-                        ?.filter((r) => r.cluster_type === cluster)
-                        .map((r) => r[metric.key]) || [],
+                        ?.filter(
+                            (r) => r.cluster_type === cluster
+                        )
+                        .map((r) => r[metric.key]) || []
             );
 
             const histogram = createHistogram(values);
@@ -59,9 +61,12 @@ const HistogramChart = ({ households, selectedClusters }) => {
             datasets.push({
                 label: `${metric.label}-${cluster}`,
                 data: histogram.counts,
-                backgroundColor: metric.color,
                 borderColor: metric.color,
-                borderWidth: 1,
+                backgroundColor: metric.color,
+                fill: false,
+                tension: 0.3,
+                pointRadius: 4,
+                pointHoverRadius: 6,
             });
         });
     });
@@ -72,7 +77,7 @@ const HistogramChart = ({ households, selectedClusters }) => {
     };
 
     return (
-        <Bar
+        <Line
             data={data}
             options={{
                 responsive: true,
@@ -80,7 +85,7 @@ const HistogramChart = ({ households, selectedClusters }) => {
 
                 plugins: {
                     legend: {
-                        display: false,
+                        display: true,
                     },
                 },
 
@@ -90,7 +95,6 @@ const HistogramChart = ({ households, selectedClusters }) => {
                             display: true,
                             text: 'Behavioral Score',
                         },
-                        stacked: false,
                     },
                     y: {
                         title: {
