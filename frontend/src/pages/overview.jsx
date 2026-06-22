@@ -17,6 +17,7 @@ import OverviewNavbar from '../components/OverviewNavbar.jsx';
 
 import KPIWindow from '../components/KPIWindow.jsx';
 import MunicipalityWindow from '../components/MunicipalityWindow.jsx';
+import SimulationMunicipalityWindow from '../components/SimulationMunicipalityWindow.jsx';
 import { useMapData } from '../hooks/useMapData.js';
 import { useSimulationYear } from '../hooks/useSimulationYear.js';
 import { GRAPH_OPTIONS, GRAPH_SLOTS } from '../components/graphOptions.js';
@@ -141,9 +142,6 @@ function OverviewContent() {
                         </>
                     )}
                 </div>
-                {/* <div className="graphics-container"> // TODO: CHANGE LOCATION
-                    <GraphicsView> </GraphicsView>
-                </div> */}
                 <div className="resident-container">
                     <ResidentNavbar />
                     <ResidentWindow
@@ -153,11 +151,11 @@ function OverviewContent() {
                         onResidentChange={setSelectedResidentIndex}
                     />
                 </div>
-                {/* <div className="parameters-container"> // TODO: CHANGE LOCATION
-                    <SimulationParameters> </SimulationParameters>
-                </div> */}
                 <div className="municipality-container">
                     <MunicipalityWindow />
+                </div>
+                <div className="simulation-municipality-container">
+                    <SimulationMunicipalityWindow />
                 </div>
                 <div className="kpi-container">
                     <KPIWindow year={year + simulationYearStart} />

@@ -7,7 +7,7 @@ const MunicipalityWindow = () => {
             <div className="municipality-window">
                 <div className="interventions-container">
                     <div className="intervention-group">
-                        <h3>Boost Options</h3>
+                        <h3>Municipality Options</h3>
 
                         <button className="intervention-button">Financial Subsidy</button>
 
@@ -16,12 +16,6 @@ const MunicipalityWindow = () => {
                         </button>
 
                         <button className="intervention-button">Renovation Campaign</button>
-                    </div>
-
-                    <div className="intervention-group">
-                        <h3>Regulation Options</h3>
-
-                        <button className="intervention-button">Announce Heat Grid</button>
                     </div>
                 </div>
             </div>

@@ -67,7 +67,7 @@ const ResidentInfo = ({
             <div className="select-resident-hint">
                 <h3>Click on a Building</h3>
             </div>
-        ); //TODO change to click on a resident, but for now we want to show the home trends when no resident is selected, so we ask to click on a home instead of a resident
+        );
     }
 
     if (viewMode === 'home' && !home) {
@@ -126,6 +126,18 @@ const ResidentInfo = ({
 
                             <span className="info-value">
                                 {resident.intention?.toFixed(decibel)}
+                            </span>
+                        </div>
+
+                        <div className="info-row">
+                            <span className="info-label">Actual control:</span>
+
+                            <span className="info-value">
+                                {JSON.stringify(
+            resident?.household_actual_control,
+            null,
+            2
+        )}
                             </span>
                         </div>
 
