@@ -50,28 +50,28 @@ const HistogramChart = ({ households, selectedClusters, selectedMetrics }) => {
 
     selectedClusters.forEach((cluster) => {
         metrics.filter((metric) => selectedMetrics.includes(metric.key)).forEach((metric) => {
-                const values = households.flatMap(
-                    (h) =>
-                        h.residents
-                            ?.filter(
-                                (r) => r.cluster_type === cluster
-                            )
-                            .map((r) => r[metric.key]) || []
-                );
-                const histogram = createHistogram(values);
+            const values = households.flatMap(
+                (h) =>
+                    h.residents
+                        ?.filter(
+                            (r) => r.cluster_type === cluster
+                        )
+                        .map((r) => r[metric.key]) || []
+            );
+            const histogram = createHistogram(values);
 
-                datasets.push({
-                    label: `${metric.label}-${cluster}`,
-                    data: histogram.counts,
-                    borderColor: metric.color,
-                    backgroundColor: metric.color,
-                    pointStyle: clusterPointStyles[cluster] || 'circle',
-                    fill: false,
-                    tension: 0.3,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                });
+            datasets.push({
+                label: `${metric.label}-${cluster}`,
+                data: histogram.counts,
+                borderColor: metric.color,
+                backgroundColor: metric.color,
+                pointStyle: clusterPointStyles[cluster] || 'circle',
+                fill: false,
+                tension: 0.3,
+                pointRadius: 4,
+                pointHoverRadius: 6,
             });
+        });
     });
 
     const data = {
@@ -118,6 +118,7 @@ const HistogramChart = ({ households, selectedClusters, selectedMetrics }) => {
 HistogramChart.propTypes = {
     households: PropTypes.array.isRequired,
     selectedClusters: PropTypes.array.isRequired,
+    selectedMetrics: PropTypes.array.isRequired,
 };
 
 export default HistogramChart;

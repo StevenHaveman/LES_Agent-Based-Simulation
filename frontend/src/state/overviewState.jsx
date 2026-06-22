@@ -9,7 +9,7 @@ const initialState = {
     selectedResidents: [],
     selectedResidentIndex: null,
     householdWindow: '',
-    residentWindow: '',
+    residentWindow: 'info-home',
     chatWindow: '',
 };
 

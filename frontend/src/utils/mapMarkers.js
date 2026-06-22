@@ -17,9 +17,9 @@ export const createClusterMarker = (house, map) => {
         .sort((a, b) => clusterCounts[b] - clusterCounts[a])[0];
 
     const colorMap = {
-        engaged: '#00bbff',
+        engaged: '#2088ae',
         neutral: '#5a5754',
-        resistant: '#ffea00',
+        resistant: '#d7b21c',
         unknown: '#fffaa4'
     };
 
