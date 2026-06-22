@@ -121,6 +121,10 @@ const Graphic = ({
         'resistant',
     ]);
 
+    const [selectedMetrics, setSelectedMetrics] = useState([
+        'attitude',
+    ]);
+
     const yKey = validKeys.includes(yAxisKey) ? yAxisKey : validKeys[0];
 
     const uniqueSimulationData = Array.from(
@@ -176,6 +180,7 @@ const Graphic = ({
             <HistogramChart
                 households={households}
                 selectedClusters={selectedClusters}
+                selectedMetrics={selectedMetrics}
             />
         ),
     };
@@ -197,6 +202,14 @@ const Graphic = ({
             prev.includes(cluster)
                 ? prev.filter((c) => c !== cluster)
                 : [...prev, cluster],
+        );
+    };
+
+    const toggleMetric = (metric) => {
+        setSelectedMetrics((prev) =>
+            prev.includes(metric)
+                ? prev.filter((m) => m !== metric)
+                : [...prev, metric],
         );
     };
 
@@ -251,6 +264,33 @@ const Graphic = ({
                             onChange={() => toggleCluster('resistant')}
                         />
                         Resistant
+                    </label>
+
+                    <label style={{ marginLeft: '1rem' }}>
+                        <input
+                            type="checkbox"
+                            checked={selectedMetrics.includes('attitude')}
+                            onChange={() => toggleMetric('attitude')}
+                        />
+                        Attitude
+                    </label>
+
+                    <label style={{ marginLeft: '1rem' }}>
+                        <input
+                            type="checkbox"
+                            checked={selectedMetrics.includes('perceived_norm')}
+                            onChange={() => toggleMetric('perceived_norm')}
+                        />
+                        Perceived Norm
+                    </label>
+
+                    <label style={{ marginLeft: '1rem' }}>
+                        <input
+                            type="checkbox"
+                            checked={selectedMetrics.includes('survey_pbc')}
+                            onChange={() => toggleMetric('survey_pbc')}
+                        />
+                        Perceived Behavioral Control
                     </label>
                 </div>
             )}
