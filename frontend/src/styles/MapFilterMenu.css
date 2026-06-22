@@ -47,7 +47,7 @@
 }
 
 .cluster-dot-engaged {
-  background: #16dd16;
+  background: #00bbff;
 }
 
 .cluster-dot-neutral {
@@ -55,7 +55,7 @@
 }
 
 .cluster-dot-resistant {
-  background: #ff0000;
+  background: #ffea00;
 }
 
 .cluster-filter-title {

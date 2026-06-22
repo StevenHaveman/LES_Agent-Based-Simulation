@@ -21,7 +21,7 @@ const HomeTrendChart = ({ homeTrends }) => {
                         const n = Number(level);
                         return Number.isFinite(n) ? n : null;
                     }),
-                    borderColor: '#1f77b4',
+                    borderColor: '#188cde',
                     backgroundColor: '#1f77b433',
                     fill: true,
                     tension: 0.3,
@@ -35,8 +35,8 @@ const HomeTrendChart = ({ homeTrends }) => {
                         const n = Number(v);
                         return Number.isFinite(n) ? n : null;
                     }),
-                    borderColor: '#2ca02c',
-                    backgroundColor: '#2ca02c33',
+                    borderColor: '#4ca216',
+                    backgroundColor: '#4ca21633',
                     fill: true,
                     tension: 0.3,
                     pointRadius: 3,
