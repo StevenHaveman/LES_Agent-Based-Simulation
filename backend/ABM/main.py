@@ -63,7 +63,7 @@ def is_simulation_paused():
     return simulation_paused
 
 
-def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=None):
+def run_simulation(simulation_years=30, seed=None):
     """
     Runs the agent-based model simulation.
 

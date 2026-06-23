@@ -54,6 +54,8 @@ class Household(Agent):
         self.active_package = None  # Track the currently active package for this household, if any.
         self.actual_control = {package.name: 0.0 for package in self.model.sustainability_packages} # This will be calculated based on the household's attributes and the requirements of each package, and can be used in the decision-making process of the residents.
 
+        self.active_subsidy = 0
+        self.heat_grid_announced = False
         # Flags for "Direct" subjective norm, per package
         self.skip_prev_flags = {} # {package_name: False/True}
         self.skip_next_flags = {} # {package_name: False/True}
@@ -72,13 +74,14 @@ class Household(Agent):
     def calculate_actual_control(self):
 
         household_income = self.get_household_income()
+        actual_income = household_income + self.active_subsidy
         action_score = self.get_household_action_score()
 
         for package in self.model.sustainability_packages:
 
             self.actual_control[package.name] = (
                 package.calculate_behavioral_influence(
-                    income=household_income,
+                    income=actual_income,
                     household=self,
                     action_score=action_score
                 )

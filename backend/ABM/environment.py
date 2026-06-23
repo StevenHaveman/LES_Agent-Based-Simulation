@@ -6,6 +6,7 @@ from agents.household_agent import Household
 from agents.resident_agent import Resident
 import utilities
 from sustainability_packages.upgrade_package import UpgradePackage
+from PolicyInterventions import PolicyInterventions
 import json
 import os
 
@@ -43,6 +44,7 @@ class Environment(Model):
         self.config_id, self.config = utilities.choose_config() # Load the chosen configuration This is not used in the frontend defaults to config 1
 
         self.package_data = utilities.load_package_data("data/15_package_steps.xlsx")
+        self.policy = PolicyInterventions(self)
         self.sustainability_packages = []
         for _, row in self.package_data.iterrows():
             package = UpgradePackage(
@@ -62,7 +64,6 @@ class Environment(Model):
             pkg.name: 0 for pkg in self.sustainability_packages
         }
     
-        self.energy_price = self.config['energy_price'] 
         self.households = []  # gewone Python-lijst voor filteren/gemak
         self.gis_data = utilities.load_gis_data("data/AmstelHeuvelWijk2_TableToExcel.xlsx")
         self.residents = []  # gewone Python-lijst voor filteren/gemak
@@ -537,7 +538,7 @@ class Environment(Model):
                 "resident_count":
                     values["count"]
             }
-            print(f"Cluster {cluster} behavior data: {result[cluster]}")
+            # print(f"Cluster {cluster} behavior data: {result[cluster]}")
 
         return result
 

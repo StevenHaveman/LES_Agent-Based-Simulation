@@ -44,20 +44,13 @@ def start_simulation():
         }), 400
 
     try:
-        nr_households = int(data.get("nr_households", chosen_config["nr_households"]))
-        nr_residents = int(data.get("nr_residents", chosen_config["nr_residents"]))
-        simulation_years = int(data.get("simulation_years", chosen_config["simulation_years"]))
+        simulation_years = int(data.get("simulation_years"))
         seed = int(data.get("seed", config.configs[config_id].get("seed", None)))
     except (ValueError, TypeError) as e:
         return jsonify({
             "status": "error",
             "message": "Invalid input: " + str(e)
         }), 400
-
-    config.configs[config_id]["nr_households"] = nr_households
-    config.configs[config_id]["nr_residents"] = nr_residents
-    config.configs[config_id]["simulation_years"] = simulation_years
-    config.configs[config_id]["seed"] = seed
 
     def run():
         global simulation_running
@@ -66,9 +59,6 @@ def start_simulation():
         try:
             print("=== Simulation started ===")
             run_simulation(
-                nr_households,
-                nr_residents,
-                simulation_years,
                 seed=seed
             )
             print("=== Simulation finished ===")
@@ -86,8 +76,6 @@ def start_simulation():
         "status": "ok",
         "message": "Simulation started",
         "parameters": {
-            "nr_households": nr_households,
-            "nr_residents": nr_residents,
             "simulation_years": simulation_years,
             "seed": seed
         }
