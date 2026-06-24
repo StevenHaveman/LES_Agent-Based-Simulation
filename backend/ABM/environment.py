@@ -689,6 +689,8 @@ class Environment(Model):
                 "name": f"Household  {household.gis_attributes['Huisnummer']}",
                 "GIS_attributes": household.gis_attributes, # Include all GIS attributes for reference
                 "residents": resident_details,
+                "current_kpi_level": household.current_kpi_level,
+                "residents_with_positive_intention": household.residents_with_positive_intention,
                 "package_installations": {
                     pkg.name: household.package_installations.get(pkg.name, False)
                     for pkg in self.sustainability_packages

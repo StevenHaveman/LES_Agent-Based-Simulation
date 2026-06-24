@@ -53,6 +53,7 @@ class Household(Agent):
         self.renovation_cooldown = 0
         self.active_package = None  # Track the currently active package for this household, if any.
         self.actual_control = {package.name: 0.0 for package in self.model.sustainability_packages} # This will be calculated based on the household's attributes and the requirements of each package, and can be used in the decision-making process of the residents.
+        self.residents_with_positive_intention = 0.0
 
         self.active_subsidy = 0
         self.heat_grid_announced = False
@@ -91,6 +92,11 @@ class Household(Agent):
         if self.renovation_cooldown > 0:
             # print(f"Household {self.unique_id} is in renovation cooldown for {self.renovation_cooldown} more years.")
             self.renovation_cooldown = max(0, self.renovation_cooldown - 1)
+
+    def calculate_residents_with_positive_intention(self):
+        self.residents_with_positive_intention = sum(
+            1 for res in self.residents if res.intentions >= res.intention_threshold
+        )
 
     def choose_household_package(self):
 
@@ -142,7 +148,7 @@ class Household(Agent):
 
             final_score = (
                 0.5 * avg_intention +
-                0.3 * support_score +
+                0.3 * support_score + # Support score er uithalen.
                 0.2 * actual_control_score
             )
 
@@ -251,6 +257,7 @@ class Household(Agent):
         for resident in self.residents:
             resident.step()
         
+        self.calculate_residents_with_positive_intention()
         # After all residents have made their decisions, determine which package the household installs based on the support of its residents and the decision threshold.
         self.choose_household_package()
 
