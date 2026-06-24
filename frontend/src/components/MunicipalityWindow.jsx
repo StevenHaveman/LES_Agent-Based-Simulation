@@ -16,6 +16,8 @@ const MunicipalityWindow = () => {
                         </button>
 
                         <button className="intervention-button">Renovation Campaign</button>
+
+                        <button className="intervention-button">Announce Heat Grid</button>
                     </div>
                 </div>
             </div>

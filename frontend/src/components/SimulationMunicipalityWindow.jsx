@@ -9,7 +9,7 @@ const SimulationMunicipalityWindow = () => {
                     <div className="intervention-group">
                         <h3>Simulation Options</h3>
 
-                        <button className="intervention-button">Announce Heat Grid</button>
+                        
                     </div>
                 </div>
             </div>
