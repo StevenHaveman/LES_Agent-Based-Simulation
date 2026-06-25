@@ -134,10 +134,10 @@ const ResidentInfo = ({
 
                             <span className="info-value">
                                 {JSON.stringify(
-            resident?.household_actual_control,
-            null,
-            2
-        )}
+                                    resident?.household_actual_control,
+                                    null,
+                                    2
+                                )}
                             </span>
                         </div>
 

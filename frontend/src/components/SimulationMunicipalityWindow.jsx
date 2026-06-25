@@ -8,7 +8,6 @@ const SimulationMunicipalityWindow = () => {
                 <div className="interventions-container">
                     <div className="intervention-group">
                         <h3>Simulation Options</h3>
-
                         
                     </div>
                 </div>

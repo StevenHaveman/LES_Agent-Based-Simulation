@@ -20,7 +20,7 @@ const createHistogram = (values, binCount = 5) => {
 };
 /* eslint-enable */
 
-const HistogramChart = ({ households, selectedClusters, selectedMetrics }) => {
+const HistogramChart = ({ households, selectedClusters, selectedMetrics, showTotal }) => {
     const metrics = [
         {
             key: 'attitude',
@@ -47,32 +47,59 @@ const HistogramChart = ({ households, selectedClusters, selectedMetrics }) => {
         resistant: 'rectRot',
         unknown: 'cross',
     };
+    if (showTotal) {
+        metrics
+            .filter(metric => selectedMetrics.includes(metric.key))
+            .forEach((metric) => {
 
-    selectedClusters.forEach((cluster) => {
-        metrics.filter((metric) => selectedMetrics.includes(metric.key)).forEach((metric) => {
-            const values = households.flatMap(
-                (h) =>
-                    h.residents
-                        ?.filter(
-                            (r) => r.cluster_type === cluster
-                        )
-                        .map((r) => r[metric.key]) || []
-            );
-            const histogram = createHistogram(values);
+                const values = households.flatMap(
+                    h =>
+                        h.residents
+                            ?.filter(r => selectedClusters.includes(r.cluster_type))
+                            .map(r => r[metric.key]) || []
+                );
 
-            datasets.push({
-                label: `${metric.label}-${cluster}`,
-                data: histogram.counts,
-                borderColor: metric.color,
-                backgroundColor: metric.color,
-                pointStyle: clusterPointStyles[cluster] || 'circle',
-                fill: false,
-                tension: 0.3,
-                pointRadius: 4,
-                pointHoverRadius: 6,
+                const histogram = createHistogram(values);
+
+                datasets.push({
+                    label: metric.label,
+                    data: histogram.counts,
+                    borderColor: metric.color,
+                    backgroundColor: metric.color,
+                    fill: false,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                });
+            });
+    } else {
+
+        selectedClusters.forEach((cluster) => {
+            metrics.filter((metric) => selectedMetrics.includes(metric.key)).forEach((metric) => {
+                const values = households.flatMap(
+                    (h) =>
+                        h.residents
+                            ?.filter(
+                                (r) => r.cluster_type === cluster
+                            )
+                            .map((r) => r[metric.key]) || []
+                );
+                const histogram = createHistogram(values);
+
+                datasets.push({
+                    label: `${metric.label}-${cluster}`,
+                    data: histogram.counts,
+                    borderColor: metric.color,
+                    backgroundColor: metric.color,
+                    pointStyle: clusterPointStyles[cluster] || 'circle',
+                    fill: false,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                });
             });
         });
-    });
+    }
 
     const data = {
         labels: createHistogram([]).labels,
@@ -119,6 +146,7 @@ HistogramChart.propTypes = {
     households: PropTypes.array.isRequired,
     selectedClusters: PropTypes.array.isRequired,
     selectedMetrics: PropTypes.array.isRequired,
+    showTotal: PropTypes.bool,
 };
 
 export default HistogramChart;

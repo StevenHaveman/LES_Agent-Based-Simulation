@@ -122,8 +122,10 @@ const Graphic = ({
     ]);
 
     const [selectedMetrics, setSelectedMetrics] = useState([
-        'attitude',
+        'attitude', 'perceived_norm', 'survey_pbc',
     ]);
+
+    const [showTotal, setShowTotal] = useState(false);
 
     const yKey = validKeys.includes(yAxisKey) ? yAxisKey : validKeys[0];
 
@@ -181,6 +183,7 @@ const Graphic = ({
                 households={households}
                 selectedClusters={selectedClusters}
                 selectedMetrics={selectedMetrics}
+                showTotal={showTotal}
             />
         ),
     };
@@ -272,7 +275,7 @@ const Graphic = ({
                             checked={selectedMetrics.includes('attitude')}
                             onChange={() => toggleMetric('attitude')}
                         />
-                        Attitude
+                        Att
                     </label>
 
                     <label style={{ marginLeft: '1rem' }}>
@@ -281,7 +284,7 @@ const Graphic = ({
                             checked={selectedMetrics.includes('perceived_norm')}
                             onChange={() => toggleMetric('perceived_norm')}
                         />
-                        Perceived Norm
+                        PN
                     </label>
 
                     <label style={{ marginLeft: '1rem' }}>
@@ -290,7 +293,16 @@ const Graphic = ({
                             checked={selectedMetrics.includes('survey_pbc')}
                             onChange={() => toggleMetric('survey_pbc')}
                         />
-                        Perceived Behavioral Control
+                        PBC
+                    </label>
+                    
+                    <label style={{ marginLeft: '1rem' }}>
+                        <input
+                            type="checkbox"
+                            checked={showTotal}
+                            onChange={(e) => setShowTotal(e.target.checked)}
+                        />
+                        Total
                     </label>
                 </div>
             )}
