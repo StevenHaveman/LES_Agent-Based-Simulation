@@ -247,6 +247,7 @@ const Graphic = ({
                             type="checkbox"
                             checked={selectedClusters.includes('engaged')}
                             onChange={() => toggleCluster('engaged')}
+                             disabled={showTotal}
                         />
                         Engaged
                     </label>
@@ -256,6 +257,7 @@ const Graphic = ({
                             type="checkbox"
                             checked={selectedClusters.includes('neutral')}
                             onChange={() => toggleCluster('neutral')}
+                             disabled={showTotal}
                         />
                         Neutral
                     </label>
@@ -265,6 +267,7 @@ const Graphic = ({
                             type="checkbox"
                             checked={selectedClusters.includes('resistant')}
                             onChange={() => toggleCluster('resistant')}
+                             disabled={showTotal}
                         />
                         Resistant
                     </label>
@@ -274,8 +277,9 @@ const Graphic = ({
                             type="checkbox"
                             checked={selectedMetrics.includes('attitude')}
                             onChange={() => toggleMetric('attitude')}
+                             disabled={showTotal}
                         />
-                        Att
+                        Attitude
                     </label>
 
                     <label style={{ marginLeft: '1rem' }}>
@@ -283,8 +287,9 @@ const Graphic = ({
                             type="checkbox"
                             checked={selectedMetrics.includes('perceived_norm')}
                             onChange={() => toggleMetric('perceived_norm')}
+                             disabled={showTotal}
                         />
-                        PN
+                        Perceived Norm
                     </label>
 
                     <label style={{ marginLeft: '1rem' }}>
@@ -292,15 +297,28 @@ const Graphic = ({
                             type="checkbox"
                             checked={selectedMetrics.includes('survey_pbc')}
                             onChange={() => toggleMetric('survey_pbc')}
+                             disabled={showTotal}
                         />
-                        PBC
+                        Perceived Behavioral Control
                     </label>
                     
                     <label style={{ marginLeft: '1rem' }}>
                         <input
                             type="checkbox"
                             checked={showTotal}
-                            onChange={(e) => setShowTotal(e.target.checked)}
+                            onChange={(e) => {
+                            const checked = e.target.checked;
+
+                            setShowTotal(checked);
+
+                            if (checked) {
+                                setSelectedMetrics([
+                                    'attitude',
+                                    'perceived_norm',
+                                    'survey_pbc',
+                                ]);
+                            }
+                        }}
                         />
                         Total
                     </label>
