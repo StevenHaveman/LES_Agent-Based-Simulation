@@ -11,7 +11,6 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
-import { averageResidentScores } from '../utils/residentStats';
 import ResidentDropdown from './ResidentDropdown.jsx';
 import HomeTrendChart from './HomeTrendChart.jsx';
 import ResidentTrendChart from './ResidentTrendChart.jsx';
@@ -86,24 +85,18 @@ const ResidentInfo = ({
         startYearSimulation,
     );
     const decibel = 2;
-    const averageBehaviorScore = averageResidentScores(resident, [
-        'attitude',
-        'perceived_norm',
-        'survey_pbc',
-    ]);
-    const parsedAction = Number(resident?.action_score);
-    const actionScore = Number.isFinite(parsedAction) ? parsedAction : 0;
 
     const homeResidents = home?.residents ?? [];
 
     const positiveResidents = homeResidents.filter(
         resident => resident.wants_to_renovate
     ).length;
-
+    /* eslint-disable */
     const positiveIntentionPercentage =
         homeResidents.length === 0
             ? 0
             : (positiveResidents / homeResidents.length) * 100;
+    /* eslint-enable */
 
     const packageOrder = ['Bad', 'Poor', 'Medium', 'OK', 'Good'];
 
@@ -125,7 +118,6 @@ const ResidentInfo = ({
             )
             : null;
 
-    console.log('home', home);
     return (
         <div className="resident_info-container">
             <div className="info">
@@ -294,6 +286,8 @@ ResidentInfo.propTypes = {
         intention: PropTypes.number,
         wants_to_renovate: PropTypes.bool,
         intention_threshold: PropTypes.number,
+        actual_control: PropTypes.object,
+        renovation_cooldown: PropTypes.number,
     }),
     home: PropTypes.shape({
         address: PropTypes.string,
