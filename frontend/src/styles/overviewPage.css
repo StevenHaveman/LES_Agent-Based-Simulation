@@ -141,6 +141,7 @@ body {
     border-right: 1px solid black;
     padding: 20px;
     box-sizing: border-box;
+    overflow: auto;
 }
 .simulation-municipality-container {
     grid-column: 7 / 11;

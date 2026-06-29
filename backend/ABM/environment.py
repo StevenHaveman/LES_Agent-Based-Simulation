@@ -701,6 +701,8 @@ class Environment(Model):
                     "intention": getattr(resident, "intention", None),
                     "intention_threshold": getattr(resident, "intention_threshold", None),
                     "wants_to_renovate": bool(getattr(resident, "wants_to_renovate", False)),
+                    "actual_control": getattr(household, "actual_control", {}),
+                    "renovation_cooldown": getattr(household, "renovation_cooldown", 0),
                 }
                 for pkg_name in [p.name for p in self.sustainability_packages]:
                     res_data[f"{pkg_name}_decision"] = resident.package_decisions.get(pkg_name, False)

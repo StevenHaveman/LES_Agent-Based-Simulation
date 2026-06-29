@@ -15,6 +15,7 @@ import { averageResidentScores } from '../utils/residentStats';
 import ResidentDropdown from './ResidentDropdown.jsx';
 import HomeTrendChart from './HomeTrendChart.jsx';
 import ResidentTrendChart from './ResidentTrendChart.jsx';
+import ActualControlScoreChart from '../charts/ActualControlScoreChart.jsx';
 import '../styles/ResidentInfo.css';
 import { getHomeTrends, getResidentTrends } from '../utils/trends';
 
@@ -92,62 +93,108 @@ const ResidentInfo = ({
     ]);
     const parsedAction = Number(resident?.action_score);
     const actionScore = Number.isFinite(parsedAction) ? parsedAction : 0;
+
+    const homeResidents = home?.residents ?? [];
+
+    const positiveResidents = homeResidents.filter(
+        resident => resident.wants_to_renovate
+    ).length;
+
+    const positiveIntentionPercentage =
+        homeResidents.length === 0
+            ? 0
+            : (positiveResidents / homeResidents.length) * 100;
+
+    const packageOrder = ['Bad', 'Poor', 'Medium', 'OK', 'Good'];
+
+    const currentIndex = packageOrder.indexOf(resident.kpi_level);
+
+    const availablePackages = packageOrder.slice(currentIndex + 1);
+
+    const values = availablePackages
+        .map(pkg => ({
+            label: pkg,
+            value: resident.actual_control?.[`${resident.kpi_level}->${pkg}`],
+        }))
+        .filter(item => item.value !== undefined);
+
+    const plannedRenovationPackage =
+        values.length > 0
+            ? values.reduce((best, current) =>
+                current.value > best.value ? current : best
+            )
+            : null;
+
+    console.log('home', home);
     return (
         <div className="resident_info-container">
             <div className="info">
                 {viewMode === 'home' && (
                     <>
-                        <h3>Residence Information</h3>
                         <div className="info-list">
+                            <div className="info-row">
+                                <span className="info-label">Type home:</span>
+                                <span className="info-value">{home.houseType}</span>
+                            </div>
                             <div className="info-row">
                                 <span className="info-label">
                                     Current Performance category:
                                 </span>
                                 <span className="info-value">
                                     {home?.residents?.[0]?.kpi_level ||
-                    home?.GIS_attributes?.Energielabel ||
-                    '-'}
+                                    home?.GIS_attributes?.Energielabel ||
+                                    '-'}
                                 </span>
                             </div>
-                            <div className="info-row">
-                                <span className="info-label">Type home:</span>
-                                <span className="info-value">{home.houseType}</span>
-                            </div>
+
                             <hr className="resident-info-divider" />
                             <div className="info-row">
-                                <span className="info-label">Action Score:</span>
+                                <span className="info-label">
+                                    Residents with positive intention:
+                                </span>
                                 <span className="info-value">
-                                    {actionScore.toFixed(decibel)}
+                                    {positiveIntentionPercentage.toFixed(0)}%
                                 </span>
                             </div>
+
+                            <div className="info-row">
+                                <span className="info-label">Household Renovation Intention:</span>
+
+                                <span className="info-value">
+                                    {resident.wants_to_renovate ? 'Yes' : 'No'}
+                                </span>
+                            </div>
+
                         </div>
-                        <div className="info-row">
-                            <span className="info-label">Total Intention Score:</span>
-
-                            <span className="info-value">
-                                {resident.intention?.toFixed(decibel)}
-                            </span>
-                        </div>
-
-                        <div className="info-row">
-                            <span className="info-label">Actual control:</span>
-
-                            <span className="info-value">
-                                {JSON.stringify(
-                                    resident?.household_actual_control,
-                                    null,
-                                    2
+                                            
+                        {resident.kpi_level !== 'Good' && (
+                            <>
+                                <hr className="resident-info-divider" />
+                                <span className="info-label">
+                                    Actual Control Score per Renovation Package:
+                                </span>
+                                {!loading && (
+                                    <ActualControlScoreChart
+                                        currentPerformanceCategory={resident.kpi_level}
+                                        actualControl={resident.actual_control}
+                                    />
                                 )}
-                            </span>
-                        </div>
-
-                        <div className="info-row">
-                            <span className="info-label">Intention Above Threshold:</span>
-
-                            <span className="info-value">
-                                {resident.wants_to_renovate ? 'Yes' : 'No'}
-                            </span>
-                        </div>
+                                <hr className="resident-info-divider" />
+                                <div className="info-row">
+                                    <span className="info-label">Planned Renovation Package:</span>
+                                    <span className="info-value">
+                                        {plannedRenovationPackage?.label ?? 'None'}
+                                    </span>
+                                </div>
+                                <div className="info-row">
+                                    <span className="info-label">Time until next action:</span>
+                                    <span className="info-value">
+                                        {resident.renovation_cooldown}
+                                    </span>
+                                </div>
+                            </>
+                        )}
+                        
                         {!loading && <HomeTrendChart homeTrends={homeTrends} />}
                     </>
                 )}
@@ -160,7 +207,6 @@ const ResidentInfo = ({
                             onSelect={onResidentChange}
                             className="inline-selector"
                         />
-                        <h3>Resident Details</h3>
                         <div className="info-list">
                             <div className="info-row">
                                 <span className="info-label">Name:</span>
@@ -196,9 +242,17 @@ const ResidentInfo = ({
                                 </span>
                             </div>
                             <div className="info-row">
-                                <span className="info-label">Average Total:</span>
+                                <span className="info-label">Intention Score:</span>
+
                                 <span className="info-value">
-                                    {averageBehaviorScore.toFixed(decibel)}
+                                    {resident.intention?.toFixed(decibel)}
+                                </span>
+                            </div>
+                            <div className="info-row">
+                                <span className="info-label">Renovation Intention:</span>
+
+                                <span className="info-value">
+                                    {resident.wants_to_renovate ? 'Yes' : 'No'}
                                 </span>
                             </div>
                         </div>

@@ -1,5 +1,5 @@
 @echo off
-echo Starting INNO 625...
+echo Starting INSIGHT: Integrated Neighborhood Simulation for Informing Green Housing Transitions
 
 start "Frontend" cmd /k "cd frontend && npm run dev"
 start "Ollama" cmd /k "ollama serve"
