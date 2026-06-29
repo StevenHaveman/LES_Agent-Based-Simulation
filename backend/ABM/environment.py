@@ -6,6 +6,7 @@ from agents.household_agent import Household
 from agents.resident_agent import Resident
 import utilities
 from sustainability_packages.upgrade_package import UpgradePackage
+from PolicyInterventions import PolicyInterventions
 import json
 import os
 
@@ -43,6 +44,7 @@ class Environment(Model):
         self.config_id, self.config = utilities.choose_config() # Load the chosen configuration This is not used in the frontend defaults to config 1
 
         self.package_data = utilities.load_package_data("data/15_package_steps.xlsx")
+        self.policy = PolicyInterventions(self)
         self.sustainability_packages = []
         for _, row in self.package_data.iterrows():
             package = UpgradePackage(
@@ -62,8 +64,6 @@ class Environment(Model):
             pkg.name: 0 for pkg in self.sustainability_packages
         }
     
-        self.energy_price = self.config['energy_price']
-        self.survey_clusters = self.config.get('cluster_profiles') # This is the number of clusters we will use for the survey-based perceived behavioral control, which can be calibrated based on the survey data and the desired level of heterogeneity in resident characteristics and 
         self.households = []  # gewone Python-lijst voor filteren/gemak
         self.gis_data = utilities.load_gis_data("data/AmstelHeuvelWijk2_TableToExcel.xlsx")
         self.residents = []  # gewone Python-lijst voor filteren/gemak
@@ -79,7 +79,6 @@ class Environment(Model):
         # Initialize households, residents, streets, and social norms
 
         self.create_household_agents()
-        # self.create_resident_agents(nr_residents=1)
         self.create_residents_from_survey_profiles(nr_residents=1)
         # self.generate_streets()
         self.build_street_groups()
@@ -96,28 +95,6 @@ class Environment(Model):
                 hh.skip_next_flags[package.name] = False
 
             self.households.append(hh)
-
-    def create_resident_agents(self, nr_residents=1): # TODO: This function will create Resident agents for a given Household agent, using attributes from the GIS data to assign realistic characteristics to the residents (e.g., income, attitudes). The number of residents created will be based on the household size determined from the GIS data.
-
-        id_counter = 0
-
-        for hh in self.households:
-            for _ in range(nr_residents):
-                # survey cluster assignment for attitude and perceived behavioral control (PBC)
-                survey_profile = random.choices(self.survey_clusters, weights=[0.5, 0.35, 0.15], k=1)[0]
-                resident = Resident(id_counter, self, hh, survey_profile)
-                resident.income = utilities.generate_income(self.income_distribution) # Generate income based on distribution from survey data
-
-
-
-                for package_name, installed in hh.package_installations.items():
-                    if installed:
-                        resident.package_decisions[package_name] = True
-
-                hh.residents.append(resident)
-                self.residents.append(resident)
-
-                id_counter += 1
 
     def create_residents_from_survey_profiles(self, nr_residents=1):
 
@@ -561,7 +538,7 @@ class Environment(Model):
                 "resident_count":
                     values["count"]
             }
-            print(f"Cluster {cluster} behavior data: {result[cluster]}")
+            # print(f"Cluster {cluster} behavior data: {result[cluster]}")
 
         return result
 
@@ -714,6 +691,9 @@ class Environment(Model):
                 "name": f"Household  {household.gis_attributes['Huisnummer']}",
                 "GIS_attributes": household.gis_attributes, # Include all GIS attributes for reference
                 "residents": resident_details,
+                "current_kpi_level": household.current_kpi_level,
+                "residents_with_positive_intention": household.residents_with_positive_intention,
+                "renovation_cooldown": household.renovation_cooldown,
                 "package_installations": {
                     pkg.name: household.package_installations.get(pkg.name, False)
                     for pkg in self.sustainability_packages
