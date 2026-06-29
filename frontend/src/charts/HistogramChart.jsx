@@ -25,12 +25,12 @@ const HistogramChart = ({ households, selectedClusters, selectedMetrics, showTot
         {
             key: 'attitude',
             label: 'Att',
-            color: '#d62728',
+            color: '#0e7381',
         },
         {
             key: 'perceived_norm',
             label: 'PN',
-            color: '#2ca02c',
+            color: '#b8c808',
         },
         {
             key: 'survey_pbc',

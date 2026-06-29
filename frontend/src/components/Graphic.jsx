@@ -78,7 +78,7 @@ const clusterMetrics = [
     },
 ];
 
-const clusterColors = ['#2088ae', '#5a5754', '#d7b21c'];
+const clusterColors = ['#17bd2b', '#5a5754', '#d10707'];
 
 const chartOptions = {
     responsive: true,

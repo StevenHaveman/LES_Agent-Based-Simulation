@@ -28,8 +28,8 @@ const ResidentTrendChart = ({ trends, loading, historicalData }) => {
             {
                 label: 'Attitude',
                 data: trends.attitude,
-                borderColor: '#d62728',
-                backgroundColor: '#d6272833',
+                borderColor: '#0e7381',
+                backgroundColor: '#0e738133',
                 fill: true,
                 tension: 0.4,
                 pointRadius: 4,
@@ -38,8 +38,8 @@ const ResidentTrendChart = ({ trends, loading, historicalData }) => {
             {
                 label: 'Perceived Norm',
                 data: trends.perceived_norm,
-                borderColor: '#2ca02c',
-                backgroundColor: '#2ca02c33',
+                borderColor: '#b8c808',
+                backgroundColor: '#b8c80833',
                 fill: true,
                 tension: 0.4,
                 pointRadius: 4,
