@@ -64,8 +64,8 @@ class PolicyInterventions:
                     resident.cluster_type
                 )
 
-                resident.pbc = self._clamp(
-                    resident.pbc + effect
+                resident.survey_pbc = self._clamp(
+                    resident.survey_pbc + effect
                 )
 
     def financial_subsidy(self, amount):
@@ -86,8 +86,8 @@ class PolicyInterventions:
                     resident.cluster_type
                 )
 
-                resident.pbc = self._clamp(
-                    resident.pbc + effect
+                resident.survey_pbc = self._clamp(
+                    resident.survey_pbc + effect
                 )
 
     def announce_heat_grid(self):
@@ -113,6 +113,6 @@ class PolicyInterventions:
                     resident.attitude + attitude_effect
                 )
 
-                resident.pbc = self._clamp(
-                    resident.pbc + pbc_effect
+                resident.survey_pbc = self._clamp(
+                    resident.survey_pbc + pbc_effect
                 )

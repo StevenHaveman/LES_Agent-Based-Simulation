@@ -8,12 +8,14 @@ This application provides endpoints to:
 """
 
 from __future__ import annotations
+from py_compile import main
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from main import run_simulation, graphics_data, households_data, households_historical_data, kpi_data
 import utilities
 import threading
 import traceback
+import main
 
 from AgentLLMHandler import AgentLLMHandler
 
@@ -257,6 +259,35 @@ def parameters():
 @app.route('/config', methods=["GET"])
 def get_sim_config():
     return jsonify(chosen_config)
+
+@app.route("/policy/sustainability_campaign", methods=["POST"])
+def sustainability_campaign():
+    if main.model is None:
+        return jsonify({"error": "Simulation not running"}), 400
+
+    main.model.policy.sustainability_information_campaign()
+
+    return jsonify({
+        "status": "ok"
+    })
+
+@app.route("/policy/financial_subsidy", methods=["POST"])
+def financial_subsidy():
+    if main.model is None:
+        return jsonify({"error": "Simulation not running"}), 400
+
+    main.model.policy.financial_subsidy(5000)
+
+    return jsonify({"status": "ok"})
+
+@app.route("/policy/heat_grid", methods=["POST"])
+def heat_grid():
+    if main.model is None:
+        return jsonify({"error": "Simulation not running"}), 400
+
+    main.model.policy.announce_heat_grid()
+
+    return jsonify({"status": "ok"})
 
 
 

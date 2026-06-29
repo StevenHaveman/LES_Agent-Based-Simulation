@@ -29,6 +29,8 @@ kpi_data = {}  # Stores key performance indicators (KPIs) collected at the end o
 # Global pause flag
 simulation_paused = False
 
+model = None
+
 
 def initialize_data_collection(model: Environment):
     save_folder = config['data_save_folder']
@@ -83,6 +85,7 @@ def run_simulation(simulation_years=30, seed=None):
     global households_data
     global households_historical_data
     global kpi_data
+    global model
 
     if seed is None:
         seed = random.randint(0, 2 ** 32 - 1)
