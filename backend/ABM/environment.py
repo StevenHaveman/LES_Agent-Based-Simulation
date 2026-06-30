@@ -340,13 +340,31 @@ class Environment(Model):
             "decisions_this_year_per_package": dict(self.decided_residents_this_step_per_package),
             "housing_stock": self.collect_housing_stock_data(),
             "kpi_stock": self.collect_kpi_stock_data(),
-            "cluster_behavior_data": self.collect_cluster_behavior_data()
+            "cluster_behavior_data": self.collect_cluster_behavior_data(),
+            "avarage_TPB" = self.collect_avg_TPB_data()
         }
 
         # print(data["cluster_behavior_data"])
         self.yearly_stats.append(data)
 
         return data
+    
+    def collect_avg_TPB_data(self):
+        """
+        Collects average TPB (Theory of Planned Behavior) data across all residents.
+
+        Returns:
+            dict: A dictionary containing average attitude, perceived norm, and PBC.
+        """
+        avg_attitude = np.mean([r.attitude for r in self.residents]) if self.residents else 0
+        avg_perceived_norm = np.mean([r.perceived_norm for r in self.residents]) if self.residents else 0
+        avg_pbc = np.mean([r.survey_pbc for r in self.residents]) if self.residents else 0
+
+        return {
+            "average_attitude": avg_attitude,
+            "average_perceived_norm": avg_perceived_norm,
+            "average_pbc": avg_pbc
+        }
 
     def collect_street_heatmap_data(self):
 
