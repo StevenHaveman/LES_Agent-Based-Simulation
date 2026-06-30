@@ -78,7 +78,7 @@ const clusterMetrics = [
     },
 ];
 
-const clusterColors = ['#2ac72a', '#5a5754', '#ff0000'];
+const clusterColors = ['#17bd2b', '#5a5754', '#d10707'];
 
 const chartOptions = {
     responsive: true,
@@ -120,6 +120,12 @@ const Graphic = ({
         'neutral',
         'resistant',
     ]);
+
+    const [selectedMetrics, setSelectedMetrics] = useState([
+        'attitude', 'perceived_norm', 'survey_pbc',
+    ]);
+
+    const [showTotal, setShowTotal] = useState(false);
 
     const yKey = validKeys.includes(yAxisKey) ? yAxisKey : validKeys[0];
 
@@ -176,6 +182,8 @@ const Graphic = ({
             <HistogramChart
                 households={households}
                 selectedClusters={selectedClusters}
+                selectedMetrics={selectedMetrics}
+                showTotal={showTotal}
             />
         ),
     };
@@ -197,6 +205,14 @@ const Graphic = ({
             prev.includes(cluster)
                 ? prev.filter((c) => c !== cluster)
                 : [...prev, cluster],
+        );
+    };
+
+    const toggleMetric = (metric) => {
+        setSelectedMetrics((prev) =>
+            prev.includes(metric)
+                ? prev.filter((m) => m !== metric)
+                : [...prev, metric],
         );
     };
 
@@ -231,6 +247,7 @@ const Graphic = ({
                             type="checkbox"
                             checked={selectedClusters.includes('engaged')}
                             onChange={() => toggleCluster('engaged')}
+                            disabled={showTotal}
                         />
                         Engaged
                     </label>
@@ -240,6 +257,7 @@ const Graphic = ({
                             type="checkbox"
                             checked={selectedClusters.includes('neutral')}
                             onChange={() => toggleCluster('neutral')}
+                            disabled={showTotal}
                         />
                         Neutral
                     </label>
@@ -249,8 +267,60 @@ const Graphic = ({
                             type="checkbox"
                             checked={selectedClusters.includes('resistant')}
                             onChange={() => toggleCluster('resistant')}
+                            disabled={showTotal}
                         />
                         Resistant
+                    </label>
+
+                    <label style={{ marginLeft: '1rem' }}>
+                        <input
+                            type="checkbox"
+                            checked={selectedMetrics.includes('attitude')}
+                            onChange={() => toggleMetric('attitude')}
+                            disabled={showTotal}
+                        />
+                        Attitude
+                    </label>
+
+                    <label style={{ marginLeft: '1rem' }}>
+                        <input
+                            type="checkbox"
+                            checked={selectedMetrics.includes('perceived_norm')}
+                            onChange={() => toggleMetric('perceived_norm')}
+                            disabled={showTotal}
+                        />
+                        Perceived Norm
+                    </label>
+
+                    <label style={{ marginLeft: '1rem' }}>
+                        <input
+                            type="checkbox"
+                            checked={selectedMetrics.includes('survey_pbc')}
+                            onChange={() => toggleMetric('survey_pbc')}
+                            disabled={showTotal}
+                        />
+                        Perceived Behavioral Control
+                    </label>
+                    
+                    <label style={{ marginLeft: '1rem' }}>
+                        <input
+                            type="checkbox"
+                            checked={showTotal}
+                            onChange={(e) => {
+                                const checked = e.target.checked;
+
+                                setShowTotal(checked);
+
+                                if (checked) {
+                                    setSelectedMetrics([
+                                        'attitude',
+                                        'perceived_norm',
+                                        'survey_pbc',
+                                    ]);
+                                }
+                            }}
+                        />
+                        Total
                     </label>
                 </div>
             )}

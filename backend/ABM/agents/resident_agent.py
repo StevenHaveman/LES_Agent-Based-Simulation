@@ -111,6 +111,7 @@ class Resident(Agent):
             "income": self.income, # change to household level income if we want to analyze household-level constraints more directly
             "attitude": self.attitude,
             "attitude_sensitivity": self.attitude_sensitivity,
+            "wants_to_renovate": self.wants_to_renovate,
 
             # perceived norm (psychological perception)
             "perceived_norm": self.perceived_norm,

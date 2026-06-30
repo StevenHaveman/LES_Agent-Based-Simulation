@@ -8,12 +8,14 @@ This application provides endpoints to:
 """
 
 from __future__ import annotations
+from py_compile import main
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from main import run_simulation, graphics_data, households_data, households_historical_data, kpi_data
 import utilities
 import threading
 import traceback
+import main
 
 from AgentLLMHandler import AgentLLMHandler
 
@@ -44,20 +46,13 @@ def start_simulation():
         }), 400
 
     try:
-        nr_households = int(data.get("nr_households", chosen_config["nr_households"]))
-        nr_residents = int(data.get("nr_residents", chosen_config["nr_residents"]))
-        simulation_years = int(data.get("simulation_years", chosen_config["simulation_years"]))
+        simulation_years = int(data.get("simulation_years"))
         seed = int(data.get("seed", config.configs[config_id].get("seed", None)))
     except (ValueError, TypeError) as e:
         return jsonify({
             "status": "error",
             "message": "Invalid input: " + str(e)
         }), 400
-
-    config.configs[config_id]["nr_households"] = nr_households
-    config.configs[config_id]["nr_residents"] = nr_residents
-    config.configs[config_id]["simulation_years"] = simulation_years
-    config.configs[config_id]["seed"] = seed
 
     def run():
         global simulation_running
@@ -66,9 +61,6 @@ def start_simulation():
         try:
             print("=== Simulation started ===")
             run_simulation(
-                nr_households,
-                nr_residents,
-                simulation_years,
                 seed=seed
             )
             print("=== Simulation finished ===")
@@ -86,8 +78,6 @@ def start_simulation():
         "status": "ok",
         "message": "Simulation started",
         "parameters": {
-            "nr_households": nr_households,
-            "nr_residents": nr_residents,
             "simulation_years": simulation_years,
             "seed": seed
         }
@@ -269,6 +259,35 @@ def parameters():
 @app.route('/config', methods=["GET"])
 def get_sim_config():
     return jsonify(chosen_config)
+
+@app.route("/policy/sustainability_campaign", methods=["POST"])
+def sustainability_campaign():
+    if main.model is None:
+        return jsonify({"error": "Simulation not running"}), 400
+
+    main.model.policy.sustainability_information_campaign()
+
+    return jsonify({
+        "status": "ok"
+    })
+
+@app.route("/policy/financial_subsidy", methods=["POST"])
+def financial_subsidy():
+    if main.model is None:
+        return jsonify({"error": "Simulation not running"}), 400
+
+    main.model.policy.financial_subsidy(5000)
+
+    return jsonify({"status": "ok"})
+
+@app.route("/policy/heat_grid", methods=["POST"])
+def heat_grid():
+    if main.model is None:
+        return jsonify({"error": "Simulation not running"}), 400
+
+    main.model.policy.announce_heat_grid()
+
+    return jsonify({"status": "ok"})
 
 
 

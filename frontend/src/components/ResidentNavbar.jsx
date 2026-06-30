@@ -23,7 +23,10 @@ const ResidentNavbar = () => {
    * otherwise, it opens the tab.
    */
     const toggleAiTab = () => {
-        dispatch({ type: 'SET_CHAT_WINDOW', payload: 'ai' });
+        dispatch({
+            type: 'SET_CHAT_WINDOW',
+            payload: state.chatWindow === 'ai' ? '' : 'ai',
+        });
     };
 
     const toggleHomeTab = () => {

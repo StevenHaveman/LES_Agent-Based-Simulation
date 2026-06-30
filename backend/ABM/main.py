@@ -29,6 +29,8 @@ kpi_data = {}  # Stores key performance indicators (KPIs) collected at the end o
 # Global pause flag
 simulation_paused = False
 
+model = None
+
 
 def initialize_data_collection(model: Environment):
     save_folder = config['data_save_folder']
@@ -63,7 +65,7 @@ def is_simulation_paused():
     return simulation_paused
 
 
-def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=None):
+def run_simulation(simulation_years=30, seed=None):
     """
     Runs the agent-based model simulation.
 
@@ -83,6 +85,7 @@ def run_simulation(nr_households=10, nr_residents=10, simulation_years=30, seed=
     global households_data
     global households_historical_data
     global kpi_data
+    global model
 
     if seed is None:
         seed = random.randint(0, 2 ** 32 - 1)
