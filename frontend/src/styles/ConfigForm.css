@@ -120,7 +120,6 @@
     font-size: 14px;
     cursor: pointer;
     transition: background-color 0.2s;
-    margin-left: 17px;
 }
 
 .form-button:hover {
