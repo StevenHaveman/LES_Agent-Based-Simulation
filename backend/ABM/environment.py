@@ -341,7 +341,7 @@ class Environment(Model):
             "housing_stock": self.collect_housing_stock_data(),
             "kpi_stock": self.collect_kpi_stock_data(),
             "cluster_behavior_data": self.collect_cluster_behavior_data(),
-            "avarage_TPB" = self.collect_avg_TPB_data()
+            "average_total_population_data": self.collect_avg_total_population_data()
         }
 
         # print(data["cluster_behavior_data"])
@@ -349,7 +349,7 @@ class Environment(Model):
 
         return data
     
-    def collect_avg_TPB_data(self):
+    def collect_avg_total_population_data(self):
         """
         Collects average TPB (Theory of Planned Behavior) data across all residents.
 
