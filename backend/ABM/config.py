@@ -25,8 +25,9 @@ configs = {
         'raise_income': [1.00, 1.01, 1.02, 1.03, 1.04, 1.05], # Random increase in income per year
         'decision_threshold': 0.5, # Decision threshold for investing in sustainable energy
         'attitude_sensitivity': 1,
-        'subj_norm_sensitivity': 1,
+        'norm_sensitivity': 1,
         'control_sensitivity': 1,
+        "random_sensitivities": False, # Whether to randomize sensitivities for attitude, norm, and control
         'intention_threshold': 0.7, # Decision threshold for forming intentions to invest in sustainable energy
         'cluster_profiles': {
                     0: {
@@ -78,6 +79,7 @@ configs = {
         'attitude_sensitivity': 1,
         'norm_sensitivity': 1,
         'control_sensitivity': 1,
+        "random_sensitivities": False, # Whether to randomize sensitivities for attitude, norm, and control
         'intention_threshold': 0.7, # Decision threshold for forming intentions to invest in sustainable energy
         'cluster_profiles': {
                     0: {
@@ -132,6 +134,7 @@ configs = {
         'attitude_sensitivity': 1,
         'norm_sensitivity': 1,
         'control_sensitivity': 1,
+        "random_sensitivities": False, # Whether to randomize sensitivities for attitude, norm, and control
         'intention_threshold': 0.7, # Decision threshold for forming intentions to invest in sustainable energy
         'cluster_profiles': {
                     0: {

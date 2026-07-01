@@ -52,13 +52,13 @@ class Resident(Agent):
         self.intention_threshold = 0.7 # This is a new parameter that determines how high the intention needs to be for the resident to decide to adopt a package. We can experiment with different values for this to see how it affects adoption rates.
 
         # ATTITUDE AND SENSITIVITY
-        if self.config_id in (0, 1):
+        if self.config.get("random_sensitivities", False):
             self.attitude_sensitivity = utilities.gen_random_value(0, 2)
             self.norm_sensitivity = utilities.gen_random_value(0, 2)
             self.control_sensitivity = utilities.gen_random_value(0, 2)
         else:
             self.attitude_sensitivity = self.config['attitude_sensitivity']
-            self.norm_sensitivity = self.config['subj_norm_sensitivity']
+            self.norm_sensitivity = self.config['norm_sensitivity']
             self.control_sensitivity = self.config['control_sensitivity']
 
         # DECISIONS STATE
