@@ -179,7 +179,7 @@ const ResidentInfo = ({
                                     </span>
                                 </div>
                                 <div className="info-row">
-                                    <span className="info-label">Time until next action:</span>
+                                    <span className="info-label">Years until next renovation is possible:</span>
                                     <span className="info-value">
                                         {resident.renovation_cooldown}
                                     </span>
