@@ -254,13 +254,6 @@ class Environment(Model):
                     other_household.residents
                 )
 
-        print(
-            f"Household {household.unique_id}: "
-            f"{len(nearby_households)} households, "
-            f"{len(nearby_residents)} residents "
-            f"within {radius} meters"
-        )
-
         return nearby_residents
     
     def calculate_distance(self, lat1, lon1, lat2, lon2):
