@@ -253,7 +253,7 @@ class Environment(Model):
                 nearby_residents.extend(
                     other_household.residents
                 )
-
+                
         return nearby_residents
     
     def calculate_distance(self, lat1, lon1, lat2, lon2):
