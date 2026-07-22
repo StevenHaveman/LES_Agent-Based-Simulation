@@ -53,7 +53,7 @@ const applySocialNormRadius = async () => {
                             <input
                                 type="range"
                                 min="10"
-                                max="1000"
+                                max="3000"
                                 step="10"
                                 value={socialNormRadius}
                                 onChange={(e) =>
