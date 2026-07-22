@@ -111,9 +111,13 @@ const ResidentInfo = ({
         }))
         .filter(item => item.value !== undefined);
 
+    const validPackages = values.filter(
+        pkg => pkg.value >= resident.intention_threshold
+    );
+
     const plannedRenovationPackage =
-        values.length > 0
-            ? values.reduce((best, current) =>
+        validPackages.length > 0
+            ? validPackages.reduce((best, current) =>
                 current.value > best.value ? current : best
             )
             : null;
@@ -169,6 +173,7 @@ const ResidentInfo = ({
                                     <ActualControlScoreChart
                                         currentPerformanceCategory={resident.kpi_level}
                                         actualControl={resident.actual_control}
+                                        threshold={resident.intention_threshold}
                                     />
                                 )}
                                 <hr className="resident-info-divider" />
@@ -179,7 +184,7 @@ const ResidentInfo = ({
                                     </span>
                                 </div>
                                 <div className="info-row">
-                                    <span className="info-label">Time until next action:</span>
+                                    <span className="info-label">Years until next renovation is possible:</span>
                                     <span className="info-value">
                                         {resident.renovation_cooldown}
                                     </span>
