@@ -15,6 +15,7 @@ configs = {
         "subjective_norm": 0.0, # Initial environmental influence (0-1)
         "min_nr_houses": 20,
         "max_nr_houses": 60,
+        "social_norm_radius": 10, # Radius for social norm influence (in meters)
         "subj_norm_level": "Street", # District, Street, Direct
 
         # Household Agent parameters
@@ -67,6 +68,7 @@ configs = {
         "subjective_norm": 0.0, # Initial environmental influence (0-1)
         "min_nr_houses": 20,
         "max_nr_houses": 60,
+        "social_norm_radius": 10,
         "subj_norm_level": "Street", # District, Street, Direct
 
         # Household Agent parameters
@@ -123,6 +125,8 @@ configs = {
         "subjective_norm": 0.0,
         "min_nr_houses": 15,
         "max_nr_houses": 70,
+        "subj_norm_level": "Street", # District, Street, Direct
+        "social_norm_radius": 10,
 
         # Household Agent parameters
         "household_decision_threshold": 0.5,
