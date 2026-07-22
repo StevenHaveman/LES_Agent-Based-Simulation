@@ -7,6 +7,7 @@ const packageOrder = ['Bad', 'Poor', 'Medium', 'OK', 'Good'];
 const ActualControlScoreChart = ({
     currentPerformanceCategory,
     actualControl,
+    threshold,
 }) => {
 
     if (currentPerformanceCategory === 'Good') {
@@ -28,7 +29,11 @@ const ActualControlScoreChart = ({
         datasets: [{
             label: 'Actual Control Score',
             data: values.map(v => v.value),
-            backgroundColor: 'rgba(247, 102, 255, 0.6)',
+            backgroundColor: values.map(v =>
+                v.value >= threshold
+                    ? 'rgba(34,197,94,0.7)'
+                    : 'rgba(239,68,68,0.7)'
+            ),
         }],
     };
 
@@ -52,4 +57,5 @@ export default ActualControlScoreChart;
 ActualControlScoreChart.propTypes = {
     currentPerformanceCategory: PropTypes.string.isRequired,
     actualControl: PropTypes.object.isRequired,
+    threshold: PropTypes.number.isRequired,
 };
