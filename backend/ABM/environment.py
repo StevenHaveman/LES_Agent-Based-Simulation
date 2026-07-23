@@ -70,6 +70,8 @@ class Environment(Model):
         self.survey_data = utilities.load_survey_data("data/survey_data.xlsx")
         self.survey_cluster_profiles = utilities.load_survey_cluster_profiles("data/survey_cluster_profiles.xlsx")
         self.income_distribution = (utilities.calculate_income_distribution(self.survey_data))
+        # Social norm settings
+        self.social_norm_radius = self.config.get("social_norm_radius", 500)  # Default to 500 meters if not specified in config
         self.street_groups = {} # Build street groups based on GIS data, this will be used for calculating street-level norms and for the heatmap visualization.
         self.yearly_stats = []
         self.total_co2_baseline = 0
@@ -190,35 +192,124 @@ class Environment(Model):
                 chosen_list = random.randint(0, len(self.streets) - 1)
                 self.streets[chosen_list].append(self.households[i])
 
-    def update_social_norms(self):
-        # This function updates the perceived social norms for each resident based on the current state of their street. For simplicity, 
-        # we calculate an average attitude and PBC for the residents in the same street and use that to update each resident's perceived norm. 
-        # This is a simplified approach and can be further refined to consider more complex interactions and influences among residents.
-        for street_name, households in self.street_groups.items():
 
-            # Get all residents in the street
-            residents_in_street = [
-                r
-                for hh in households
-                for r in hh.residents
+    def update_social_norms(self):
+
+        radius = self.social_norm_radius  # meters
+
+        for resident in self.residents:
+
+            household = resident.household
+
+            nearby_residents = self.get_residents_within_radius(
+                household,
+                radius
+            )
+
+            other_residents = [
+                r for r in nearby_residents
+                if r.unique_id != resident.unique_id
             ]
 
-            if not residents_in_street:
+            if not other_residents:
                 continue
 
-            # Calculate average attitude and PBC for the street
-            for resident in residents_in_street:
-                other_residents = [r for r in residents_in_street if r.unique_id != resident.unique_id]
+            avg_attitude = np.mean(
+                [r.attitude for r in other_residents]
+            )
 
-                if not other_residents:
-                    continue
+            avg_pbc = np.mean(
+                [r.survey_pbc for r in other_residents]
+            )
 
-                avg_attitude = np.mean([r.attitude for r in other_residents])
+            resident.perceived_norm = (
+                0.5 * avg_attitude +
+                0.5 * avg_pbc
+            )
 
-                avg_pbc = np.mean([r.survey_pbc for r in other_residents])
+    def get_residents_within_radius(self, household, radius):
 
-                # Update the resident's perceived norm based on the average attitude and PBC of their street.
-                resident.perceived_norm = (0.5 * avg_attitude + 0.5 * avg_pbc) 
+        nearby_residents = []
+        nearby_households = []
+
+        lat1 = household.gis_attributes["Latitude"]
+        lon1 = household.gis_attributes["Longitude"]
+
+        for other_household in self.households:
+
+            lat2 = other_household.gis_attributes["Latitude"]
+            lon2 = other_household.gis_attributes["Longitude"]
+
+            distance = self.calculate_distance(
+                lat1,
+                lon1,
+                lat2,
+                lon2
+            )
+
+            if distance <= radius:
+                nearby_households.append(other_household)
+
+                nearby_residents.extend(
+                    other_household.residents
+                )
+                
+        return nearby_residents
+    
+    def calculate_distance(self, lat1, lon1, lat2, lon2):
+
+        R = 6371000  # meter
+
+        lat1 = np.radians(lat1)
+        lat2 = np.radians(lat2)
+
+        delta_lat = np.radians(lat2 - lat1)
+        delta_lon = np.radians(lon2 - lon1)
+
+        a = (
+            np.sin(delta_lat / 2)**2
+            +
+            np.cos(lat1)
+            * np.cos(lat2)
+            * np.sin(delta_lon / 2)**2
+        )
+
+        c = 2 * np.arctan2(
+            np.sqrt(a),
+            np.sqrt(1 - a)
+        )
+
+        return R * c
+
+    # def update_social_norms_OLD(self):
+    #     # This function updates the perceived social norms for each resident based on the current state of their street. For simplicity, 
+    #     # we calculate an average attitude and PBC for the residents in the same street and use that to update each resident's perceived norm. 
+    #     # This is a simplified approach and can be further refined to consider more complex interactions and influences among residents.
+    #     for street_name, households in self.street_groups.items():
+
+    #         # Get all residents in the street
+    #         residents_in_street = [
+    #             r
+    #             for hh in households
+    #             for r in hh.residents
+    #         ]
+
+    #         if not residents_in_street:
+    #             continue
+
+    #         # Calculate average attitude and PBC for the street
+    #         for resident in residents_in_street:
+    #             other_residents = [r for r in residents_in_street if r.unique_id != resident.unique_id]
+
+    #             if not other_residents:
+    #                 continue
+
+    #             avg_attitude = np.mean([r.attitude for r in other_residents])
+
+    #             avg_pbc = np.mean([r.survey_pbc for r in other_residents])
+
+    #             # Update the resident's perceived norm based on the average attitude and PBC of their street.
+    #             resident.perceived_norm = (0.5 * avg_attitude + 0.5 * avg_pbc) 
 
     def step(self):
         """

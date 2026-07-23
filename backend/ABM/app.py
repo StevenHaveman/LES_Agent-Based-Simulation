@@ -290,6 +290,28 @@ def heat_grid():
     return jsonify({"status": "ok"})
 
 
+@app.route("/update_social_norm_radius", methods=["POST"])
+def update_social_norm_radius():
+    if main.model is None:
+        return jsonify({"error": "Simulation not running"}), 400
+
+    data = request.get_json()
+    radius = data.get("radius")
+
+    try:
+        radius = int(radius)
+    except (ValueError, TypeError):
+        return jsonify({
+            "status": "error",
+            "message": "Invalid radius value"
+        }), 400
+
+    if radius < 0:
+        return jsonify({
+            "status": "error",
+            "message": "Radius cannot be negative"
+        }), 400
+
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False)
