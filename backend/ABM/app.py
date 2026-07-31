@@ -266,6 +266,7 @@ def sustainability_campaign():
         return jsonify({"error": "Simulation not running"}), 400
 
     main.model.policy.sustainability_information_campaign()
+    main.model.log_municipality_event("Sustainability Campaign Announced")
 
     return jsonify({
         "status": "ok"
@@ -276,7 +277,14 @@ def financial_subsidy():
     if main.model is None:
         return jsonify({"error": "Simulation not running"}), 400
 
-    main.model.policy.financial_subsidy(5000)
+    amount = 5000
+
+    main.model.policy.financial_subsidy(amount)
+
+    main.model.log_municipality_event(
+        "Financial Subsidy",
+        {"amount": amount}
+    )
 
     return jsonify({"status": "ok"})
 
@@ -286,6 +294,7 @@ def heat_grid():
         return jsonify({"error": "Simulation not running"}), 400
 
     main.model.policy.announce_heat_grid()
+    main.model.log_municipality_event("Heat Grid Announced")
 
     return jsonify({"status": "ok"})
 
@@ -311,6 +320,24 @@ def update_social_norm_radius():
             "status": "error",
             "message": "Radius cannot be negative"
         }), 400
+
+    old_radius = main.model.social_norm_radius
+    main.model.social_norm_radius = radius
+
+    main.model.log_municipality_event(
+        "Social Norm Radius Changed",
+        {
+            "old_radius": old_radius,
+            "new_radius": radius
+        }
+    )
+
+    print(f"Social norm radius updated to {radius} meters")
+
+    return jsonify({
+        "status": "ok",
+        "social_norm_radius": radius
+    })
 
 
 if __name__ == '__main__':

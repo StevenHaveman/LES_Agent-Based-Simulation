@@ -6,6 +6,7 @@ export const GRAPH_OPTIONS = [
     { key: 'cluster_behavior_trends', label: 'Cluster averages over time' },
     { key: 'behavior_metrics', label: 'Behavior Metrics' },
     { key: 'histogram', label: 'Population Distribution Chart' },
+    {key: "municipality_events", label: "Municipality Actions Timeline"}
 ];
 
 export const GRAPH_SLOTS = 3;

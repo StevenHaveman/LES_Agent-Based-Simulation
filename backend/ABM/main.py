@@ -110,6 +110,7 @@ def run_simulation(simulation_years=30, seed=None):
 
         print(f"=== Year {year + 1} ===")
         print("Current Environment State (begin):")
+        model.current_year = year + 1  # Update the current year in the model
         # print(model)  # Uncomment this to print the full environment state at the beginning of each year, can be useful for debugging but will create a lot of output.
 
         data = model.collect_start_of_year_data(year + 1)

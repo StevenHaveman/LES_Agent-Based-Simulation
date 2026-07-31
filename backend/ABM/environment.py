@@ -72,7 +72,9 @@ class Environment(Model):
         self.income_distribution = (utilities.calculate_income_distribution(self.survey_data))
         # Social norm settings
         self.social_norm_radius = self.config.get("social_norm_radius", 500)  # Default to 500 meters if not specified in config
+        self.municipality_timeline = []
         self.street_groups = {} # Build street groups based on GIS data, this will be used for calculating street-level norms and for the heatmap visualization.
+        self.current_year = 0
         self.yearly_stats = []
         self.total_co2_baseline = 0
         self.current_co2 = 0
@@ -191,7 +193,6 @@ class Environment(Model):
             for i in range(pointer, len(self.households)):
                 chosen_list = random.randint(0, len(self.streets) - 1)
                 self.streets[chosen_list].append(self.households[i])
-
 
     def update_social_norms(self):
 
@@ -324,6 +325,7 @@ class Environment(Model):
         for pkg_name in self.decided_residents_this_step_per_package:
             self.decided_residents_this_step_per_package[pkg_name] = 0
 
+        print(self.municipality_timeline)
 
         print("Updating social norms in environment step...")
         self.update_social_norms()
@@ -432,7 +434,8 @@ class Environment(Model):
             "housing_stock": self.collect_housing_stock_data(),
             "kpi_stock": self.collect_kpi_stock_data(),
             "cluster_behavior_data": self.collect_cluster_behavior_data(),
-            "average_total_population_data": self.collect_avg_total_population_data()
+            "average_total_population_data": self.collect_avg_total_population_data(),
+            "municipality_timeline": self.municipality_timeline
         }
 
         # print(data["cluster_behavior_data"])
@@ -844,6 +847,16 @@ class Environment(Model):
             streets[street_name].append(hh)
 
         self.street_groups = streets
+
+    def log_municipality_event(self, event, details=None):
+        if details is None:
+            details = {}
+
+        self.municipality_timeline.append({
+            "year": self.current_year,
+            "event": event,
+            "details": details
+        })
 
     def __str__(self):
         """

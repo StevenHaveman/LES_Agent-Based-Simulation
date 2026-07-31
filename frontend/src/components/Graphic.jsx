@@ -36,6 +36,7 @@ import ClusterChart from '../charts/ClusterChart';
 import ClusterTrendChart from '../charts/ClusterTrendChart';
 import BehaviorMetricsChart from '../charts/BehaviorMetricsChart';
 import HistogramChart from '../charts/HistogramChart';
+import MunicipalityTimelineChart from '../charts/MunicipalityTimelineChart';
 
 const validKeys = [
     'energy_label_A',
@@ -51,6 +52,7 @@ const validKeys = [
     'cluster_behavior_trends',
     'behavior_metrics',
     'histogram',
+    'municipality_events',
 ];
 
 const simulationYearStart = 2025;
@@ -132,6 +134,9 @@ const Graphic = ({
     const uniqueSimulationData = Array.from(
         new Map(simulationData.map((item) => [item.year, item])).values(),
     );
+
+    const municipalityEvents = uniqueSimulationData
+        .at(-1)?.municipality_timeline || [];
     const chartComponents = {
         co2: (
             <Co2Chart
@@ -184,6 +189,13 @@ const Graphic = ({
                 selectedClusters={selectedClusters}
                 selectedMetrics={selectedMetrics}
                 showTotal={showTotal}
+            />
+        ),
+        municipality_events: (
+            <MunicipalityTimelineChart
+                municipalityEvents={municipalityEvents}
+                uniqueSimulationData={uniqueSimulationData}
+                simulationYearStart={simulationYearStart}
             />
         ),
     };
@@ -337,6 +349,7 @@ Graphic.propTypes = {
     yAxisKey: PropTypes.string,
     simulationData: PropTypes.arrayOf(PropTypes.object),
     households: PropTypes.arrayOf(PropTypes.object),
+
 };
 
 export default Graphic;
