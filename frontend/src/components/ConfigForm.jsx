@@ -48,14 +48,6 @@ const basicSettings = [
         label: "Random Seed"
     },
     {
-        key: "min_nr_houses",
-        label: "Minimum Houses"
-    },
-    {
-        key: "max_nr_houses",
-        label: "Maximum Houses"
-    },
-    {
         key: "social_norm_radius",
         label: "Social Norm Radius"
     }
