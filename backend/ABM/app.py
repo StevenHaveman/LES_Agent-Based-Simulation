@@ -39,6 +39,14 @@ def start_simulation():
     global simulation_thread, simulation_running
 
     data = request.get_json()
+    config_id = int(data["config_id"])
+
+    simulation_config = config.configs[config_id].copy()
+
+    for key, value in data.items():
+
+        if key in simulation_config:
+            simulation_config[key] = value
 
     if simulation_thread and simulation_thread.is_alive():
         return jsonify({
@@ -62,7 +70,8 @@ def start_simulation():
         try:
             print("=== Simulation started ===")
             run_simulation(
-                seed=seed
+                simulation_years=simulation_years,
+                config=simulation_config
             )
             print("=== Simulation finished ===")
         except Exception as e:

@@ -190,15 +190,22 @@ const ConfigForm = () => {
             checked
         } = e.target;
 
+        let parsedValue;
 
-        setFormData({
-            ...formData,
-            [name]:
-                type === "checkbox"
-                    ? checked
-                    : value
-        });
+        if (type === "checkbox") {
+            parsedValue = checked;
+        } else if (type === "number") {
+            parsedValue = value === "" ? "" : Number(value);
+        } else {
+            parsedValue = value;
+        }
+
+        setFormData(prev => ({
+            ...prev,
+            [name]: parsedValue
+        }));
     };
+
 
 
     /**

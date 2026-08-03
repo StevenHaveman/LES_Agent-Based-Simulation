@@ -31,17 +31,17 @@ class Environment(Model):
         yearly_stats (list[dict]): List to store aggregated data collected each year.
     """
     # def __init__(self, nr_households, nr_residents): # Maybe no longer needed when we create households based on GIS data, and survey data for residents.
-    def __init__(self):
+    def __init__(self,config):
         """
         Initializes the simulation environment.
 
         Args:
-            nr_households (int): The total number of households to create.
-            nr_residents (int): The total number of residents to create and
-                                distribute among households.
+            config_id (int): The ID of the configuration to use for the simulation.
         """
         super().__init__()
-        self.config_id, self.config = utilities.choose_config() # Load the chosen configuration This is not used in the frontend defaults to config 1
+        self.config = config # save the given config for later use in the model
+
+        print(self.config)
 
         self.package_data = utilities.load_package_data("data/15_package_steps.xlsx")
         self.policy = PolicyInterventions(self)

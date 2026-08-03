@@ -1,85 +1,121 @@
 """
-Main script for running the agent-based model simulation.
+Main simulation controller.
 
-This script initializes the simulation environment and runs it for a specified
-number of years. It collects data for visualization and detailed household
-information at the end of each simulation year.
+This module is responsible for running the agent-based simulation and exposing
+simulation data for the Flask API. It creates the simulation environment,
+advances the model year by year, and stores data used by the frontend for
+visualisation and analysis.
 """
 
+import glob
+import os
 import random
-import numpy as np
 import time
-import json
+
+import numpy as np
+
 from environment import Environment
-import utilities
 from shared_state import get_delay
 
-import os
-import glob
 
-# Load configuration
-config_id, config = utilities.choose_config()
+# =============================================================================
+# Global simulation state
+# =============================================================================
 
-# Global lists to store data from the simulation for potential use by an API or UI.
-graphics_data = []  # Stores yearly aggregated data for charts/graphs.
-households_data = []  # Stores detailed household information per year (updated yearly)
-households_historical_data = []  # Stores historical resident score data per year
-kpi_data = {}  # Stores key performance indicators (KPIs) collected at the end of each year.
+graphics_data = []
+"""Yearly aggregated simulation data used for charts."""
 
-# Global pause flag
+households_data = []
+"""Detailed household information for the current simulation year."""
+
+households_historical_data = []
+"""Historical household information for all simulated years."""
+
+kpi_data = {}
+"""Latest Key Performance Indicators (KPIs)."""
+
 simulation_paused = False
+"""Indicates whether the simulation is currently paused."""
 
 model = None
+"""Reference to the currently active Environment instance."""
 
 
-def initialize_data_collection(model: Environment):
-    save_folder = config['data_save_folder']
+# =============================================================================
+# Helper functions
+# =============================================================================
+
+def initialize_data_collection(model: Environment, config: dict) -> str:
+    """
+    Prepare the JSON output file for simulation data collection.
+
+    A unique filename is generated based on the number of existing simulation
+    output files in the configured data directory.
+
+    Args:
+        model: The simulation environment.
+        config: Simulation configuration.
+
+    Returns:
+        str: Path to the JSON output file.
+    """
+    save_folder = config["data_save_folder"]
     os.makedirs(save_folder, exist_ok=True)
 
-    existing_files = glob.glob(os.path.join(save_folder, "simulation_data_*.json"))
+    existing_files = glob.glob(
+        os.path.join(save_folder, "simulation_data_*.json")
+    )
+
     run_number = len(existing_files) + 1
-    file_name = os.path.join(save_folder, f"simulation_data_{run_number:03d}.json")
+
+    file_name = os.path.join(
+        save_folder,
+        f"simulation_data_{run_number:03d}.json"
+    )
 
     model.setup_data_structure(file_name)
 
     return file_name
 
 
-def toggle_simulation_pause():
+def toggle_simulation_pause() -> bool:
     """
-    Toggle the global pause state of the simulation.
+    Toggle the paused state of the simulation.
+
     Returns:
-        bool: The new paused state (True if paused, False if running).
+        bool: True if the simulation is now paused, otherwise False.
     """
     global simulation_paused
+
     simulation_paused = not simulation_paused
     return simulation_paused
 
 
-def is_simulation_paused():
+def is_simulation_paused() -> bool:
     """
-    Check if the simulation is currently paused.
+    Check whether the simulation is currently paused.
+
     Returns:
-        bool: True if paused, False otherwise.
+        bool: True if paused, otherwise False.
     """
     return simulation_paused
 
 
-def run_simulation(simulation_years=30, seed=None):
-    """
-    Runs the agent-based model simulation.
+# =============================================================================
+# Simulation
+# =============================================================================
 
-    Initializes the model with the given parameters, runs it for the specified
-    number of simulation years, and collects data.
+def run_simulation(config: dict, simulation_years: int = 30):
+    """
+    Run the agent-based simulation.
+
+    The simulation is executed year by year. After every simulation step,
+    aggregated statistics, household information and KPIs are collected for
+    use by the frontend.
 
     Args:
-        nr_households (int): The number of households in the simulation.
-        nr_residents (int): The total number of residents, distributed among households.
-        simulation_years (int): The number of years the simulation will run.
-        seed (int): Seed for random number generators for reproducibility.
-
-    Returns:
-        dict: A dictionary containing a message indicating simulation completion.
+        config: Simulation configuration.
+        simulation_years: Number of simulation years to execute.
     """
     global graphics_data
     global households_data
@@ -87,83 +123,70 @@ def run_simulation(simulation_years=30, seed=None):
     global kpi_data
     global model
 
+    if config is None:
+        raise ValueError("A simulation configuration must be provided.")
+
+    seed = config.get("seed")
+
     if seed is None:
-        seed = random.randint(0, 2 ** 32 - 1)
+        seed = random.randint(0, 2**32 - 1)
 
     random.seed(seed)
     np.random.seed(seed)
 
     graphics_data.clear()
-    kpi_data.clear()
     households_data.clear()
     households_historical_data.clear()
+    kpi_data.clear()
 
-    # model = Environment(nr_households=nr_households, nr_residents=nr_residents) We will likely need to change this when we create households based on GIS data, and residents based on survey data.
-    model = Environment()
+    model = Environment(config=config)
 
-    if config['collect_data']:
-        file_name = initialize_data_collection(model)
+    file_name = None
+    if config.get("collect_data", False):
+        file_name = initialize_data_collection(model, config)
 
     for year in range(simulation_years):
+
         while is_simulation_paused():
             time.sleep(1)
 
-        print(f"=== Year {year + 1} ===")
-        print("Current Environment State (begin):")
-        model.current_year = year + 1  # Update the current year in the model
-        # print(model)  # Uncomment this to print the full environment state at the beginning of each year, can be useful for debugging but will create a lot of output.
+        model.current_year = year + 1
 
-        data = model.collect_start_of_year_data(year + 1)
+        print(f"=== Year {model.current_year} ===")
+
+        yearly_data = model.collect_start_of_year_data(model.current_year)
+
         model.step()
 
-        print(f"\nEnd of Year {year + 1}:")
-        # for package_name, count in model.decided_residents_this_step_per_package.items():
-        #     print(f"  Decisions this year for {package_name}: {count}")
+        model.collect_end_of_year_data(yearly_data)
 
-        print("  Current Environment State (end):")
-        # print(model)
-        print("-" * 40)
+        graphics_data.append(yearly_data)
 
-        model.collect_end_of_year_data(data)
-        graphics_data.append(data)
         kpi_data.clear()
         kpi_data.update(model.collect_kpi_data())
 
-        print("Test KPI data:")
-        print (f"KPIs collected for year {year + 1}:")
-        for kpi_name, kpi_value in kpi_data.items():
-            print(f"  {kpi_name}: {kpi_value}")
+        print("Collected KPIs:")
+        for name, value in kpi_data.items():
+            print(f"  {name}: {value}")
 
+        if file_name is not None:
+            model.export_data(file_name, model.current_year)
 
-        # Export data to JSON file if configured
-        if config['collect_data']:
-            model.export_data(file_name, year + 1)
+        household_info = model.collect_household_information()
 
-        # Update household data (per year)
         households_data.clear()
-        households_data.extend(model.collect_household_information())
-        
-        year_resident_data = {
-            "year": year + 1,
-            "households": model.collect_household_information()
-        }
-        households_historical_data.append(year_resident_data)
+        households_data.extend(household_info)
 
-        print(f"Household data collected for year {year + 1}: {len(households_data)} households")
+        households_historical_data.append(
+            {
+                "year": model.current_year,
+                "households": household_info,
+            }
+        )
 
-        # print(households_data[:2])  # Print the first 2 households for a quick check, can be removed later.
-        graphics_data.append(data)
+        print(
+            f"Collected household data for "
+            f"{len(households_data)} households."
+        )
 
-        # print("\n=== GRAPHICS DATA ===")
-        # print(json.dumps(graphics_data[-1], indent=4))
-        # Wait before next simulation year
         time.sleep(get_delay())
-
-
-if __name__ == "__main__":
-    simulation_result = run_simulation(
-        config['nr_households'],
-        config['nr_residents'],
-        config['simulation_years'],
-        config['seed']
-    )
