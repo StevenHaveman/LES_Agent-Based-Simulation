@@ -1,23 +1,31 @@
 /**
  * ConfigForm Component
  *
- * This React component provides a form for configuring and starting a simulation.
- * Users can input parameters such as the number of households, number of residents,
- * simulation duration, and an optional random seed. Upon submission, the simulation
- * is started and the user is navigated to the `/overview` page.
+ * This React component provides a form for configuring and starting an agent-based
+ * simulation. Users can select a predefined configuration from the backend and
+ * adjust simulation parameters before starting the simulation.
+ *
+ * Features:
+ * - Loads available simulation configurations from the backend.
+ * - Automatically fills form fields based on the selected configuration.
+ * - Separates basic and advanced simulation settings.
+ * - Sends the selected configuration and modified parameters to the backend.
  *
  * State:
- * - `formData`: An object containing the simulation parameters.
- *   - `nr_households` (number): Number of households for the simulation (default: 10).
- *   - `nr_residents` (number): Number of residents per household (default: 10).
- *   - `simulation_years` (number): Duration of the simulation in years (default: 30).
- *   - `seed` (string): Random seed for the simulation (optional, default: empty string).
+ * - `selectedConfig` (number):
+ *      ID of the currently selected simulation configuration.
+ *
+ * - `showAdvanced` (boolean):
+ *      Controls visibility of advanced configuration settings.
+ *
+ * - `formData` (object):
+ *      Contains all simulation parameters that will be sent to the backend.
  *
  * Props:
  * - None
  *
  * Returns:
- * - A React component that renders a form for configuring the simulation.
+ * - A React component containing the simulation configuration form.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -26,7 +34,90 @@ import { useSimulation } from '../hooks/useSimulation.js';
 import { useSimulationConfigs } from '../hooks/useSimulationConfigs.js';
 import { useNavigate } from '@tanstack/react-router';
 
+
+/**
+ * Basic simulation settings displayed by default.
+ */
+const basicSettings = [
+    {
+        key: "simulation_years",
+        label: "Simulation Duration (years)"
+    },
+    {
+        key: "seed",
+        label: "Random Seed"
+    },
+    {
+        key: "min_nr_houses",
+        label: "Minimum Houses"
+    },
+    {
+        key: "max_nr_houses",
+        label: "Maximum Houses"
+    },
+    {
+        key: "social_norm_radius",
+        label: "Social Norm Radius"
+    }
+];
+
+
+/**
+ * Advanced simulation parameters.
+ * These settings are hidden by default because they are mainly
+ * used for experiments and model calibration.
+ */
+const advancedSettings = [
+    {
+        key: "household_decision_threshold",
+        label: "Household Decision Threshold"
+    },
+    {
+        key: "renovation_cooldown",
+        label: "Renovation Cooldown"
+    },
+    {
+        key: "decision_threshold",
+        label: "Decision Threshold"
+    },
+    {
+        key: "intention_threshold",
+        label: "Intention Threshold"
+    },
+    {
+        key: "attitude_sensitivity",
+        label: "Attitude Sensitivity"
+    },
+    {
+        key: "norm_sensitivity",
+        label: "Norm Sensitivity"
+    },
+    {
+        key: "control_sensitivity",
+        label: "Control Sensitivity"
+    },
+    {
+        key: "weight_attitude",
+        label: "Attitude Weight"
+    },
+    {
+        key: "weight_norm",
+        label: "Norm Weight"
+    },
+    {
+        key: "weight_control",
+        label: "Control Weight"
+    },
+    {
+        key: "random_sensitivities",
+        label: "Random Sensitivities",
+        type: "checkbox"
+    }
+];
+
+
 const ConfigForm = () => {
+
     const { start } = useSimulation();
 
     const {
@@ -35,40 +126,28 @@ const ConfigForm = () => {
     } = useSimulationConfigs();
 
 
+    // Selected backend configuration
     const [selectedConfig, setSelectedConfig] = useState(1);
 
-    const [formData, setFormData] = useState({
-
-        simulation_years: 30,
-
-        seed: '',
-
-        min_nr_houses: '',
-        max_nr_houses: '',
-
-        social_norm_radius: '',
-        subj_norm_level: '',
-
-        household_decision_threshold: '',
-        renovation_cooldown: '',
-
-        intention_threshold: '',
-
-        attitude_sensitivity: '',
-        norm_sensitivity: '',
-        control_sensitivity: '',
-
-        weight_attitude: '',
-        weight_norm: '',
-        weight_control: ''
-
-    });
+    // Controls visibility of advanced settings
+    const [showAdvanced, setShowAdvanced] = useState(false);
 
 
+    // Stores current simulation parameters
+    const [formData, setFormData] = useState({});
+
+
+    /**
+     * Loads available configurations from Flask.
+     */
     useEffect(() => {
         fetchConfigs();
     }, [fetchConfigs]);
 
+
+    /**
+     * Updates form values when a different configuration is selected.
+     */
     useEffect(() => {
 
         const selected = configs[selectedConfig];
@@ -77,152 +156,340 @@ const ConfigForm = () => {
             return;
         }
 
-        console.log("Loading config settings:", selected.settings);
+        console.log(
+            "Loading config settings:",
+            selected.settings
+        );
+
 
         setFormData({
             ...selected.settings,
 
-            // extra frontend opties
+            // Frontend-only simulation options
             simulation_years: 30,
             seed: selected.settings.seed ?? ''
         });
 
     }, [selectedConfig, configs]);
 
-    // Hook for navigation
+
     const navigate = useNavigate();
 
+
     /**
-     * Handles changes to the form inputs.
-     * Updates the `formData` state with the new input values.
+     * Handles changes in input fields.
      *
-     * @param {Object} e - The event object from the input change.
+     * Supports both normal inputs and checkboxes.
      */
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+
+        const {
+            name,
+            value,
+            type,
+            checked
+        } = e.target;
+
+
+        setFormData({
+            ...formData,
+            [name]:
+                type === "checkbox"
+                    ? checked
+                    : value
+        });
     };
+
 
     /**
-     * Handles form submission to start the simulation.
-     * Navigates to the `/overview` page and sends the simulation parameters to the backend.
+     * Generates input fields dynamically based on settings.
      *
-     * @param {Object} e - The event object from the form submission.
+     * @param {string} key - Configuration property name.
+     * @param {string} label - Display label.
+     * @param {string} type - Input type.
      */
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        await navigate({ to: '/overview' });
+    const renderInput = (
+        key,
+        label,
+        type = "number"
+    ) => {
 
-        try {
-            const payload = {
-                ...formData,
-                config_id: selectedConfig,
-                seed: formData.seed === '' ? 0 : Number(formData.seed)
-            };
-            
-            await start(payload);
-        } catch (error) {
-            console.error('Simulation start failed', error);
+
+        if (!(key in formData)) {
+            return null;
         }
+
+
+        return (
+
+            <div
+                className="form-group"
+                key={key}
+            >
+
+                <label
+                    htmlFor={key}
+                    className="form-label"
+                >
+                    {label}
+                </label>
+
+
+                <input
+
+                    type={type}
+
+                    id={key}
+
+                    name={key}
+
+                    value={
+                        type !== "checkbox"
+                            ? formData[key]
+                            : undefined
+                    }
+
+                    checked={
+                        type === "checkbox"
+                            ? formData[key]
+                            : undefined
+                    }
+
+                    onChange={handleChange}
+
+                    className="form-input"
+
+                />
+
+            </div>
+
+        );
     };
 
+
+
+    /**
+     * Starts the simulation.
+     *
+     * Sends selected configuration ID and modified settings
+     * to the backend API.
+     */
+    const handleSubmit = async (e) => {
+
+        e.preventDefault();
+
+        await navigate({
+            to: '/overview'
+        });
+
+
+        try {
+
+            const payload = {
+
+                ...formData,
+
+                config_id: selectedConfig,
+
+                seed:
+                    formData.seed === ''
+                        ? 0
+                        : Number(formData.seed)
+
+            };
+
+
+            await start(payload);
+
+
+        } catch (error) {
+
+            console.error(
+                'Simulation start failed',
+                error
+            );
+
+        }
+
+    };
+
+
+
     return (
+
         <div className="form-container">
+
             <div className="form-wrapper">
+
                 <section className="form-card">
+
+
                     <header className="form-header">
+
                         <h1 className="form-title">
                             Configure Simulation
                         </h1>
+
+
                         <p className="form-subtitle">
                             Select configuration and simulation settings
                         </p>
+
                     </header>
 
-                    <form onSubmit={handleSubmit} className="form-body">
 
-                        {/* Simulation configuration selector */}
+
+                    <form
+                        onSubmit={handleSubmit}
+                        className="form-body"
+                    >
+
+
+                        {/* Configuration selector */}
+
                         <div className="form-group">
+
                             <label className="form-label">
                                 Simulation Configuration
                             </label>
 
+
                             <select
+
                                 className="form-input"
+
                                 value={selectedConfig}
+
                                 onChange={(e) =>
-                                    setSelectedConfig(Number(e.target.value))
+                                    setSelectedConfig(
+                                        Number(e.target.value)
+                                    )
                                 }
+
                             >
-                                {Object.entries(configs).map(([id, config]) => (
-                                    <option
-                                        key={id}
-                                        value={id}
-                                    >
-                                        {config.name ?? `Config ${id}`}
-                                    </option>
-                                ))}
+
+                                {
+                                    Object.entries(configs)
+                                    .map(([id, config]) => (
+
+                                        <option
+                                            key={id}
+                                            value={id}
+                                        >
+                                            {
+                                                config.name ??
+                                                `Config ${id}`
+                                            }
+
+                                        </option>
+
+                                    ))
+                                }
+
                             </select>
+
                         </div>
 
 
-                        {/* Simulation duration */}
-                        <div className="form-group">
-                            <label
-                                htmlFor="simulation_years"
-                                className="form-label"
-                            >
-                                Duration of Simulation (years)
-                            </label>
 
-                            <input
-                                type="number"
-                                id="simulation_years"
-                                name="simulation_years"
-                                value={formData.simulation_years}
-                                onChange={handleChange}
-                                className="form-input"
-                                min="1"
-                                required
-                            />
-                        </div>
+                        <h3>
+                            Simulation Settings
+                        </h3>
 
 
-                        {/* Random seed */}
-                        <div className="form-group">
-                            <label
-                                htmlFor="seed"
-                                className="form-label"
-                            >
-                                Random Seed (optional)
-                            </label>
-
-                            <input
-                                type="number"
-                                id="seed"
-                                name="seed"
-                                value={formData.seed}
-                                onChange={handleChange}
-                                className="form-input"
-                                min="0"
-                                placeholder="0 (default if empty)"
-                            />
-                        </div>
+                        {
+                            basicSettings.map(setting =>
+                                renderInput(
+                                    setting.key,
+                                    setting.label,
+                                    setting.type
+                                )
+                            )
+                        }
 
 
-                        {/* Submit button */}
+
+                        {/* Advanced settings toggle */}
+
                         <button
-                            type="submit"
+
+                            type="button"
+
                             className="form-button"
+
+                            onClick={() =>
+                                setShowAdvanced(!showAdvanced)
+                            }
+
                         >
-                            Start Simulation
+
+                            {
+                                showAdvanced
+                                    ? "Hide Advanced Settings"
+                                    : "Show Advanced Settings"
+                            }
+
                         </button>
 
+
+
+
+                        {
+                            showAdvanced && (
+
+                                <div className="advanced-container">
+
+                                    <h3>
+                                        Advanced Settings
+                                    </h3>
+
+
+                                    {
+                                        advancedSettings.map(setting =>
+                                            renderInput(
+                                                setting.key,
+                                                setting.label,
+                                                setting.type
+                                            )
+                                        )
+                                    }
+
+                                </div>
+
+                            )
+                        }
+
+
+
+                        {/* Start simulation */}
+
+                        <button
+
+                            type="submit"
+
+                            className="form-button"
+
+                        >
+
+                            Start Simulation
+
+                        </button>
+
+
                     </form>
+
+
                 </section>
+
+
             </div>
+
+
         </div>
+
     );
+
 };
+
 
 export default ConfigForm;

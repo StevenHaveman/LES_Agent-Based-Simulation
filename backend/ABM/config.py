@@ -14,7 +14,7 @@ configs = {
         # Environment parameters
         "subjective_norm": 0.0, # Initial environmental influence (0-1)
         "min_nr_houses": 20,
-        "max_nr_houses": 60,---
+        "max_nr_houses": 60,
         "social_norm_radius": 10, # Radius for social norm influence (in meters)
         "subj_norm_level": "Street", # District, Street, Direct
 
