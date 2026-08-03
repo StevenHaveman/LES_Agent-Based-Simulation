@@ -20,21 +20,74 @@
  * - A React component that renders a form for configuring the simulation.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/ConfigForm.css';
 import { useSimulation } from '../hooks/useSimulation.js';
+import { useSimulationConfigs } from '../hooks/useSimulationConfigs.js';
 import { useNavigate } from '@tanstack/react-router';
 
 const ConfigForm = () => {
     const { start } = useSimulation();
 
-    // State to manage form data
+    const {
+        configs,
+        fetchConfigs
+    } = useSimulationConfigs();
+
+
+    const [selectedConfig, setSelectedConfig] = useState(1);
+
     const [formData, setFormData] = useState({
-        nr_households: 10, // Default number of households
-        nr_residents: 10,  // Default number of residents per household
-        simulation_years: 30, // Default simulation duration in years
-        seed: '' // Default random seed (empty string)
+
+        simulation_years: 30,
+
+        seed: '',
+
+        min_nr_houses: '',
+        max_nr_houses: '',
+
+        social_norm_radius: '',
+        subj_norm_level: '',
+
+        household_decision_threshold: '',
+        renovation_cooldown: '',
+
+        intention_threshold: '',
+
+        attitude_sensitivity: '',
+        norm_sensitivity: '',
+        control_sensitivity: '',
+
+        weight_attitude: '',
+        weight_norm: '',
+        weight_control: ''
+
     });
+
+
+    useEffect(() => {
+        fetchConfigs();
+    }, [fetchConfigs]);
+
+    useEffect(() => {
+
+        const selected = configs[selectedConfig];
+
+        if (!selected) {
+            return;
+        }
+
+        console.log("Loading config settings:", selected.settings);
+
+        setFormData({
+            ...selected.settings,
+
+            // extra frontend opties
+            simulation_years: 30,
+            seed: selected.settings.seed ?? ''
+        });
+
+    }, [selectedConfig, configs]);
 
     // Hook for navigation
     const navigate = useNavigate();
@@ -63,6 +116,7 @@ const ConfigForm = () => {
         try {
             const payload = {
                 ...formData,
+                config_id: selectedConfig,
                 seed: formData.seed === '' ? 0 : Number(formData.seed)
             };
             
@@ -77,13 +131,50 @@ const ConfigForm = () => {
             <div className="form-wrapper">
                 <section className="form-card">
                     <header className="form-header">
-                        <h1 className="form-title">Configure Simulation</h1>
-                        <p className="form-subtitle">Put Starting Values</p>
+                        <h1 className="form-title">
+                            Configure Simulation
+                        </h1>
+                        <p className="form-subtitle">
+                            Select configuration and simulation settings
+                        </p>
                     </header>
+
                     <form onSubmit={handleSubmit} className="form-body">
-                        {/* Input for simulation duration */}
+
+                        {/* Simulation configuration selector */}
                         <div className="form-group">
-                            <label htmlFor="simulation_years" className="form-label">Duration of Simulation (years)</label>
+                            <label className="form-label">
+                                Simulation Configuration
+                            </label>
+
+                            <select
+                                className="form-input"
+                                value={selectedConfig}
+                                onChange={(e) =>
+                                    setSelectedConfig(Number(e.target.value))
+                                }
+                            >
+                                {Object.entries(configs).map(([id, config]) => (
+                                    <option
+                                        key={id}
+                                        value={id}
+                                    >
+                                        {config.name ?? `Config ${id}`}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+
+                        {/* Simulation duration */}
+                        <div className="form-group">
+                            <label
+                                htmlFor="simulation_years"
+                                className="form-label"
+                            >
+                                Duration of Simulation (years)
+                            </label>
+
                             <input
                                 type="number"
                                 id="simulation_years"
@@ -96,9 +187,16 @@ const ConfigForm = () => {
                             />
                         </div>
 
-                        {/* Input for random seed */}
+
+                        {/* Random seed */}
                         <div className="form-group">
-                            <label htmlFor="seed" className="form-label">Random Seed (optional)</label>
+                            <label
+                                htmlFor="seed"
+                                className="form-label"
+                            >
+                                Random Seed (optional)
+                            </label>
+
                             <input
                                 type="number"
                                 id="seed"
@@ -111,6 +209,7 @@ const ConfigForm = () => {
                             />
                         </div>
 
+
                         {/* Submit button */}
                         <button
                             type="submit"
@@ -118,6 +217,7 @@ const ConfigForm = () => {
                         >
                             Start Simulation
                         </button>
+
                     </form>
                 </section>
             </div>

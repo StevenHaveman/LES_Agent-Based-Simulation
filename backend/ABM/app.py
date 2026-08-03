@@ -12,6 +12,7 @@ from py_compile import main
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from main import run_simulation, graphics_data, households_data, households_historical_data, kpi_data
+import config_utils
 import utilities
 import threading
 import traceback
@@ -298,7 +299,6 @@ def heat_grid():
 
     return jsonify({"status": "ok"})
 
-
 @app.route("/update_social_norm_radius", methods=["POST"])
 def update_social_norm_radius():
     if main.model is None:
@@ -338,6 +338,11 @@ def update_social_norm_radius():
         "status": "ok",
         "social_norm_radius": radius
     })
+
+@app.route("/simulation/configs", methods=["GET"])
+def get_configs():
+
+    return jsonify(config_utils.get_frontend_configs())
 
 
 if __name__ == '__main__':
