@@ -43,7 +43,7 @@ class Environment(Model):
 
         print(self.config)
 
-        self.package_data = utilities.load_package_data("data/15_package_steps.xlsx")
+        self.package_data = utilities.load_package_data(config["package_data_path"])
         self.policy = PolicyInterventions(self)
         self.sustainability_packages = []
         for _, row in self.package_data.iterrows():
@@ -65,10 +65,10 @@ class Environment(Model):
         }
     
         self.households = []  # gewone Python-lijst voor filteren/gemak
-        self.gis_data = utilities.load_gis_data("data/AmstelHeuvelWijk2_TableToExcel.xlsx")
+        self.gis_data = utilities.load_gis_data(config["gis_data_path"])
         self.residents = []  # gewone Python-lijst voor filteren/gemak
-        self.survey_data = utilities.load_survey_data("data/survey_data.xlsx")
-        self.survey_cluster_profiles = utilities.load_survey_cluster_profiles("data/survey_cluster_profiles.xlsx")
+        self.survey_data = utilities.load_survey_data(config["survey_data_path"])
+        self.survey_cluster_profiles = utilities.load_survey_cluster_profiles(config["survey_cluster_profiles_path"])
         self.income_distribution = (utilities.calculate_income_distribution(self.survey_data))
         # Social norm settings
         self.social_norm_radius = self.config.get("social_norm_radius", 500)  # Default to 500 meters if not specified in config

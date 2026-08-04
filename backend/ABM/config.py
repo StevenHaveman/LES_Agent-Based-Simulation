@@ -8,8 +8,10 @@ configs = {
         "config_name": "Default Config",
         # Main simulation startup parameters
         "seed": random.randint(0,100000),
-        "gis_data_path": None, # Path to GIS data file
-        "survey_data_path": None, # Path to survey data file
+        "gis_data_path": "data/AmstelHeuvelWijk2_TableToExcel.xlsx", # Path to GIS data file
+        "survey_data_path": "data/survey_data.xlsx" , # Path to survey data file
+        "package_data_path": "data/15_package_steps.xlsx", # Path to package data file
+        "survey_cluster_profiles_path": "data/survey_cluster_profiles.xlsx", # Path to survey cluster profiles file
 
         # Environment parameters
         "subjective_norm": 0.0, # Initial environmental influence (0-1)
@@ -58,8 +60,10 @@ configs = {
         "config_name": "Test Config",
         # Main simulation startup parameters
         "seed": random.randint(0,100000),
-        "gis_data_path": None, # Path to GIS data file
-        "survey_data_path": None, # Path to survey data file
+        "gis_data_path": "data/AmstelHeuvelWijk2_TableToExcel.xlsx", # Path to GIS data file
+        "survey_data_path": "data/survey_data.xlsx" , # Path to survey data file
+        "package_data_path": "data/15_package_steps.xlsx", # Path to package data file
+        "survey_cluster_profiles_path": "data/survey_cluster_profiles.xlsx", # Path to survey cluster profiles file
 
         # Environment parameters
         "subjective_norm": 0.0, # Initial environmental influence (0-1)
