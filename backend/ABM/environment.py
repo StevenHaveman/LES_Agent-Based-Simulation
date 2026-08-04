@@ -31,19 +31,19 @@ class Environment(Model):
         yearly_stats (list[dict]): List to store aggregated data collected each year.
     """
     # def __init__(self, nr_households, nr_residents): # Maybe no longer needed when we create households based on GIS data, and survey data for residents.
-    def __init__(self):
+    def __init__(self,config):
         """
         Initializes the simulation environment.
 
         Args:
-            nr_households (int): The total number of households to create.
-            nr_residents (int): The total number of residents to create and
-                                distribute among households.
+            config_id (int): The ID of the configuration to use for the simulation.
         """
         super().__init__()
-        self.config_id, self.config = utilities.choose_config() # Load the chosen configuration This is not used in the frontend defaults to config 1
+        self.config = config # save the given config for later use in the model
 
-        self.package_data = utilities.load_package_data("data/15_package_steps.xlsx")
+        print(self.config)
+
+        self.package_data = utilities.load_package_data(config["package_data_path"])
         self.policy = PolicyInterventions(self)
         self.sustainability_packages = []
         for _, row in self.package_data.iterrows():
@@ -65,10 +65,10 @@ class Environment(Model):
         }
     
         self.households = []  # gewone Python-lijst voor filteren/gemak
-        self.gis_data = utilities.load_gis_data("data/AmstelHeuvelWijk2_TableToExcel.xlsx")
+        self.gis_data = utilities.load_gis_data(config["gis_data_path"])
         self.residents = []  # gewone Python-lijst voor filteren/gemak
-        self.survey_data = utilities.load_survey_data("data/survey_data.xlsx")
-        self.survey_cluster_profiles = utilities.load_survey_cluster_profiles("data/survey_cluster_profiles.xlsx")
+        self.survey_data = utilities.load_survey_data(config["survey_data_path"])
+        self.survey_cluster_profiles = utilities.load_survey_cluster_profiles(config["survey_cluster_profiles_path"])
         self.income_distribution = (utilities.calculate_income_distribution(self.survey_data))
         # Social norm settings
         self.social_norm_radius = self.config.get("social_norm_radius", 500)  # Default to 500 meters if not specified in config
@@ -364,50 +364,88 @@ class Environment(Model):
 
         return environment_data
     
-    def setup_data_structure(self, file_name) -> None:       
+    def setup_data_structure(self, file_name) -> None:
+        """
+        Creates the initial JSON structure for storing simulation results,
+        resident history, environment data and LLM conversations.
+        """
+
         data = {
-            "metadata":{
-                "config_id": self.config_id,
-                "nr_households": self.config['nr_households'],
-                "nr_residents": self.config['nr_residents'],
-                "simulation_years": self.config['simulation_years'],
-                "subjective_norm": self.config['subjective_norm'],
+            "metadata": {
+                "config": self.config
             },
+
             "simulation_years": {
                 f"year {year}": {
                     "residents_data": {},
                     "environment_data": {}
-                } for year in range(1, self.config['simulation_years'] + 1)
+                }
+                for year in range(1, self.config["simulation_years"] + 1)
             },
+
             "conversation_history": {
-                "residents": {resident.unique_id: [] for resident in self.residents},
+                "residents": {
+                    resident.unique_id: []
+                    for resident in self.residents
+                }
             }
         }
 
-        # Dump to the json file
-        with open(file_name, 'w+') as file:
-            json.dump(data, file, indent=4)
+        with open(file_name, "w", encoding="utf-8") as file:
+            json.dump(
+                utilities.make_json_serializable(data),
+                file,
+                indent=4
+            )
 
-    def export_data(self, file_name, year: int) -> None: # TODO I dont believe this is working as a button in the GUI yet?
+    def export_data(self, file_name, year: int) -> None:
+        """
+        Export simulation data for a specific simulation year.
+
+        Stores:
+        - Resident behavioural data (RAA variables)
+        - Household information
+        - Environment statistics
+
+        The exported JSON file is also used by the LLM handler to provide
+        historical context about residents.
+        """
+
         if not os.path.exists(file_name):
-            raise FileNotFoundError(f"Data file {file_name} not found.")
+            raise FileNotFoundError(
+                f"Data file {file_name} not found."
+            )
 
-        # Load current JSON data
-        with open(file_name, 'r') as file:
+        with open(file_name, "r", encoding="utf-8") as file:
             data = json.load(file)
+
 
         year_key = f"year {year}"
 
+        if year_key not in data["simulation_years"]:
+            data["simulation_years"][year_key] = {
+                "residents_data": {},
+                "environment_data": {}
+            }
+
+
         for resident in self.residents:
-            resident_data = resident.collect_resident_data()
-            data['simulation_years'][year_key]['residents_data'][resident.unique_id] = resident_data
+            data["simulation_years"][year_key]["residents_data"][
+                str(resident.unique_id)
+            ] = resident.collect_resident_data()
 
-        environment_data = self.collect_environment_data()
-        data['simulation_years'][year_key]['environment_data'] = environment_data
 
-        # Save to file
-        with open(file_name, 'w') as file:
-            json.dump(data, file, indent=4)       
+        data["simulation_years"][year_key]["environment_data"] = (
+            self.collect_environment_data()
+        )
+
+
+        with open(file_name, "w", encoding="utf-8") as file:
+            json.dump(
+                utilities.make_json_serializable(data),
+                file,
+                indent=4
+            )   
 
     def collect_start_of_year_data(self, year):
         """

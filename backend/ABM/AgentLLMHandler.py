@@ -104,58 +104,141 @@ class AgentLLMHandler:
 
     def _get_system_prompt_second_version(self, max_years=5):
         """
-        System prompt using historical behavior data for the agent.
+        Creates a system prompt containing the resident's historical behavioural data.
+
+        The prompt summarizes the resident's psychological state over the most
+        recent simulation years based on the RAA (Reasoned Action Approach) model.
+
+        Included behavioural components:
+        - Attitude towards sustainable renovation
+        - Perceived social norm
+        - Perceived behavioural control (PBC)
+        - Behavioural intention
+        - Previous renovation decisions
+
+        The historical data is translated into natural language context so the LLM
+        can respond as the simulated resident while maintaining behavioural
+        consistency over time.
         """
+
         data = self._load_json()
+
         if "simulation_years" not in data:
             return self._get_system_prompt()
 
-        year_data_list = []
+        history = []
 
+        # Collect historical data for the current resident
         for year_key, year_info in data["simulation_years"].items():
+
             try:
                 year_number = int(year_key.split()[-1])
-                resident_data = year_info["residents_data"].get(str(self.current_agent_id), {})
-                if not resident_data:
+
+                resident_data = (
+                    year_info["residents_data"]
+                    .get(str(self.current_agent_id))
+                )
+
+                if resident_data is None:
                     continue
 
-                attitude = resident_data.get("attitude", 0.0)
-                subj_norm = resident_data.get("subj_norm", {})
-                behavioral_control = resident_data.get("behavioral_control", {})
-                year_data_list.append((year_number, attitude, subj_norm, behavioral_control))
+                history.append({
+                    "year": year_number,
+
+                    # RAA variables
+                    "attitude": resident_data.get("attitude", 0.0),
+                    "perceived_norm": resident_data.get("perceived_norm", 0.0),
+                    "survey_pbc": resident_data.get("survey_pbc", 0.0),
+                    "intention": resident_data.get("intention", 0.0),
+                    "intention_threshold": resident_data.get("intention_threshold", 0.7),
+
+                    # Behavioural outcome
+                    "wants_to_renovate": resident_data.get("wants_to_renovate", False),
+
+                    # Resident profile
+                    "action_score": resident_data.get("action_score", 0.0),
+                    "cluster_type": resident_data.get("cluster_type", "Unknown"),
+                })
+
             except (KeyError, ValueError):
                 continue
 
-        year_data_list = sorted(year_data_list, key=lambda x: x[0], reverse=True)[:max_years]
-        year_data_list = sorted(year_data_list, key=lambda x: x[0])  # Oldest first
 
-        if not year_data_list:
+        # Keep only the most recent years
+        history = sorted(
+            history,
+            key=lambda x: x["year"],
+            reverse=True
+        )[:max_years]
+
+        # Restore chronological order
+        history.reverse()
+
+
+        if not history:
             return self._get_system_prompt()
 
-        year_lines = []
-        for year, att, sn_dict, bc_dict in year_data_list:
-            sn_str = ", ".join(f"{k}: {v:.2f}" for k, v in sn_dict.items())
-            bc_str = ", ".join(f"{k}: {v:.2f}" for k, v in bc_dict.items())
-            year_lines.append(
-                f"(Year {year})\n"
-                f"  Attitude: {att:.2f}\n"
-                f"  Subjective Norms: {sn_str}\n"
-                f"  Perceived Behavioral Control: {bc_str}"
+
+        history_lines = []
+
+        for entry in history:
+
+            history_lines.append(
+                f"(Year {entry['year']})\n"
+                f"  Attitude towards sustainability: "
+                f"{entry['attitude']:.2f}\n"
+                f"  Perceived Social Norm: "
+                f"{entry['perceived_norm']:.2f}\n"
+                f"  Perceived Behavioural Control: "
+                f"{entry['survey_pbc']:.2f}\n"
+                f"  Behavioural Intention: "
+                f"{entry['intention']:.2f}\n"
+                f"  Renovation threshold: "
+                f"{entry['intention_threshold']:.2f}\n"
+                f"  Wanted to renovate: "
+                f"{entry['wants_to_renovate']}\n"
+                f"  Action score: "
+                f"{entry['action_score']:.2f}"
             )
 
-        score_block = "\n".join(year_lines)
+
+        history_block = "\n\n".join(history_lines)
+
+        # Latest cluster type represents current resident profile
+        cluster = history[-1]["cluster_type"]
+
 
         return {
-            'role': 'system',
-            'content': (
-                "You are a resident in a neighborhood and will be asked about your opinion on sustainable energy solutions for your home.\n"
-                "Your answer should reflect how your attitude, social influences, and financial control changed over time.\n"
-                "Here is your historical behavior data:\n"
-                f"{score_block}\n"
-                "Please answer within 150 words."
+            "role": "system",
+            "content": (
+
+                "You are a resident living in a Dutch neighbourhood. "
+                "You participate in a simulation about household sustainability "
+                "and renovation decisions.\n\n"
+
+                f"You belong to the '{cluster}' behavioural cluster.\n\n"
+
+                "Your responses should represent this resident's personal "
+                "opinion and remain consistent with their historical behaviour.\n\n"
+
+                "Consider the following behavioural factors:\n"
+                "- Attitude towards sustainable renovation.\n"
+                "- Perceived social norm from neighbours and surroundings.\n"
+                "- Perceived behavioural control, such as financial and practical "
+                "ability.\n"
+                "- Behavioural intention and previous renovation decisions.\n\n"
+
+                "Historical behavioural development:\n"
+                f"{history_block}\n\n"
+
+                "Answer as if you are this resident. "
+                "Do not mention numerical scores or simulation variables. "
+                "Translate the behavioural information into realistic opinions, "
+                "motivations, concerns and personal reasoning.\n"
+
+                "Keep your answer below 150 words."
             )
         }
-
     def _init_conversation(self, agent_id):
         """
         Initializes the conversation by loading previous history or inserting system prompt.

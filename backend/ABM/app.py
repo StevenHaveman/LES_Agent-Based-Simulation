@@ -12,6 +12,7 @@ from py_compile import main
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from main import run_simulation, graphics_data, households_data, households_historical_data, kpi_data
+import config_utils
 import utilities
 import threading
 import traceback
@@ -38,6 +39,14 @@ def start_simulation():
     global simulation_thread, simulation_running
 
     data = request.get_json()
+    config_id = int(data["config_id"])
+
+    simulation_config = config.configs[config_id].copy()
+
+    for key, value in data.items():
+
+        if key in simulation_config:
+            simulation_config[key] = value
 
     if simulation_thread and simulation_thread.is_alive():
         return jsonify({
@@ -48,6 +57,9 @@ def start_simulation():
     try:
         simulation_years = int(data.get("simulation_years"))
         seed = int(data.get("seed", config.configs[config_id].get("seed", None)))
+
+        simulation_config["simulation_years"] = simulation_years
+        simulation_config["seed"] = seed
     except (ValueError, TypeError) as e:
         return jsonify({
             "status": "error",
@@ -61,7 +73,8 @@ def start_simulation():
         try:
             print("=== Simulation started ===")
             run_simulation(
-                seed=seed
+                simulation_years=simulation_years,
+                config=simulation_config
             )
             print("=== Simulation finished ===")
         except Exception as e:
@@ -298,7 +311,6 @@ def heat_grid():
 
     return jsonify({"status": "ok"})
 
-
 @app.route("/update_social_norm_radius", methods=["POST"])
 def update_social_norm_radius():
     if main.model is None:
@@ -338,6 +350,11 @@ def update_social_norm_radius():
         "status": "ok",
         "social_norm_radius": radius
     })
+
+@app.route("/simulation/configs", methods=["GET"])
+def get_configs():
+
+    return jsonify(config_utils.get_frontend_configs())
 
 
 if __name__ == '__main__':
