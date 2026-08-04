@@ -364,29 +364,39 @@ class Environment(Model):
 
         return environment_data
     
-    def setup_data_structure(self, file_name) -> None:       
+    def setup_data_structure(self, file_name) -> None:
+        """
+        Creates the initial JSON structure for storing simulation results,
+        resident history, environment data and LLM conversations.
+        """
+
         data = {
-            "metadata":{
-                "config_id": self.config_id,
-                "nr_households": self.config['nr_households'],
-                "nr_residents": self.config['nr_residents'],
-                "simulation_years": self.config['simulation_years'],
-                "subjective_norm": self.config['subjective_norm'],
+            "metadata": {
+                "config": self.config
             },
+
             "simulation_years": {
                 f"year {year}": {
                     "residents_data": {},
                     "environment_data": {}
-                } for year in range(1, self.config['simulation_years'] + 1)
+                }
+                for year in range(1, self.config["simulation_years"] + 1)
             },
+
             "conversation_history": {
-                "residents": {resident.unique_id: [] for resident in self.residents},
+                "residents": {
+                    resident.unique_id: []
+                    for resident in self.residents
+                }
             }
         }
 
-        # Dump to the json file
-        with open(file_name, 'w+') as file:
-            json.dump(data, file, indent=4)
+        with open(file_name, "w", encoding="utf-8") as file:
+            json.dump(
+                utilities.make_json_serializable(data),
+                file,
+                indent=4
+            )
 
     def export_data(self, file_name, year: int) -> None:
         """
@@ -406,15 +416,12 @@ class Environment(Model):
                 f"Data file {file_name} not found."
             )
 
-        # Load existing simulation data
         with open(file_name, "r", encoding="utf-8") as file:
             data = json.load(file)
 
 
         year_key = f"year {year}"
 
-
-        # Ensure yearly structure exists
         if year_key not in data["simulation_years"]:
             data["simulation_years"][year_key] = {
                 "residents_data": {},
@@ -422,29 +429,23 @@ class Environment(Model):
             }
 
 
-        # Store resident-level behavioural information
         for resident in self.residents:
-
-            resident_data = resident.collect_resident_data()
-
             data["simulation_years"][year_key]["residents_data"][
                 str(resident.unique_id)
-            ] = resident_data
+            ] = resident.collect_resident_data()
 
 
-        # Store environment-level information
         data["simulation_years"][year_key]["environment_data"] = (
             self.collect_environment_data()
         )
 
 
-        # Save updated simulation data
         with open(file_name, "w", encoding="utf-8") as file:
             json.dump(
-                data,
+                utilities.make_json_serializable(data),
                 file,
                 indent=4
-            )    
+            )   
 
     def collect_start_of_year_data(self, year):
         """

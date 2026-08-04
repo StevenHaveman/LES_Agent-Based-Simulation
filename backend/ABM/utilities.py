@@ -10,6 +10,7 @@ import random
 from pandas import test
 import config
 import pandas as pd
+import numpy as np
 
 def gen_random_value(range_min: float, range_max: float):
     """
@@ -151,3 +152,31 @@ def generate_income(income_distribution): #TODO Add to config to give new income
     values = list(range(min_income, max_income + 1, step))
 
     return random.choice(values)
+
+def make_json_serializable(obj):
+    """
+    Converts numpy data types into native Python types
+    so they can be stored in JSON format.
+    """
+    if isinstance(obj, dict):
+        return {
+            key: make_json_serializable(value)
+            for key, value in obj.items()
+        }
+
+    if isinstance(obj, list):
+        return [
+            make_json_serializable(value)
+            for value in obj
+        ]
+
+    if isinstance(obj, np.bool_):
+        return bool(obj)
+
+    if isinstance(obj, np.integer):
+        return int(obj)
+
+    if isinstance(obj, np.floating):
+        return float(obj)
+
+    return obj

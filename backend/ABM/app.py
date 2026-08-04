@@ -57,6 +57,9 @@ def start_simulation():
     try:
         simulation_years = int(data.get("simulation_years"))
         seed = int(data.get("seed", config.configs[config_id].get("seed", None)))
+
+        simulation_config["simulation_years"] = simulation_years
+        simulation_config["seed"] = seed
     except (ValueError, TypeError) as e:
         return jsonify({
             "status": "error",
