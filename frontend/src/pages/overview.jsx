@@ -3,7 +3,7 @@ import { createRoute } from '@tanstack/react-router';
 import { rootRoute } from './root';
 import '../styles/overviewpage.css';
 import '../styles/globalPageStyles.css';
-import { OverviewProvider, useOverviewState } from '../state/overviewState.jsx';
+import { OverviewProvider, useOverviewState, useOverviewDispatch } from '../state/overviewState.jsx';
 
 import GraphicsView from '../components/GraphicsView.jsx';
 import MapView from '../components/MapView.jsx';
@@ -28,6 +28,7 @@ const simulationYearStart = 2024;
 
 function OverviewContent() {
     const state = useOverviewState();
+    const dispatch = useOverviewDispatch();
     const [showGraphOptions, setShowGraphOptions] = useState(false);
     const [selectedGraphs, setSelectedGraphs] = useState([
         'cluster_behavior_trends',
@@ -51,19 +52,29 @@ function OverviewContent() {
     
     const year = useSimulationYear();
     const houses = useMapData(year);
-
     useEffect(() => {
-        if (selectedHouse && houses.length > 0) {
-            const updatedHouse = houses.find(h => h.id === selectedHouse.id);
-            if (updatedHouse) {
-                setSelectedHouse(updatedHouse);
-            }
+        if (!state.selectedHouseholdId || houses.length === 0) {
+            return;
         }
-    }, [houses]);
+
+        const savedHouse = houses.find(
+            h => h.id === state.selectedHouseholdId
+        );
+
+        if (savedHouse) {
+            setSelectedHouse(savedHouse);
+        }
+
+    }, [houses, state.selectedHouseholdId]);
 
     const handleHouseClick = (house) => {
         setSelectedHouse(house);
         setSelectedResidentIndex(0);
+
+        dispatch({
+            type: 'SELECT_HOUSEHOLD',
+            payload: house,
+        });
     };
 
     const handleToggleLabel = (label) => {
