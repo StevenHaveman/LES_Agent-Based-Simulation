@@ -17,61 +17,148 @@ const GraphicsView = ({
     graphOptions = GRAPH_OPTIONS,
     graphSlots = graphSlotsTotal,
 }) => {
+
     const [simulationData, setSimulationData] = React.useState([]);
     const [households, setHouseholds] = React.useState([]);
+
     const lastYearRef = React.useRef(null);
 
+    // Hooks moeten hier staan
+    const overview = useOverview();
+    const simulationRun = useSimulationRun();
+
+
     React.useEffect(() => {
+
         let intervalId;
 
+
         const fetchData = async () => {
-            const result = await useOverview().getSimulationGraphicResults();
 
-            const latestYear = result[result.length - 1]?.year;
+            try {
 
-            if (latestYear !== lastYearRef.current) {
-                lastYearRef.current = latestYear;
+                const result = await overview.getSimulationGraphicResults();
 
-                setSimulationData(result);
+                if (!result || result.length === 0) {
+                    return;
+                }
 
-                const householdData = await useOverview().fetchHouseholds();
 
-                setHouseholds(householdData);
+                const latestYear = result[result.length - 1]?.year;
+
+
+                // Update alleen als nieuwe data beschikbaar is
+                if (latestYear !== lastYearRef.current) {
+
+                    lastYearRef.current = latestYear;
+
+                    setSimulationData(result);
+
+
+                    const householdData =
+                        await overview.fetchHouseholds();
+
+
+                    setHouseholds(householdData);
+                }
+
+
+            } catch (error) {
+
+                console.error(
+                    "Failed loading graphics data:",
+                    error
+                );
+
             }
+
         };
+
 
         const start = async () => {
-            const seconds = 6;
-            const multiplier = 1000;
 
-            const res = await useSimulationRun().getSimulationDelay();
-            const delay = (parseInt(res.delay) || seconds) * multiplier;
+            try {
 
-            await fetchData();
+                const defaultDelay = 6;
 
-            intervalId = setInterval(fetchData, delay);
+                const res =
+                    await simulationRun.getSimulationDelay();
+
+
+                const delay =
+                    (parseInt(res.delay) || defaultDelay) * 1000;
+
+
+                // Eerste keer direct laden
+                await fetchData();
+
+
+                intervalId = setInterval(
+                    fetchData,
+                    delay
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Failed starting graphics polling:",
+                    error
+                );
+
+            }
+
         };
+
 
         start();
 
-        return () => clearInterval(intervalId);
-    }, []);
+
+        return () => {
+
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+
+        };
+
+
+    }, [overview, simulationRun]);
+
+
 
     const graphItems = selectedGraphs.map((key) => {
-        const option = GRAPH_OPTIONS.find((item) => item.key === key);
+
+        const option =
+            GRAPH_OPTIONS.find(
+                (item) => item.key === key
+            );
+
 
         return {
             key,
             title: option ? option.label : key,
         };
+
     });
 
+
+
     return (
+
         <div className="graphics-view-container">
+
             <div className="graphic-wrapper">
+
                 <div className="graphics-header">
-                    <h3 className="graphics-title-centered">Neighborhood Trends</h3>
+
+                    <h3 className="graphics-title-centered">
+                        Neighborhood Trends
+                    </h3>
+
+
                     <div className="graphics-chooser">
+
                         <GraphSelector
                             showOptions={showOptions}
                             setShowOptions={setShowOptions}
@@ -80,10 +167,15 @@ const GraphicsView = ({
                             graphOptions={graphOptions}
                             graphSlots={graphSlots}
                         />
+
                     </div>
+
                 </div>
 
+
+
                 {graphItems.map((item) => (
+
                     <Graphic
                         key={item.key}
                         title={item.title}
@@ -91,19 +183,46 @@ const GraphicsView = ({
                         simulationData={simulationData}
                         households={households}
                     />
+
                 ))}
+
+
             </div>
+
         </div>
+
     );
+
 };
 
+
+
 GraphicsView.propTypes = {
-    selectedGraphs: PropTypes.arrayOf(PropTypes.string).isRequired,
-    showOptions: PropTypes.bool,
-    setShowOptions: PropTypes.func,
-    handleGraphChange: PropTypes.func,
-    graphOptions: PropTypes.arrayOf(PropTypes.object),
-    graphSlots: PropTypes.number,
+
+    selectedGraphs:
+        PropTypes.arrayOf(
+            PropTypes.string
+        ).isRequired,
+
+    showOptions:
+        PropTypes.bool,
+
+    setShowOptions:
+        PropTypes.func,
+
+    handleGraphChange:
+        PropTypes.func,
+
+    graphOptions:
+        PropTypes.arrayOf(
+            PropTypes.object
+        ),
+
+    graphSlots:
+        PropTypes.number,
+
 };
+
+
 
 export default GraphicsView;
