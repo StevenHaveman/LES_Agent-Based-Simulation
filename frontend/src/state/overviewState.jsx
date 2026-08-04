@@ -5,7 +5,9 @@ const OverviewStateContext = createContext(null);
 const OverviewDispatchContext = createContext(null);
 
 const initialState = {
-    selectedHouseholdId: null,
+    selectedHouseholdId: localStorage.getItem('selectedHouseholdId')
+        ? Number(localStorage.getItem('selectedHouseholdId'))
+        : null,
     selectedResidents: [],
     selectedResidentIndex: null,
     householdWindow: '',
@@ -16,6 +18,11 @@ const initialState = {
 function reducer(state, action) {
     switch (action.type) {
         case 'SELECT_HOUSEHOLD':
+            localStorage.setItem(
+                'selectedHouseholdId',
+                action.payload.id
+            );
+
             return {
                 ...state,
                 selectedHouseholdId: action.payload.id,
