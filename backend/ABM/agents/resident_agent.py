@@ -124,6 +124,15 @@ class Resident(Agent):
             # action score from cluster 
             "action_score": self.action_score,
 
+            # NEW: behavioural intention from RAA model
+            "intention": self.intention,
+            "intention_threshold": self.intention_threshold,
+
+            # NEW: intention calculation weights
+            "weight_attitude": self.config.get("weight_attitude", 1.0),
+            "weight_norm": self.config.get("weight_norm", 1.0),
+            "weight_control": self.config.get("weight_control", 1.0),
+
             # NEW: actual household constraint (optional but very useful for analysis)
             "household_actual_control": {
                 p.name: self.household.actual_control[p.name]

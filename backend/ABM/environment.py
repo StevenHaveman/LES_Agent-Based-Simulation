@@ -388,26 +388,63 @@ class Environment(Model):
         with open(file_name, 'w+') as file:
             json.dump(data, file, indent=4)
 
-    def export_data(self, file_name, year: int) -> None: # TODO I dont believe this is working as a button in the GUI yet?
-        if not os.path.exists(file_name):
-            raise FileNotFoundError(f"Data file {file_name} not found.")
+    def export_data(self, file_name, year: int) -> None:
+        """
+        Export simulation data for a specific simulation year.
 
-        # Load current JSON data
-        with open(file_name, 'r') as file:
+        Stores:
+        - Resident behavioural data (RAA variables)
+        - Household information
+        - Environment statistics
+
+        The exported JSON file is also used by the LLM handler to provide
+        historical context about residents.
+        """
+
+        if not os.path.exists(file_name):
+            raise FileNotFoundError(
+                f"Data file {file_name} not found."
+            )
+
+        # Load existing simulation data
+        with open(file_name, "r", encoding="utf-8") as file:
             data = json.load(file)
+
 
         year_key = f"year {year}"
 
+
+        # Ensure yearly structure exists
+        if year_key not in data["simulation_years"]:
+            data["simulation_years"][year_key] = {
+                "residents_data": {},
+                "environment_data": {}
+            }
+
+
+        # Store resident-level behavioural information
         for resident in self.residents:
+
             resident_data = resident.collect_resident_data()
-            data['simulation_years'][year_key]['residents_data'][resident.unique_id] = resident_data
 
-        environment_data = self.collect_environment_data()
-        data['simulation_years'][year_key]['environment_data'] = environment_data
+            data["simulation_years"][year_key]["residents_data"][
+                str(resident.unique_id)
+            ] = resident_data
 
-        # Save to file
-        with open(file_name, 'w') as file:
-            json.dump(data, file, indent=4)       
+
+        # Store environment-level information
+        data["simulation_years"][year_key]["environment_data"] = (
+            self.collect_environment_data()
+        )
+
+
+        # Save updated simulation data
+        with open(file_name, "w", encoding="utf-8") as file:
+            json.dump(
+                data,
+                file,
+                indent=4
+            )    
 
     def collect_start_of_year_data(self, year):
         """
