@@ -24,13 +24,19 @@ export const triggerHeatGridAnnouncement = async () => {
     return response.json();
 };
 
-export const triggerFinancialSubsidy = async () => {
+export const triggerFinancialSubsidy = async (amount) => {
     const response = await fetch(`${BASE_URL}/policy/financial_subsidy`, {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            amount: amount,
+        }),
     });
 
     if (!response.ok) {
-        throw new Error('Failed to announce financial subsidy');
+        throw new Error('Failed to apply financial subsidy');
     }
 
     return response.json();
