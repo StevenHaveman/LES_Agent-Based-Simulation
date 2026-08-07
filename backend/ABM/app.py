@@ -290,16 +290,34 @@ def financial_subsidy():
     if main.model is None:
         return jsonify({"error": "Simulation not running"}), 400
 
-    amount = 5000
+    data = request.get_json()
+
+    if data is None:
+        return jsonify({"error": "No data received"}), 400
+
+    amount = data.get("amount", 0)
+
+    try:
+        amount = float(amount)
+    except (TypeError, ValueError):
+        return jsonify({"error": "Invalid subsidy amount"}), 400
+
+    if amount < 0:
+        return jsonify({"error": "Subsidy amount cannot be negative"}), 400
 
     main.model.policy.financial_subsidy(amount)
 
     main.model.log_municipality_event(
         "Financial Subsidy",
-        {"amount": amount}
+        {
+            "amount": amount
+        }
     )
 
-    return jsonify({"status": "ok"})
+    return jsonify({
+        "status": "ok",
+        "amount": amount
+    })
 
 @app.route("/policy/heat_grid", methods=["POST"])
 def heat_grid():
