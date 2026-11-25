@@ -65,7 +65,7 @@ class Environment(Model):
         }
     
         self.households = []  # gewone Python-lijst voor filteren/gemak
-        self.gis_data = utilities.load_gis_data(config["gis_data_path"])
+        self.gis_data = utilities.load_gis_data(config["gis_data_path"], config.get("gis_column_map"))
         self.residents = []  # gewone Python-lijst voor filteren/gemak
         self.survey_data = utilities.load_survey_data(config["survey_data_path"])
         self.survey_cluster_profiles = utilities.load_survey_cluster_profiles(config["survey_cluster_profiles_path"])

@@ -2,6 +2,33 @@ import random
 
 CHOSEN_CONFIG = 1
 
+# Neighbourhoods that can be simulated. The frontend shows these as a dropdown;
+# the chosen area's GIS file replaces "gis_data_path" in the run config.
+# "column_map" renames columns of a GIS file to the names the model expects
+# (see utilities.load_gis_data) when a file uses a different export layout.
+DEFAULT_AREA = "amstelheuvelwijk"
+
+AREAS = {
+    "amstelheuvelwijk": {
+        "name": "Amstelheuvelwijk (Leidschendam)",
+        "gis_data_path": "data/AmstelHeuvelWijk2_TableToExcel.xlsx",
+        "column_map": {},
+    },
+    "generalenbuurt": {
+        "name": "Generalenbuurt (Eindhoven)",
+        "gis_data_path": "data/Adres_BB_GHS_TableToExcel.xlsx",
+        "column_map": {
+            "oppervlakte": "Oppervlakte",
+            "huisnummer": "Huisnummer",
+            "postcode": "Postcode",
+            "openbareruimtenaam": "OpenbareRuimteNaam",
+            "woonplaatsnaam": "WoonplaatsNaam",
+            "Energielabels_Woning_type": "Woning type",
+            "Energielabels_Bouwjaar": "Bouwjaar",
+        },
+    },
+}
+
 configs = {
     0: {
         # TESTING CONFIG 

@@ -9,6 +9,7 @@ import MapView from '../components/MapView';
 jest.mock('leaflet', () => {
     const mapMock = {
         setView: jest.fn().mockReturnThis(),
+        fitBounds: jest.fn().mockReturnThis(),
         remove: jest.fn(),
         addLayer: jest.fn(),
         on: jest.fn(),

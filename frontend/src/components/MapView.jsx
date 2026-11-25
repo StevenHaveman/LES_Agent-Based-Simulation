@@ -20,6 +20,7 @@ const longitude = 4.388425;
 const zoomLevel = 16;
 const maxZoomLevel = 22;
 const maxNativeZoomLevel = 19;
+const maxFitZoomLevel = 18; // don't zoom in further than this when fitting a small area
 
 const radiusWeight = 4;
 
@@ -80,6 +81,40 @@ const MapView = ({
     }, []);
 
     const streetIncomeMap = useMemo(() => buildStreetIncomeMap(houses), [houses]);
+
+    // Zoom to the simulated neighbourhood. Houses don't move during a run, so
+    // the map only refits when the set of locations changes (e.g. a new area),
+    // not on every data refresh, which would undo the user's own panning.
+    const fittedBoundsKeyRef = useRef(null);
+
+    useEffect(() => {
+        if (!mapRef.current) {
+            return;
+        }
+
+        const points = houses.filter(
+            h => Number.isFinite(h.lat) && Number.isFinite(h.lng),
+        );
+        if (points.length === 0) {
+            return;
+        }
+
+        const lats = points.map(h => h.lat);
+        const lngs = points.map(h => h.lng);
+        const bounds = [
+            [Math.min(...lats), Math.min(...lngs)],
+            [Math.max(...lats), Math.max(...lngs)],
+        ];
+        const key = bounds.flat().map(v => v.toFixed(5)).join(',');
+
+        if (fittedBoundsKeyRef.current !== key) {
+            fittedBoundsKeyRef.current = key;
+            mapRef.current.fitBounds(bounds, {
+                padding: [30, 30],
+                maxZoom: maxFitZoomLevel,
+            });
+        }
+    }, [houses]);
 
     useEffect(() => {
         if (!mapRef.current) {

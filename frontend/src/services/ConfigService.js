@@ -50,3 +50,21 @@ export async function getSimulationConfigs() {
 
     return await response.json();
 }
+
+
+export async function getSimulationAreas() {
+
+    const response = await fetch(
+        `${API_URL}/simulation/areas`
+    );
+
+
+    if (!response.ok) {
+        throw new Error(
+            'Fetching simulation areas failed'
+        );
+    }
+
+
+    return await response.json();
+}

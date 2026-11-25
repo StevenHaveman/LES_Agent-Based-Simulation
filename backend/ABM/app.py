@@ -48,6 +48,18 @@ def start_simulation():
         if key in simulation_config:
             simulation_config[key] = value
 
+    # Pick the neighbourhood: its GIS file replaces the config's default one.
+    area_key = data.get("area", config.DEFAULT_AREA)
+    area = config.AREAS.get(area_key)
+    if area is None:
+        return jsonify({
+            "status": "error",
+            "message": f"Unknown area '{area_key}'."
+        }), 400
+    simulation_config["area"] = area_key
+    simulation_config["gis_data_path"] = area["gis_data_path"]
+    simulation_config["gis_column_map"] = area["column_map"]
+
     if simulation_thread and simulation_thread.is_alive():
         return jsonify({
             "status": "error",
@@ -373,6 +385,17 @@ def update_social_norm_radius():
 def get_configs():
 
     return jsonify(config_utils.get_frontend_configs())
+
+@app.route("/simulation/areas", methods=["GET"])
+def get_areas():
+    """Lists the neighbourhoods that can be simulated, default first."""
+    return jsonify({
+        "default": config.DEFAULT_AREA,
+        "areas": [
+            {"key": key, "name": area["name"]}
+            for key, area in config.AREAS.items()
+        ],
+    })
 
 
 if __name__ == '__main__':

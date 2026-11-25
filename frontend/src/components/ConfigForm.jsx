@@ -114,12 +114,17 @@ const ConfigForm = () => {
 
     const {
         configs,
-        fetchConfigs
+        fetchConfigs,
+        areas,
+        fetchAreas
     } = useSimulationConfigs();
 
 
     // Selected backend configuration
     const [selectedConfig, setSelectedConfig] = useState(1);
+
+    // Selected neighbourhood (null until the backend's default is known)
+    const [selectedArea, setSelectedArea] = useState(null);
 
     // Controls visibility of advanced settings
     const [showAdvanced, setShowAdvanced] = useState(false);
@@ -134,7 +139,18 @@ const ConfigForm = () => {
      */
     useEffect(() => {
         fetchConfigs();
-    }, [fetchConfigs]);
+        fetchAreas();
+    }, [fetchConfigs, fetchAreas]);
+
+
+    /**
+     * Preselects the backend's default neighbourhood once areas are loaded.
+     */
+    useEffect(() => {
+        if (selectedArea === null && areas.default) {
+            setSelectedArea(areas.default);
+        }
+    }, [areas, selectedArea]);
 
 
     /**
@@ -290,6 +306,8 @@ const ConfigForm = () => {
 
                 config_id: selectedConfig,
 
+                ...(selectedArea ? { area: selectedArea } : {}),
+
                 seed:
                     formData.seed === ''
                         ? 0
@@ -342,6 +360,51 @@ const ConfigForm = () => {
                         onSubmit={handleSubmit}
                         className="form-body"
                     >
+
+
+                        {/* Neighbourhood selector */}
+
+                        <div className="form-group">
+
+                            <label
+                                htmlFor="area"
+                                className="form-label"
+                            >
+                                Neighbourhood
+                            </label>
+
+
+                            <select
+
+                                id="area"
+
+                                className="form-input"
+
+                                value={selectedArea ?? ''}
+
+                                onChange={(e) =>
+                                    setSelectedArea(e.target.value)
+                                }
+
+                            >
+
+                                {
+                                    areas.areas.map(area => (
+
+                                        <option
+                                            key={area.key}
+                                            value={area.key}
+                                        >
+                                            {area.name}
+                                        </option>
+
+                                    ))
+                                }
+
+                            </select>
+
+                        </div>
+
 
 
                         {/* Configuration selector */}

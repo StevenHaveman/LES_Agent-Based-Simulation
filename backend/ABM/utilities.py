@@ -42,7 +42,7 @@ def choose_config():
     config_data = config.configs.get(chosen_config_id, config.configs[0]) # Default to config 0 if not found
     return chosen_config_id, config_data
 
-def load_gis_data(gis_data_path: str):
+def load_gis_data(gis_data_path: str, column_map: dict | None = None):
     """
     Loads GIS data from a specified file path.
 
@@ -52,6 +52,8 @@ def load_gis_data(gis_data_path: str):
 
     Args:
         gis_data_path (str): The file path to the GIS data.
+        column_map (dict, optional): Renames source columns to the expected names
+            (e.g. {"huisnummer": "Huisnummer"}) for files with a different layout.
     Returns:
         pd.DataFrame: A DataFrame containing the GIS data with relevant columns.
     """
@@ -61,6 +63,10 @@ def load_gis_data(gis_data_path: str):
     # Remove leading/trailing whitespace from column names to ensure they match expected names in the code.
     df.columns = df.columns.str.strip()
 
+    # Map area-specific column names onto the names used below.
+    if column_map:
+        df = df.rename(columns=column_map)
+
     # Standardize energy label formatting (e.g., remove whitespace, convert to uppercase, and unify A+ levels to A).
     df["Energielabel"] = (df["Energielabel"].astype(str).str.replace(r"\s+", "", regex=True).str.upper().replace({"A+": "A", "A++": "A", "A+++": "A"}))
 
@@ -68,7 +74,7 @@ def load_gis_data(gis_data_path: str):
     df_clean = df.dropna(subset=['Bouwjaar', 'Woning type', 'WoonplaatsNaam', 'Energielabel'])
 
     apartment_types = ["Appartement","Flatwoning (overig)","Maisonnette"]
-    row_house_types = ["Rijwoning tussen", "Twee-onder-een-kap / rijwoning hoek"]
+    row_house_types = ["Rijwoning tussen", "Rijwoning hoek", "Twee-onder-een-kap / rijwoning hoek"]
 
     df_clean["Woning type"] = df_clean["Woning type"].replace({woning: "Apartment" for woning in apartment_types})
     df_clean["Woning type"] = df_clean["Woning type"].replace({woning: "Row House" for woning in row_house_types})
