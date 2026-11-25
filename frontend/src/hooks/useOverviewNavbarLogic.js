@@ -81,7 +81,7 @@ export default function useOverviewNavbarLogic() {
     const updateDelay = async (e) => {
         const newDelay = parseInt(e.target.value, 10);
         setDelay(newDelay);
-        await useSimulationRun.setDelay(newDelay);
+        await useSimulationRun().setDelay(newDelay);
     };
 
     useEffect(() => {

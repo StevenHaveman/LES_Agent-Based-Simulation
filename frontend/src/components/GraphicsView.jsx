@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import { GRAPH_OPTIONS } from './graphOptions.js';
 import GraphSelector from './GraphSelector.jsx';
 import { useOverview } from '../hooks/useOverview.js';
-import { useSimulationRun } from '../hooks/useSimulationRun.js';
 
 const graphSlotsTotal = 3;
 
@@ -25,12 +24,9 @@ const GraphicsView = ({
 
     // Hooks moeten hier staan
     const overview = useOverview();
-    const simulationRun = useSimulationRun();
 
 
     React.useEffect(() => {
-
-        let intervalId;
 
 
         const fetchData = async () => {
@@ -75,55 +71,27 @@ const GraphicsView = ({
         };
 
 
-        const start = async () => {
+        // Poll on a short fixed interval instead of the simulation delay:
+        // fetchData only updates state when a new year is available, so this
+        // follows any delay the user picks (including 0 sec) without refetching
+        // the delay itself.
+        const pollIntervalMs = 1000;
 
-            try {
+        // Eerste keer direct laden
+        fetchData();
 
-                const defaultDelay = 6;
-
-                const res =
-                    await simulationRun.getSimulationDelay();
-
-
-                const delay =
-                    (parseInt(res.delay) || defaultDelay) * 1000;
-
-
-                // Eerste keer direct laden
-                await fetchData();
-
-
-                intervalId = setInterval(
-                    fetchData,
-                    delay
-                );
-
-
-            } catch (error) {
-
-                console.error(
-                    "Failed starting graphics polling:",
-                    error
-                );
-
-            }
-
-        };
-
-
-        start();
+        const intervalId = setInterval(
+            fetchData,
+            pollIntervalMs
+        );
 
 
         return () => {
-
-            if (intervalId) {
-                clearInterval(intervalId);
-            }
-
+            clearInterval(intervalId);
         };
 
-
-    }, [overview, simulationRun]);
+    // `overview` is a new object on every render; polling should start once.
+    }, []);
 
 
 

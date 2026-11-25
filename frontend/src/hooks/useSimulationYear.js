@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import overviewService from '../services/OverviewService';
 
-const delayMs = 4000;
+// Poll frequently so the displayed year keeps up with any simulation delay (including 0 sec).
+const delayMs = 1000;
 
 export const useSimulationYear = () => {
     const [year, setYear] = useState(null);
