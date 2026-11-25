@@ -23,8 +23,10 @@ export async function startSimulation(config) {
 
 
     if (!response.ok) {
+        // Surface the backend's reason (e.g. a simulation is already running).
+        const body = await response.json().catch(() => ({}));
         throw new Error(
-            'Starting simulation failed'
+            body.message || 'Starting simulation failed'
         );
     }
 

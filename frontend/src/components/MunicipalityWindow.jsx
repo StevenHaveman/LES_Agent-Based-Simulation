@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../styles/municipalityWindow.css';
+import '../styles/MunicipalityWindow.css';
 import {
     triggerSustainabilityCampaign,
     triggerHeatGridAnnouncement,
@@ -38,16 +38,17 @@ const MunicipalityWindow = () => {
     };
 
     return (
-        <>
-            <div className="municipality-window">
-                <div className="municipality-container">
-                    <h2>Municipality Options</h2>
+        <div className="panel">
+            <h3 className="panel-title">Municipality Options</h3>
 
-                    <div className="subsidy-input-container">
-                        <label htmlFor="subsidyAmount">
-                            Financial Subsidy Amount (€)
-                        </label>
+            <div className="panel-section">
+                <label className="panel-label" htmlFor="subsidyAmount">
+                    Financial subsidy
+                </label>
 
+                <div className="panel-input-row">
+                    <div className="panel-input-prefix">
+                        <span aria-hidden="true">€</span>
                         <input
                             id="subsidyAmount"
                             type="number"
@@ -61,28 +62,37 @@ const MunicipalityWindow = () => {
                     </div>
 
                     <button
-                        className="intervention-button"
+                        type="button"
+                        className="panel-button"
                         onClick={handleFinancialSubsidy}
                     >
-                        Apply Financial Subsidy
+                        Apply
                     </button>
+                </div>
+            </div>
 
+            <div className="panel-section">
+                <span className="panel-label">Campaigns</span>
+
+                <div className="panel-button-row">
                     <button
-                        className="intervention-button"
+                        type="button"
+                        className="panel-button"
                         onClick={handleSustainabilityCampaign}
                     >
                         Sustainability Campaign
                     </button>
 
                     <button
-                        className="intervention-button"
+                        type="button"
+                        className="panel-button"
                         onClick={handleHeatGridAnnouncement}
                     >
                         Announce Heat Grid
                     </button>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

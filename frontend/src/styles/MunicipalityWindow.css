@@ -1,23 +1,121 @@
-.interventions-container {
-    display: flex;
-    gap: 1rem;
-    align-items: stretch;
-}
+/* Shared panel layout for the Municipality Options and Simulation Options
+   boxes at the bottom left of the overview page. */
 
-.intervention-group h3 {
-    white-space: nowrap;
-}
-
-.intervention-group {
-    flex: 1;
-    padding: 1rem;
-
+.panel {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.85rem;
+    width: 100%;
+    max-width: 380px;
 }
 
-.intervention-button {
+.panel-title {
+    margin: 0;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.panel-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.panel-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.panel-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #5c5734;
+}
+
+.panel-value {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.panel-input-row,
+.panel-button-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.panel-button-row .panel-button {
+    flex: 1 1 0;
+}
+
+.panel-input-prefix {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0 0.6rem;
+    background: #fff;
+    border: 1px solid #c9c3a0;
+    border-radius: 6px;
+}
+
+.panel-input-prefix:focus-within {
+    border-color: #A49C52;
+    box-shadow: 0 0 0 2px rgba(164, 156, 82, 0.25);
+}
+
+.panel-input-prefix span {
+    color: #777;
+}
+
+.panel-input-prefix input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0.4rem 0;
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+}
+
+.panel-button {
+    padding: 0.45rem 0.9rem;
+    line-height: 1.2;
+    border: none;
+    border-radius: 6px;
+    background-color: #A49C52;
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.panel-button:hover {
+    background-color: #8c7b3a;
+}
+
+.panel-button:focus-visible {
+    outline: 2px solid #5c5734;
+    outline-offset: 2px;
+}
+
+.panel-button-wide {
     width: 100%;
-    padding: 0.25rem;
+}
+
+.panel-range {
+    width: 100%;
+    accent-color: #A49C52;
+}
+
+.panel-range-scale {
+    display: flex;
+    justify-content: space-between;
+    margin-top: -0.25rem;
+    font-size: 0.75rem;
+    color: #777;
 }

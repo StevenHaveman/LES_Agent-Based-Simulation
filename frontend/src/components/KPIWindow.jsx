@@ -53,7 +53,6 @@ const KPIWindow = ({ year }) => {
     }
 
     const kpi = kpi_data || {};
-    const simulationYearStart = 2024;
     /* eslint-disable */
     const totalCo2ReducedPercent = kpi.co2_emissions_start_simulation
         ? (Number(kpi.total_co2_reduced || 0) / Number(kpi.co2_emissions_start_simulation)) * 100  
@@ -75,7 +74,7 @@ const KPIWindow = ({ year }) => {
                     </div>
 
                     <div className="info-row">
-                        <span className="info-label">Emissions in{year !== null ? ` ${year + simulationYearStart}` : ''}:</span>
+                        <span className="info-label">Emissions in{year !== null ? ` ${year}` : ''}:</span>
                         <span className="info-value">{formatT(Number(kpi.current_co2_emissions?.toFixed(0)))} CO₂</span>
                     </div>
 

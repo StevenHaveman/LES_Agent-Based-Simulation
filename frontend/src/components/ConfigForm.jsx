@@ -126,6 +126,9 @@ const ConfigForm = () => {
     // Selected neighbourhood (null until the backend's default is known)
     const [selectedArea, setSelectedArea] = useState(null);
 
+    // Error from the backend when starting fails (e.g. a run is still going)
+    const [startError, setStartError] = useState(null);
+
     // Controls visibility of advanced settings
     const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -293,40 +296,42 @@ const ConfigForm = () => {
 
         e.preventDefault();
 
-        await navigate({
-            to: '/overview'
-        });
+        setStartError(null);
+
+        const payload = {
+
+            ...formData,
+
+            config_id: selectedConfig,
+
+            ...(selectedArea ? { area: selectedArea } : {}),
+
+            seed:
+                formData.seed === ''
+                    ? 0
+                    : Number(formData.seed)
+
+        };
 
 
+        // Only go to the overview once the backend accepted the run;
+        // otherwise the overview would show whatever simulation is running.
         try {
-
-            const payload = {
-
-                ...formData,
-
-                config_id: selectedConfig,
-
-                ...(selectedArea ? { area: selectedArea } : {}),
-
-                seed:
-                    formData.seed === ''
-                        ? 0
-                        : Number(formData.seed)
-
-            };
-
 
             await start(payload);
 
-
         } catch (error) {
 
-            console.error(
-                'Simulation start failed',
-                error
-            );
+            setStartError(error.message);
+
+            return;
 
         }
+
+
+        await navigate({
+            to: '/overview'
+        });
 
     };
 
@@ -524,6 +529,18 @@ const ConfigForm = () => {
 
 
                         {/* Start simulation */}
+
+                        {
+                            startError && (
+                                <p
+                                    className="form-error-message"
+                                    role="alert"
+                                >
+                                    {startError}
+                                </p>
+                            )
+                        }
+
 
                         <button
 

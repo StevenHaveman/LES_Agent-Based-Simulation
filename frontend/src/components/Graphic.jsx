@@ -85,6 +85,9 @@ const clusterColors = ['#17bd2b', '#5a5754', '#d10707'];
 const chartOptions = {
     responsive: true,
 
+    // Fill the chart slot's height instead of keeping a fixed aspect ratio.
+    maintainAspectRatio: false,
+
     interaction: {
         mode: 'index',
         intersect: false,
@@ -235,7 +238,7 @@ const Graphic = ({
             {/* Cluster dropdown */}
             {(yKey === 'cluster_behavior_data' ||
         yKey === 'cluster_behavior_trends') && (
-                <div style={{ marginBottom: '1em' }}>
+                <div style={{ marginBottom: '0.25rem' }}>
                     <label htmlFor="cluster-metric-select">Select metric:</label>
 
                     <select

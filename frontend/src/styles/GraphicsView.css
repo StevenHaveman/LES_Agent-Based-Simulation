@@ -1,19 +1,20 @@
 .graphics-view-container {
-    display: grid;
-    grid-template-rows: 1fr 1fr;
-    gap: 0.75rem;
-    width: 100%;
-    height: 100%;
-    padding: 0.75rem;
-    box-sizing: border-box;
-    overflow: visible;
-}
-
-.graphic-wrapper {
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: auto;
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+}
+
+/* Header on top, then the charts share the remaining height equally. */
+.graphic-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
     box-sizing: border-box;
 }
 
@@ -21,8 +22,9 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 10px;
+    padding: 4px 10px 0;
     width: 100%;
+    flex: none;
 }
 
 .graphics-chooser {
