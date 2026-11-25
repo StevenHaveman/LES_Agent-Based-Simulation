@@ -1,0 +1,209 @@
+.form-container {
+    min-height: 75vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    padding: 20px;
+}
+
+
+
+.form-wrapper {
+    background-color: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    width: fit-content;
+    max-width: 90vw;
+}
+
+.form-card {
+    background-color: #F8E6CE;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    width: 350px;
+    height: auto;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 30px;
+
+}
+
+.form-title {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.form-subtitle {
+    color: #666;
+    font-size: 14px;
+}
+
+.form-body {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    width: 100%;
+    max-width: 300px;  /* Limiteert de breedte */
+    margin: 0 auto;     /* Centreert binnen de form */
+}
+
+.form-label {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+    text-align: left;
+    margin-left: 3px;
+}
+
+
+.form-input-wrapper {
+    position: relative;
+
+}
+
+.form-input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    border-radius: 10px;
+    width: 260px;
+    box-sizing: border-box;
+}
+
+
+.form-input:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+    border-radius: 50px;
+}
+
+.form-checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: #4CAF50;
+    cursor: pointer;
+}
+
+.form-checkbox-label {
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+}
+
+.form-button {
+    background-color: #09460c;
+    color: white;
+    padding: 12px;
+    width: 285px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.form-button:hover {
+    background-color: #45a049;
+}
+
+.form-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
+}
+
+.form-link {
+    color: #207325;
+    text-decoration: none;
+}
+
+.form-link:hover {
+    text-decoration: underline;
+}
+
+.form-input.error {
+    border-color: #ff4444;
+}
+
+.form-error-message {
+    color: #ff4444;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.form-success {
+    color: #228125;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.form-button.loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+    .form-wrapper {
+        margin: 20px auto;
+    }
+
+    .form-card {
+        padding: 20px;
+    }
+}
+
+.form-link-login {
+    color: #0d4b0f;
+}
+
+.profile-info {
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.profile-info p {
+    margin: 10px 0;
+}
+
+
+.form-input[type="date"],
+.form-input[type="time"],
+.form-input[type="number"],
+select.form-input {
+    padding: 8px 12px;
+    width: 90%;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+select.form-input {
+    background-color: white;
+    cursor: pointer;
+}
+
+.title-config-page {
+    font-size: 55px;
+    text-align: center;
+}

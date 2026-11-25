@@ -17,6 +17,7 @@
 7. [Run the Application](#7-run-the-application)  
 8. [Verify Installation](#8-verify-installation)  
 9. [Troubleshooting](#9-troubleshooting)  
+10. [Quickstart] (#10-quickstart)
 
 ---
 
@@ -183,3 +184,9 @@ If the simulation runs and graphs are visible, you're good to go! 🎉
 | AI chat not working         | Ollama not running or model missing    | Make sure the model is downloaded And that your system has adleast 5-6gb free     |
 
 
+## 10. Quick Start
+
+After completing the installation steps (Python packages, Node packages, and Ollama model), start the application by running:
+
+```cmd
+start.bat

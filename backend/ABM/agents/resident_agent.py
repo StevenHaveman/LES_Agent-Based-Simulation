@@ -2,7 +2,6 @@ from mesa import Agent
 import numpy as np
 import random
 import utilities
-from sustainability_packages.solar_panel import SolarPanel
 
 class Resident(Agent):
     """
@@ -13,7 +12,7 @@ class Resident(Agent):
     behavioral control.
 
     """
-    def __init__(self, id, model, household):
+    def __init__(self, id, model, household,survey_profile):
         """
         Initializes a Resident agent.
 
@@ -27,113 +26,122 @@ class Resident(Agent):
         self.unique_id = id
         self.household = household
         self.environment = model
+        self.cluster_type = survey_profile["cluster_type"] # This is the cluster type from the survey profiles, which can be used for analysis and potentially for influencing behavior in more complex ways in the future.
+        self.action_score = survey_profile["action_score"] # This is the action score from the survey profiles, which can be used for analysis and potentially for influencing behavior in more complex ways in the future.
+        # Survey-based profile for attitude.
+        self.attitude = survey_profile["attitude_score"]
 
-        salary = self.calc_salary()
-        self.income = max(round(salary, -2), 0)
-        self.subj_norm = {package.name: None for package in self.environment.sustainability_packages}
-        self.behavioral_control = {package.name: None for package in self.environment.sustainability_packages}
-        
-        if self.config_id == 0 or self.config_id == 1:
-            self.attitude = utilities.gen_random_value(0, 1)
-            self.attitude_mod = utilities.gen_random_value(0, 2)
-            self.subj_norm_mod = utilities.gen_random_value(0, 2)
-            self.behavioral_mod = utilities.gen_random_value(0, 2)
-        else:
-            self.attitude = self.config['attitude']
-            self.attitude_mod = self.config['attitude_mod']
-            self.subj_norm_mod = self.config['subj_norm_mod']
-            self.behavioral_mod = self.config['behavioral_mod']
-
-        self.package_decisions = {} # Stores True/False for each package.name
-        self.package_subjective_norms = {}
-
-        for package in self.environment.sustainability_packages:
-            self.package_decisions[package.name] = False
-            self.package_subjective_norms[package.name] = self.config.get('subjective_norm', 0.0)
-
+        # salary = self.calc_salary()
         self.decision_threshold = self.config['decision_threshold']
-        self.calc_subjective_norm()
-        self.calc_behavioral_control()
+        self.income = 0
 
-    def calc_salary(self):
+        # gets updated each step based on the current adoption levels in the environment.
+        self.perceived_norm = 0.0
+
+        # BEHAVIORAL CONTROL (PBC)
+        # Survey-based perceived behavioral control (PBC) from cluster profiles
+        self.survey_pbc = survey_profile["pbc_score"]
+
+        # INTENTION SYSTEM
+        self.intentions = 0.0
+
+        # resident is open to renvovation.
+        self.wants_to_renovate = False
+
+        # self.intention_threshold = self.config.get('intention_threshold',self.decision_threshold)
+        self.intention_threshold = 0.7 # This is a new parameter that determines how high the intention needs to be for the resident to decide to adopt a package. We can experiment with different values for this to see how it affects adoption rates.
+
+        # ATTITUDE AND SENSITIVITY
+        if self.config.get("random_sensitivities", False):
+            self.attitude_sensitivity = utilities.gen_random_value(0, 2)
+            self.norm_sensitivity = utilities.gen_random_value(0, 2)
+            self.control_sensitivity = utilities.gen_random_value(0, 2)
+        else:
+            self.attitude_sensitivity = self.config['attitude_sensitivity']
+            self.norm_sensitivity = self.config['norm_sensitivity']
+            self.control_sensitivity = self.config['control_sensitivity']
+
+        # DECISIONS STATE
+        self.package_decisions = {
+            p.name: False for p in self.environment.sustainability_packages
+        }
+
+
+
+
+    #1. INTENTION (RAA – resident level) ## TODO 
+    def calc_intention(self):
         """
-        Calculates a resident's salary based on a log-normal distribution
-        approximating Dutch income distribution from the configuration.
-
-        Returns:
-            float: A randomly generated salary value.
+        Calculates the resident's intention based on
+        attitude, perceived norm and PBC.
         """
-        median = self.config['median_income']
-        sigma_normal = self.config['sigma_normal']
-        mu = np.log(median)
-        sigma_lognormaal = np.sqrt(np.log(1 + (sigma_normal / median) ** 2))
-        return np.random.lognormal(mu, sigma_lognormaal)
-    
-    def calc_behavioral_control(self):
-        """
-        Calculates the behavioral control for each sustainability package based on
-        the resident's income and household characteristics.
 
-        Returns:
-            None: Updates the `behavioral_control` attribute in place.
-        """
-        for package in self.environment.sustainability_packages:
-            if self.package_decisions.get(package.name, False):
-                continue
+        attitude_part = self.attitude * self.attitude_sensitivity
 
-            self.behavioral_control[package.name] = package.calculate_behavioral_influence(self.income, self.household)
+        norm_part = (
+            self.perceived_norm
+            * self.norm_sensitivity
+        )
 
-    def calc_subjective_norm(self):
-        """
-        Calculates the subjective norm for each sustainability package based on the
-        resident's attitude and the environmental influence.
+        control_part = (
+            self.survey_pbc
+            * self.control_sensitivity
+        )
 
-        Returns:
-            None: Updates the `subj_norm` attribute in place.
-        """
-        for package in self.environment.sustainability_packages:
-            if self.package_decisions.get(package.name, False):
-                continue
-            
-            self.subj_norm[package.name] = self.package_subjective_norms.get(package.name, 0.0)
+        w_att = self.config.get("weight_attitude", 1.0)
+        w_norm = self.config.get("weight_norm", 1.0)
+        w_control = self.config.get("weight_control", 1.0)
 
-    def calc_decision(self):
-        """
-        Calculates whether the resident decides to adopt available sustainability
-        packages based on attitude, subjective norm, and behavioral factors,
-        compared against a decision threshold.
+        total_weight = w_att + w_norm + w_control
 
-        If the decision score for a package exceeds the threshold, the resident's
-        decision for that package is set to True. This method iterates through
-        all sustainability packages not yet adopted by the resident.
-        """
-        for package in self.environment.sustainability_packages:
-            if self.package_decisions.get(package.name, False):
-                continue
-            
-            decision_stat = (self.attitude * self.attitude_mod +
-                             self.subj_norm[package.name] * package.subj_norm_mod * self.subj_norm_mod +
-                             self.behavioral_control[package.name] * self.behavioral_mod) / 6 # Normalize (sum of max mods if all are 2)
+        self.intention = (
+            w_att * attitude_part +
+            w_norm * norm_part +
+            w_control * control_part
+        ) / total_weight
 
-            if decision_stat > self.decision_threshold:
-                self.package_decisions[package.name] = True
-                self.environment.decided_residents_this_step_per_package[package.name] = \
-                    self.environment.decided_residents_this_step_per_package.get(package.name, 0) + 1
-                
+        return self.intention
+
+
     def collect_resident_data(self):
         agent_data = {
             "id": self.unique_id,
             "household_id": self.household.unique_id,
-            "income": self.income,
+            "cluster_type": self.cluster_type,
+            "income": self.income, # change to household level income if we want to analyze household-level constraints more directly
             "attitude": self.attitude,
-            "attitude_mod": self.attitude_mod,
-            "subj_norm": self.subj_norm,
-            "subj_norm_mod": self.subj_norm_mod,
-            "behavioral_control": self.behavioral_control,
-            "behavioral_mod": self.behavioral_mod,
-            "solar_panels": self.package_decisions.get("Solar Panels", False),
-            "heat_pump": self.package_decisions.get("Heat Pump", False),
+            "attitude_sensitivity": self.attitude_sensitivity,
+            "wants_to_renovate": self.wants_to_renovate,
+
+            # perceived norm (psychological perception)
+            "perceived_norm": self.perceived_norm,
+            "norm_sensitivity": self.norm_sensitivity,
+
+            # perceived behavioral control (survey-based PBC)
+            "survey_pbc": self.survey_pbc,
+            "control_sensitivity": self.control_sensitivity,
+
+            # action score from cluster 
+            "action_score": self.action_score,
+
+            # NEW: behavioural intention from RAA model
+            "intention": self.intention,
+            "intention_threshold": self.intention_threshold,
+
+            # NEW: intention calculation weights
+            "weight_attitude": self.config.get("weight_attitude", 1.0),
+            "weight_norm": self.config.get("weight_norm", 1.0),
+            "weight_control": self.config.get("weight_control", 1.0),
+
+            # NEW: actual household constraint (optional but very useful for analysis)
+            "household_actual_control": {
+                p.name: self.household.actual_control[p.name]
+                for p in self.environment.sustainability_packages
+            }
         }
+
+        for package in self.environment.sustainability_packages:
+            agent_data[package.name] = self.package_decisions[package.name]
 
         return agent_data
 
@@ -141,14 +149,26 @@ class Resident(Agent):
         """
         Step function for the resident.
 
-        The resident first attempts to make decisions on any sustainability packages
-        they haven't already decided on. After decision-making, their income is
-        updated with a random raise.
+        - First: form intentions (RAA model)
+        - Second: decide behavior based on intention threshold
+        - Third: update income dynamics
         """
-        if not all(self.package_decisions.get(p.name, False) for p in self.environment.sustainability_packages):
-            self.calc_decision()
-        self.income = int(round(self.income * random.choice(self.config['raise_income']), -1))
 
-        # If all decisions are made, recalculate subjective norm and behavioral control
-        self.calc_subjective_norm()
-        self.calc_behavioral_control()
+        # Only act if not all packages are already decided
+        if not all(self.package_decisions.get(p.name, False)
+                for p in self.environment.sustainability_packages):
+
+            # Calculate intention
+            self.calc_intention()
+
+            # Resident expresses support for renovation
+            self.wants_to_renovate = (
+                self.intention >= self.intention_threshold
+            )
+
+            # gradual learning / social adaptation
+            self.attitude += 0.01 * (1 - self.attitude)
+            self.survey_pbc += 0.01 * (1 - self.survey_pbc)
+
+            # optional income dynamics
+            # self.income = int(round(self.income * np.random.choice(self.config['raise_income']), -1))

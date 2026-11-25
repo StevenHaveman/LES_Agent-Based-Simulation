@@ -1,10 +1,12 @@
 import random
 from mesa import Model
 import numpy as np
+from collections import defaultdict
 from agents.household_agent import Household
+from agents.resident_agent import Resident
 import utilities
-from sustainability_packages.solar_panel import SolarPanel
-from sustainability_packages.heat_pump import HeatPump
+from sustainability_packages.upgrade_package import UpgradePackage
+from PolicyInterventions import PolicyInterventions
 import json
 import os
 
@@ -18,8 +20,6 @@ class Environment(Model):
     Attributes:
         config_id (int): Identifier for the chosen configuration.
         config (dict): The configuration dictionary.
-        solar_panel (SolarPanel): Instance of the SolarPanel package.
-        heat_pump (HeatPump): Instance of the HeatPump package.
         sustainability_packages (list): List of all available sustainability packages.
         decided_residents_this_step_per_package (dict): Tracks the number of residents
             who made a positive decision for each package in the current step.
@@ -30,87 +30,136 @@ class Environment(Model):
         streets (list[list[Household]]): Households grouped into streets.
         yearly_stats (list[dict]): List to store aggregated data collected each year.
     """
-    def __init__(self, nr_households, nr_residents):
+    # def __init__(self, nr_households, nr_residents): # Maybe no longer needed when we create households based on GIS data, and survey data for residents.
+    def __init__(self,config):
         """
         Initializes the simulation environment.
 
         Args:
-            nr_households (int): The total number of households to create.
-            nr_residents (int): The total number of residents to create and
-                                distribute among households.
+            config_id (int): The ID of the configuration to use for the simulation.
         """
         super().__init__()
-        self.config_id, self.config = utilities.choose_config()
+        self.config = config # save the given config for later use in the model
 
-        self.solar_panel = SolarPanel(self)
-        self.heat_pump = HeatPump(self)
-        self.sustainability_packages = [self.solar_panel, self.heat_pump]
+        print(self.config)
+
+        self.package_data = utilities.load_package_data(config["package_data_path"])
+        self.policy = PolicyInterventions(self)
+        self.sustainability_packages = []
+        for _, row in self.package_data.iterrows():
+            package = UpgradePackage(
+                config=self.config,
+                package_step_id=row["package_step_id"],
+                baseline_level=row["baseline_level"],
+                target_level=row["kpi_level"],
+                price=row["total_price_mid"],
+                yearly_savings=row["savings"],
+                break_even_in_years=row["break_even_in_years"],
+                co2_output=row["op_co2_B"],
+                kpi_score=0
+            )
+            self.sustainability_packages.append(package)
 
         self.decided_residents_this_step_per_package = {
-                    pkg.name: 0 for pkg in self.sustainability_packages
-                }
-        
-        self.energy_price = self.config['energy_price'] 
+            pkg.name: 0 for pkg in self.sustainability_packages
+        }
+    
         self.households = []  # gewone Python-lijst voor filteren/gemak
+        self.gis_data = utilities.load_gis_data(config["gis_data_path"])
         self.residents = []  # gewone Python-lijst voor filteren/gemak
-        self.streets = []
+        self.survey_data = utilities.load_survey_data(config["survey_data_path"])
+        self.survey_cluster_profiles = utilities.load_survey_cluster_profiles(config["survey_cluster_profiles_path"])
+        self.income_distribution = (utilities.calculate_income_distribution(self.survey_data))
+        # Social norm settings
+        self.social_norm_radius = self.config.get("social_norm_radius", 500)  # Default to 500 meters if not specified in config
+        self.municipality_timeline = []
+        self.street_groups = {} # Build street groups based on GIS data, this will be used for calculating street-level norms and for the heatmap visualization.
+        self.current_year = 0
         self.yearly_stats = []
-        self.total_co2 = 0
+        self.total_co2_baseline = 0
         self.current_co2 = 0
+        self.total_co2_emitted_over_time = 0
 
-        self.create_agents(nr_households, nr_residents)
-        self.generate_streets()
-        self.update_subjective_norm()
+        # Initialize households, residents, streets, and social norms
 
-    def create_agents(self, nr_households: int, nr_residents: int):
-        """
-        Creates a specified number of Household agents and distributes residents among them.
+        self.create_household_agents()
+        self.create_residents_from_survey_profiles(nr_residents=1)
+        # self.generate_streets()
+        self.build_street_groups()
+        self.calculate_total_co2() 
+        self.update_social_norms()
 
-        Initializes households with a chance to have pre-installed sustainability packages
-        based on configuration. Residents are then created within these households.
-
-        Args:
-            nr_households (int): The number of household agents to create.
-            nr_residents (int): The total number of resident agents to create and
-                                distribute among the households.
-        """
-        base = nr_residents // nr_households
-        remainder = nr_residents % nr_households
-
-        # Initialize the agent ID counter
-        id_counter = 0
-
-        for i in range(nr_households):
+    def create_household_agents(self): # TODO: This is a new version of the create_agents function that will use GIS data to create households with more realistic attributes and distributions. This will likely involve parsing the GIS data to determine household locations, sizes, and other relevant attributes, and then creating Household agents accordingly.
         
-            hh = Household(i, self)
-            hh_emissions = hh.calc_co2_emissions()
-            self.total_co2 += hh_emissions
-            self.current_co2 += hh_emissions
+        for i, row in self.gis_data.iterrows():
+            hh = Household(i, self, gis_attributes=row.to_dict())
+            # flags
             for package in self.sustainability_packages:
-                chance_key = f"initial_{package.name.lower().replace(' ', '')}_chance"
-                initial_chance = self.config.get(chance_key, 0.0) # Default to 0% if not in config
-                
-                hh.package_installations[package.name] = (random.random() < initial_chance)
-
-                if hh.package_installations.get(package.name, False):
-                    initial_savings = package.calc_co2_savings(hh)
-                    hh.co2_saved_yearly += initial_savings
-                    self.current_co2 -= initial_savings
-                
                 hh.skip_prev_flags[package.name] = False
                 hh.skip_next_flags[package.name] = False
 
             self.households.append(hh)
 
-            nr_res_for_hh = base + (1 if i < remainder else 0)
-            id_counter = hh.create_residents(nr_res_for_hh, id_counter)
-            self.residents.extend(hh.residents)
-        
-        for hh_obj in self.households:
-            for res_obj in hh_obj.residents:
-                for package in self.sustainability_packages:
-                    if package.name not in res_obj.package_subjective_norms:
-                         res_obj.package_subjective_norms[package.name] = self.config.get('subjective_norm', 0.0)
+    def create_residents_from_survey_profiles(self, nr_residents=1):
+
+        id_counter = 0
+
+        for hh in self.households:
+
+            house_type = hh.gis_attributes["Woning type"]
+
+            # filter dataset op woningtype
+            cluster_df = self.survey_cluster_profiles[
+                self.survey_cluster_profiles["house_type"] == house_type
+            ]
+
+            # fallback als woningtype niet bestaat
+            if cluster_df.empty:
+                cluster_df = self.survey_cluster_profiles
+
+            for _ in range(nr_residents):
+
+                # 1. kies random cluster uit beschikbare rijen
+                row = cluster_df.sample(1).iloc[0]
+                cluster_type = row["cluster_type"]
+
+                # 2. pak survey profiel binnen zelfde cluster + house_type
+                subset = self.survey_cluster_profiles[
+                    (self.survey_cluster_profiles["house_type"] == house_type)
+                    & (self.survey_cluster_profiles["cluster_type"] == cluster_type)
+                ]
+
+                if subset.empty:
+                    subset = self.survey_cluster_profiles[
+                        self.survey_cluster_profiles["cluster_type"] == cluster_type
+                    ]
+
+                if subset.empty:
+                    subset = self.survey_cluster_profiles
+
+                survey_profile = subset.sample(1).iloc[0]
+
+                # 3. create resident
+                resident = Resident(id_counter, self, hh, survey_profile)
+
+                resident.attitude = survey_profile["attitude_score"]
+                resident.survey_pbc = survey_profile["pbc_score"]
+                resident.action_score = survey_profile["action_score"]
+
+                if "income" in survey_profile:
+                    resident.income = survey_profile["income"]
+                else:
+                    resident.income = utilities.generate_income(self.income_distribution)
+
+                # package sync
+                for package_name, installed in hh.package_installations.items():
+                    if installed:
+                        resident.package_decisions[package_name] = True
+
+                hh.residents.append(resident)
+                self.residents.append(resident)
+
+                id_counter += 1
 
     def generate_streets(self,):
         """
@@ -121,9 +170,12 @@ class Environment(Model):
         within configured limits, with occasional larger streets.
         """
         pointer = 0
-        remaining = self.config['nr_households']
-        min_households = min(self.config['min_nr_houses'], self.config['nr_households'])
+        remaining = len(self.households)
+        print (f"Generating streets with {remaining} households...")
+        min_households = min(self.config['min_nr_houses'], remaining)
         max_households = self.config['max_nr_houses']
+
+        print(f"Min households per street: {min_households}, Max households per street: {max_households}")
 
         while remaining >= min_households:
             # 20% chance to pick a large household count (closer to max)
@@ -142,20 +194,162 @@ class Environment(Model):
                 chosen_list = random.randint(0, len(self.streets) - 1)
                 self.streets[chosen_list].append(self.households[i])
 
-    def update_subjective_norm(self):
+    def update_social_norms(self):
         """
-        Updates the subjective norm for all residents regarding each sustainability package.
+        Set each resident's perceived norm to the average attitude and PBC of the
+        other residents living within ``social_norm_radius`` meters.
 
-        This involves resetting flags for "Direct" norm calculation (if applicable)
-        and then invoking the package-specific subjective norm update logic.
+        Residents without any neighbours within the radius keep their current
+        perceived norm.
         """
-        for hh in self.households:
-            for package in self.sustainability_packages:
-                hh.skip_prev_flags[package.name] = False
-                hh.skip_next_flags[package.name] = False
-        
-        for package in self.sustainability_packages:
-            package.update_package_subjective_norm(self)
+        neighbours, neighbour_counts = self._get_resident_neighbour_matrix(
+            self.social_norm_radius
+        )
+
+        attitudes = np.array([r.attitude for r in self.residents], dtype=float)
+        pbc_scores = np.array([r.survey_pbc for r in self.residents], dtype=float)
+
+        has_neighbours = neighbour_counts > 0
+        safe_counts = np.where(has_neighbours, neighbour_counts, 1)
+
+        perceived_norms = (
+            0.5 * (neighbours @ attitudes) / safe_counts +
+            0.5 * (neighbours @ pbc_scores) / safe_counts
+        )
+
+        for resident, has_any, norm in zip(self.residents, has_neighbours, perceived_norms):
+            if has_any:
+                resident.perceived_norm = norm
+
+    def _get_household_distance_matrix(self):
+        """
+        Return the pairwise distance matrix (in meters) between all households.
+
+        Household locations never change during a simulation, so the matrix is
+        computed once and cached.
+        """
+        if getattr(self, "_household_distances", None) is None:
+            lat = np.array([h.gis_attributes["Latitude"] for h in self.households], dtype=float)
+            lon = np.array([h.gis_attributes["Longitude"] for h in self.households], dtype=float)
+            self._household_distances = self.calculate_distance(
+                lat[:, None], lon[:, None], lat[None, :], lon[None, :]
+            )
+        return self._household_distances
+
+    def _get_resident_neighbour_matrix(self, radius):
+        """
+        Return ``(neighbours, counts)`` for the given radius, where ``neighbours``
+        is a resident x resident 0/1 matrix marking residents whose households
+        lie within ``radius`` meters (a resident is never its own neighbour),
+        and ``counts`` is the number of neighbours per resident.
+
+        The result is cached and only rebuilt when the radius changes (e.g. via
+        the /update_social_norm_radius endpoint).
+        """
+        cache = getattr(self, "_neighbour_cache", None)
+        if cache is not None and cache[0] == radius:
+            return cache[1], cache[2]
+
+        household_index = {id(h): i for i, h in enumerate(self.households)}
+        resident_household = np.array(
+            [household_index[id(r.household)] for r in self.residents], dtype=int
+        )
+
+        within_radius = self._get_household_distance_matrix() <= radius
+        neighbours = within_radius[np.ix_(resident_household, resident_household)]
+        np.fill_diagonal(neighbours, False)
+        neighbours = neighbours.astype(float)
+        counts = neighbours.sum(axis=1)
+
+        self._neighbour_cache = (radius, neighbours, counts)
+        return neighbours, counts
+
+    def get_residents_within_radius(self, household, radius):
+
+        nearby_residents = []
+        nearby_households = []
+
+        lat1 = household.gis_attributes["Latitude"]
+        lon1 = household.gis_attributes["Longitude"]
+
+        for other_household in self.households:
+
+            lat2 = other_household.gis_attributes["Latitude"]
+            lon2 = other_household.gis_attributes["Longitude"]
+
+            distance = self.calculate_distance(
+                lat1,
+                lon1,
+                lat2,
+                lon2
+            )
+
+            if distance <= radius:
+                nearby_households.append(other_household)
+
+                nearby_residents.extend(
+                    other_household.residents
+                )
+                
+        return nearby_residents
+    
+    def calculate_distance(self, lat1, lon1, lat2, lon2):
+        """
+        Great-circle (haversine) distance in meters between coordinates given in
+        degrees. Works on scalars and on numpy arrays (with broadcasting).
+        """
+        R = 6371000  # meter
+
+        delta_lat = np.radians(lat2 - lat1)
+        delta_lon = np.radians(lon2 - lon1)
+
+        lat1 = np.radians(lat1)
+        lat2 = np.radians(lat2)
+
+        a = (
+            np.sin(delta_lat / 2)**2
+            +
+            np.cos(lat1)
+            * np.cos(lat2)
+            * np.sin(delta_lon / 2)**2
+        )
+
+        c = 2 * np.arctan2(
+            np.sqrt(a),
+            np.sqrt(1 - a)
+        )
+
+        return R * c
+
+    # def update_social_norms_OLD(self):
+    #     # This function updates the perceived social norms for each resident based on the current state of their street. For simplicity, 
+    #     # we calculate an average attitude and PBC for the residents in the same street and use that to update each resident's perceived norm. 
+    #     # This is a simplified approach and can be further refined to consider more complex interactions and influences among residents.
+    #     for street_name, households in self.street_groups.items():
+
+    #         # Get all residents in the street
+    #         residents_in_street = [
+    #             r
+    #             for hh in households
+    #             for r in hh.residents
+    #         ]
+
+    #         if not residents_in_street:
+    #             continue
+
+    #         # Calculate average attitude and PBC for the street
+    #         for resident in residents_in_street:
+    #             other_residents = [r for r in residents_in_street if r.unique_id != resident.unique_id]
+
+    #             if not other_residents:
+    #                 continue
+
+    #             avg_attitude = np.mean([r.attitude for r in other_residents])
+
+    #             avg_pbc = np.mean([r.survey_pbc for r in other_residents])
+
+    #             # Update the resident's perceived norm based on the average attitude and PBC of their street.
+    #             resident.perceived_norm = (0.5 * avg_attitude + 0.5 * avg_pbc) 
 
     def step(self):
         """
@@ -170,78 +364,127 @@ class Environment(Model):
         for pkg_name in self.decided_residents_this_step_per_package:
             self.decided_residents_this_step_per_package[pkg_name] = 0
 
+        print(self.municipality_timeline)
+
+        print("Updating social norms in environment step...")
+        self.update_social_norms()
         for hh in self.households:
              hh.step()
 
-        self.update_subjective_norm()
-
+        # Update current CO2 emissions after all households have made their decisions and packages have been applied. 
+        # This assumes that the households' step function updates their current CO2 emissions based on their active package and other factors.
+        self.current_co2 = self.current_co2 = sum(hh.current_co2_emissions for hh in self.households)
+        self.total_co2_emitted_over_time += self.current_co2
         for package in self.sustainability_packages:
             package.step()
 
     def collect_environment_data(self):
+
         environment_data = {
-            "energy_price": self.energy_price,
-            "nr_agents_with_solar_panel": "nog doen", # TODO: ...
-            "nr_agents_with_heat_pump": "nog doen", # TODO: ...
-            "average_income": np.mean([resident.income for resident in self.residents]),
-            "average_attitude": np.mean([resident.attitude for resident in self.residents]),
-            "average_subjective_norm": {
-                package.name: np.mean([resident.subj_norm[package.name] for resident in self.residents])
-                for package in self.sustainability_packages
-            },
-            "average_behavioral_control": {
-                package.name: np.mean([resident.behavioral_control[package.name] for resident in self.residents])
-                for package in self.sustainability_packages
-            }
+            "average_income": np.mean(
+                [r.income for h in self.households for r in h.residents]
+            ) if self.residents else 0,
+
+            "average_attitude": np.mean(
+                [r.attitude for h in self.households for r in h.residents]
+            ) if self.residents else 0,
         }
+
+        # system-level feasibility (no cognitive per package split needed here)
+        average_actual_control = {
+            package.name: np.mean([
+                h.actual_control[package.name]
+                for h in self.households
+            ]) if self.households else 0
+            for package in self.sustainability_packages
+        }
+
+        environment_data["average_actual_control"] = average_actual_control
 
         return environment_data
     
-    def setup_data_structure(self, file_name) -> None:       
+    def setup_data_structure(self, file_name) -> None:
+        """
+        Creates the initial JSON structure for storing simulation results,
+        resident history, environment data and LLM conversations.
+        """
+
         data = {
-            "metadata":{
-                "config_id": self.config_id,
-                "nr_households": self.config['nr_households'],
-                "nr_residents": self.config['nr_residents'],
-                "simulation_years": self.config['simulation_years'],
-                "subjective_norm": self.config['subjective_norm'],
+            "metadata": {
+                "config": self.config
             },
+
             "simulation_years": {
                 f"year {year}": {
                     "residents_data": {},
                     "environment_data": {}
-                } for year in range(1, self.config['simulation_years'] + 1)
+                }
+                for year in range(1, self.config["simulation_years"] + 1)
             },
+
             "conversation_history": {
-                "residents": {resident.unique_id: [] for resident in self.residents},
+                "residents": {
+                    resident.unique_id: []
+                    for resident in self.residents
+                }
             }
         }
 
-        # Dump to the json file
-        with open(file_name, 'w+') as file:
-            json.dump(data, file, indent=4)
+        with open(file_name, "w", encoding="utf-8") as file:
+            json.dump(
+                utilities.make_json_serializable(data),
+                file,
+                indent=4
+            )
 
     def export_data(self, file_name, year: int) -> None:
-        if not os.path.exists(file_name):
-            raise FileNotFoundError(f"Data file {file_name} not found.")
+        """
+        Export simulation data for a specific simulation year.
 
-        # Load current JSON data
-        with open(file_name, 'r') as file:
+        Stores:
+        - Resident behavioural data (RAA variables)
+        - Household information
+        - Environment statistics
+
+        The exported JSON file is also used by the LLM handler to provide
+        historical context about residents.
+        """
+
+        if not os.path.exists(file_name):
+            raise FileNotFoundError(
+                f"Data file {file_name} not found."
+            )
+
+        with open(file_name, "r", encoding="utf-8") as file:
             data = json.load(file)
+
 
         year_key = f"year {year}"
 
+        if year_key not in data["simulation_years"]:
+            data["simulation_years"][year_key] = {
+                "residents_data": {},
+                "environment_data": {}
+            }
+
+
         for resident in self.residents:
-            resident_data = resident.collect_resident_data()
-            data['simulation_years'][year_key]['residents_data'][resident.unique_id] = resident_data
+            data["simulation_years"][year_key]["residents_data"][
+                str(resident.unique_id)
+            ] = resident.collect_resident_data()
 
-        environment_data = self.collect_environment_data()
-        data['simulation_years'][year_key]['environment_data'] = environment_data
 
-        # Save to file
-        with open(file_name, 'w') as file:
-            json.dump(data, file, indent=4)
-        
+        data["simulation_years"][year_key]["environment_data"] = (
+            self.collect_environment_data()
+        )
+
+
+        with open(file_name, "w", encoding="utf-8") as file:
+            json.dump(
+                utilities.make_json_serializable(data),
+                file,
+                indent=4
+            )   
 
     def collect_start_of_year_data(self, year):
         """
@@ -257,35 +500,310 @@ class Environment(Model):
         Returns:
             dict: A dictionary containing the collected data for the start of the year.
         """
-        data_per_package = {}
-        for package in self.sustainability_packages:
-            residents_positive_decision = sum(
-                1 for hh in self.households for res in hh.residents if res.package_decisions.get(package.name, False)
-            )
-            households_with_package = sum(
-                1 for hh in self.households if hh.package_installations.get(package.name, False)
-            )
-            data_per_package[package.name] = {
-                "residents_positive_decision": residents_positive_decision,
-                "households_with_package": households_with_package,
-                "price": package.price
-            }
-        
-        total_decisions_this_year = sum(self.decided_residents_this_step_per_package.values())
-        total_yearly_co2_saved = sum(hh.co2_saved_yearly for hh in self.households)
 
         data = {
             "year": year,
-            "decisions_this_year_total": total_decisions_this_year, # This is actually decisions from end of previous year / during this step
+            "package_data": self.collect_package_adoption_data(),
+            # "tpb_data": self.collect_street_heatmap_data(), # TODO This function is not yet implemented, but will collect data on the TPB components for different clusters of residents, which can be used for analyzing behavior patterns and for informing the conversational agent's interactions with residents.
+            "co2_data": self.collect_co2_data(),
+            "decisions_this_year_total": sum(self.decided_residents_this_step_per_package.values()),
             "decisions_this_year_per_package": dict(self.decided_residents_this_step_per_package),
-            "start_state_per_package": data_per_package,
-            "total_co2_saved_yearly": total_yearly_co2_saved,
+            "housing_stock": self.collect_housing_stock_data(),
+            "kpi_stock": self.collect_kpi_stock_data(),
+            "cluster_behavior_data": self.collect_cluster_behavior_data(),
+            "average_total_population_data": self.collect_avg_total_population_data(),
+            "municipality_timeline": self.municipality_timeline
         }
 
+        # print(data["cluster_behavior_data"])
         self.yearly_stats.append(data)
-        return data
 
-    def collect_end_of_year_data(self, data_from_start_of_year):
+        return data
+    
+    def collect_avg_total_population_data(self):
+        """
+        Collects average TPB (Theory of Planned Behavior) data across all residents.
+
+        Returns:
+            dict: A dictionary containing average attitude, perceived norm, and PBC.
+        """
+        avg_attitude = np.mean([r.attitude for r in self.residents]) if self.residents else 0
+        avg_perceived_norm = np.mean([r.perceived_norm for r in self.residents]) if self.residents else 0
+        avg_pbc = np.mean([r.survey_pbc for r in self.residents]) if self.residents else 0
+
+        return {
+            "average_attitude": avg_attitude,
+            "average_perceived_norm": avg_perceived_norm,
+            "average_pbc": avg_pbc
+        }
+
+    def collect_street_heatmap_data(self):
+
+        street_data = {}
+
+        for household in self.households:
+            street_name = household.gis_attributes.get("OpenbareRuimteNaam", "Unknown")
+
+            if street_name not in street_data:
+                street_data[street_name] = {}
+
+                for package in self.sustainability_packages:
+                    street_data[street_name][package.name] = {
+                        "attitude": [],
+                        "perceived_norm": [],
+                        "pbc": [],
+                        "adoption": 0
+                    }
+
+            for resident in household.residents:
+                for package in self.sustainability_packages:
+
+                    package_name = package.name
+
+                    # Attitude (individual)
+                    street_data[street_name][package_name]["attitude"].append(
+                        resident.attitude
+                    )
+
+                    # Norm (individual perception)
+                    street_data[street_name][package_name]["perceived_norm"].append(
+                        resident.perceived_norm[package_name]
+                    )
+
+                    # PBC (household-level constraint)
+                    street_data[street_name][package_name]["pbc"].append(
+                        household.actual_control[package_name]
+                    )
+
+                    # Adoption (behavior)
+                    if resident.package_decisions.get(package_name, False):
+                        street_data[street_name][package_name]["adoption"] += 1
+
+        # --- RESULT ---
+        result = {}
+
+        for street, packages in street_data.items():
+            result[street] = {}
+
+            for package_name, values in packages.items():
+
+                result[street][package_name] = {
+                    "average_attitude": np.mean(values["attitude"]) if values["attitude"] else 0,
+                    "average_perceived_norm": np.mean(values["perceived_norm"]) if values["perceived_norm"] else 0,
+                    "average_pbc": np.mean(values["pbc"]) if values["pbc"] else 0,
+                    "adoption_count": values["adoption"]
+                }
+
+        # print(f"Collected street heatmap data for year: {result}")
+
+        return result
+
+    def collect_housing_stock_data(self):
+        """
+        Collects data on the housing stock, specifically the distribution of energy labels among the households. 
+        This can be used to understand the baseline characteristics of the housing stock in the simulation and how it may influence residents' decisions regarding sustainability packages.
+        """
+
+        labels = {
+            "A": 0,
+            "B": 0,
+            "C": 0,
+            "D": 0,
+            "E": 0,
+            "F": 0,
+            "G": 0
+        }
+
+        for hh in self.households:
+            label = hh.gis_attributes.get("Energielabel")
+            if label in labels:
+                labels[label] += 1
+        return labels
+    
+    def collect_cluster_behavior_data(self):
+        """
+        Collect behavioral statistics per cluster.
+
+        Returns:
+        - average attitude / norm / pbc (voor line charts)
+        - distributions (voor histogram/bar charts)
+        """
+
+        def create_buckets():
+            return {
+                "0.0-0.2": 0,
+                "0.2-0.4": 0,
+                "0.4-0.6": 0,
+                "0.6-0.8": 0,
+                "0.8-1.0": 0
+            }
+
+        def add_to_bucket(buckets, value):
+            value = max(0, min(1, value))
+
+            if value < 0.2:
+                buckets["0.0-0.2"] += 1
+            elif value < 0.4:
+                buckets["0.2-0.4"] += 1
+            elif value < 0.6:
+                buckets["0.4-0.6"] += 1
+            elif value < 0.8:
+                buckets["0.6-0.8"] += 1
+            else:
+                buckets["0.8-1.0"] += 1
+
+        cluster_data = {}
+
+        for resident in self.residents:
+
+            cluster = resident.cluster_type
+
+            if cluster not in cluster_data:
+                cluster_data[cluster] = {
+                    "attitudes": [],
+                    "perceived_norms": [],
+                    "pbc_scores": [],
+
+                    "attitude_distribution": create_buckets(),
+                    "perceived_norm_distribution": create_buckets(),
+                    "pbc_distribution": create_buckets(),
+
+                    "count": 0
+                }
+
+            attitude = resident.attitude
+            norm = resident.perceived_norm
+            pbc = resident.survey_pbc
+
+            cluster_data[cluster]["attitudes"].append(attitude)
+            cluster_data[cluster]["perceived_norms"].append(norm)
+            cluster_data[cluster]["pbc_scores"].append(pbc)
+
+            add_to_bucket(
+                cluster_data[cluster]["attitude_distribution"],
+                attitude
+            )
+
+            add_to_bucket(
+                cluster_data[cluster]["perceived_norm_distribution"],
+                norm
+            )
+
+            add_to_bucket(
+                cluster_data[cluster]["pbc_distribution"],
+                pbc
+            )
+
+            cluster_data[cluster]["count"] += 1
+
+        result = {}
+
+        for cluster, values in cluster_data.items():
+
+            result[cluster] = {
+                # bestaande line chart data
+                "average_attitude":
+                    float(np.mean(values["attitudes"]))
+                    if values["attitudes"] else 0,
+
+                "average_perceived_norm":
+                    float(np.mean(values["perceived_norms"]))
+                    if values["perceived_norms"] else 0,
+
+                "average_pbc":
+                    float(np.mean(values["pbc_scores"]))
+                    if values["pbc_scores"] else 0,
+
+                # nieuwe distributies
+                "attitude_distribution":
+                    values["attitude_distribution"],
+
+                "perceived_norm_distribution":
+                    values["perceived_norm_distribution"],
+
+                "pbc_distribution":
+                    values["pbc_distribution"],
+
+                "resident_count":
+                    values["count"]
+            }
+            # print(f"Cluster {cluster} behavior data: {result[cluster]}")
+
+        return result
+
+    def collect_kpi_stock_data(self):
+        """
+        Collects the distribution of household KPI levels.
+        """
+
+        kpi_levels = {
+            "Bad": 0,
+            "Poor": 0,
+            "Medium": 0,
+            "OK": 0,
+            "Good": 0
+        }
+
+        for hh in self.households:
+            kpi = hh.current_kpi_level
+
+            if kpi in kpi_levels:
+                kpi_levels[kpi] += 1
+
+        return kpi_levels
+    
+    def collect_co2_data(self):
+        """
+        Collects data related to CO2 emissions and reductions in the environment, 
+        based on the current state of the households and their sustainability package installations. 
+        This data can be used for tracking the environmental impact of the agents' decisions over time.
+        """
+        co2_data = {
+            "baseline_emissions": self.total_co2_baseline,
+            "yearly_emissions": self.current_co2,
+            "cumulative_emissions": self.total_co2_emitted_over_time,
+            "co2_reduction": self.total_co2_baseline - self.current_co2,
+            "monthly_average": self.current_co2 / 12 # we use years now so we may need to delete this.
+        }
+
+        return co2_data
+
+    def collect_package_adoption_data(self):
+        """"        
+        Collects data on the adoption of sustainability packages across the households
+        """
+        package_data = {}
+
+        for package in self.sustainability_packages:
+            # Count the number of residents who have decided for this package.
+            residents_positive_decision = sum(
+                1
+                for hh in self.households
+                for res in hh.residents
+                if res.package_decisions.get(
+                    package.name,
+                    False
+                )
+            )
+            # Count the number of households that have installed this package.
+            households_with_package = sum(
+                1
+                for hh in self.households
+                if hh.package_installations.get(
+                    package.name,
+                    False
+                )
+            )
+            # Store the data for this package, including the current price.
+            package_data[package.name] = {
+                "residents_positive_decision": residents_positive_decision,
+                "households_with_package":households_with_package,
+                "price":package.price
+            }
+
+        return package_data
+
+    def collect_end_of_year_data(self, data_from_start_of_year): # TODO Will need to update when new attributes are added top the agents and households.
         """
         Collects and appends data at the end of a simulation year to the
         data collected at the start of the year.
@@ -318,7 +836,7 @@ class Environment(Model):
         data_from_start_of_year["decisions_this_year_total_end"] = total_decisions_this_year_end 
         data_from_start_of_year["decisions_this_year_per_package_end"] = dict(self.decided_residents_this_step_per_package)
 
-    def collect_household_information(self):
+    def collect_household_information(self): # TODO WIll need to update this function to include new information.
         """
         Collects detailed information about each household and its residents.
 
@@ -334,21 +852,88 @@ class Environment(Model):
         for household in self.households:
             resident_details = []
             for i, resident in enumerate(household.residents, start=1):
-                res_data = {"name": f"Resident {i}", "income": resident.income, 'unique_id': resident.unique_id}
+                res_data = {
+                    "name": f"Resident {i}",
+                    "income": resident.income,
+                    "cluster_type" : resident.cluster_type,
+                    "unique_id": resident.unique_id,
+                    "kpi_level": household.current_kpi_level,
+                    "attitude": getattr(resident, "attitude", None),
+                    "action_score": getattr(resident, "action_score", 0),
+                    "perceived_norm": getattr(resident, "perceived_norm", None),
+                    "norm_sensitivity": getattr(resident, "norm_sensitivity", None),
+                    "survey_pbc": getattr(resident, "survey_pbc", None),
+                    "control_sensitivity": getattr(resident, "control_sensitivity", None),
+                    "intention": getattr(resident, "intention", None),
+                    "intention_threshold": getattr(resident, "intention_threshold", None),
+                    "wants_to_renovate": bool(getattr(resident, "wants_to_renovate", False)),
+                    "actual_control": getattr(household, "actual_control", {}),
+                    "renovation_cooldown": getattr(household, "renovation_cooldown", 0),
+                }
                 for pkg_name in [p.name for p in self.sustainability_packages]:
                     res_data[f"{pkg_name}_decision"] = resident.package_decisions.get(pkg_name, False)
                 resident_details.append(res_data)
 
             hh_data = {
                 "id": household.unique_id, # Assuming Household has unique_id from Mesa Agent
-                "address": f"Dorpsstraat {household.unique_id}",
-                "name": f"Household {household.unique_id}", # Or however you identify them
-                "residents": resident_details
+                "address": f"{household.gis_attributes['WoonplaatsNaam']} | {household.gis_attributes['OpenbareRuimteNaam']}",
+                "name": f"Household  {household.gis_attributes['Huisnummer']}",
+                "GIS_attributes": household.gis_attributes, # Include all GIS attributes for reference
+                "residents": resident_details,
+                "current_kpi_level": household.current_kpi_level,
+                "residents_with_positive_intention": household.residents_with_positive_intention,
+                "renovation_cooldown": household.renovation_cooldown,
+                "package_installations": {
+                    pkg.name: household.package_installations.get(pkg.name, False)
+                    for pkg in self.sustainability_packages
+                }
             }
-            for pkg_name in [p.name for p in self.sustainability_packages]:
-                 hh_data[f"{pkg_name}_installed"] = household.package_installations.get(pkg_name, False)
             households_data.append(hh_data)
         return households_data
+    
+    def calculate_total_co2(self):
+        """Calculates the total baseline CO2 emissions for the district based on the initial attributes of the households. This is used as a reference point for tracking CO2 reductions over time."""
+        # This function assumes that each household has an attribute or method to estimate its initial CO2 emissions based on its energy label and other relevant factors. 
+        # The total baseline CO2 is the sum of these initial emissions across all households.
+        self.total_co2_baseline = sum(hh.original_co2_emissions for hh in self.households)
+        # Initialize current CO2 to baseline at the start of the simulation
+        self.current_co2 = self.total_co2_baseline
+
+    def collect_kpi_data(self): # TODO This function will need to be updated to collect the relevant data for the KPIs we want to track, which may include things like total CO2 saved, average attitude changes, or other metrics based on the agents' attributes and decisions.
+        """Collects key performance indicator (KPI) data from the current state of the environment."""
+        ##% of houses ready for heat network: Energy label B or higher​
+        # Etc. Tbd​
+        # Total CO2 emitted in simulation, total CO2 reduced during simulation.​
+        # Total spending on renovation by households
+
+        kpi_data = {
+            "co2_emissions_start_simulation": self.total_co2_baseline,
+            "current_co2_emissions": self.current_co2,
+            "total_co2_reduced": self.total_co2_baseline - self.current_co2,
+            "total_co2_emitted_during_simulation": self.total_co2_emitted_over_time,
+            "total_spending_on_renovation": round(sum(hh.renovation_costs_spend for hh in self.households), 2),
+            "percentage_houses_ready_for_heat_network": round(sum(1 for hh in self.households if hh.gis_attributes.get("Energielabel", "") in ["A", "B"]) / len(self.households) * 100, 3) if self.households else 0,}
+            
+        return kpi_data
+
+    def build_street_groups(self):
+        streets = defaultdict(list)
+
+        for hh in self.households:
+            street_name = hh.gis_attributes.get("OpenbareRuimteNaam", "Unknown")
+            streets[street_name].append(hh)
+
+        self.street_groups = streets
+
+    def log_municipality_event(self, event, details=None):
+        if details is None:
+            details = {}
+
+        self.municipality_timeline.append({
+            "year": self.current_year,
+            "event": event,
+            "details": details
+        })
 
     def __str__(self):
         """
@@ -377,7 +962,9 @@ class Environment(Model):
             output += f"    Current {pkg_name} Price: {package.price}\n"
         output += f"  --- MISC INFO ---\n"
         output += f"    Total CO2 saved so far: {total_yearly_co2_saved / 1000:.1f} tons\n"
-        output += f"    % of CO2 emission relative to district total: {self.current_co2 / self.total_co2 * 100:.1f}"
+        percentage = (self.current_co2 / self.total_co2 * 100 if self.total_co2 != 0 else 0)
+        output += f"    % of CO2 emission relative to district total: {percentage:.1f}"
+        output += f"    % of CO2 emission relative to district total: {(self.current_co2 / self.total_co2 * 100 if self.total_co2 != 0 else 0):.1f}"
         return output
         
         

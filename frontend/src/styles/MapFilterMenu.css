@@ -1,0 +1,63 @@
+.map-filter-menu {
+  background: #F7E7CF;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.filter-buttons button.active {
+  background: #3a7e54;
+  color: #fff;
+}
+
+.cluster-mode-section {
+  margin-top: 0.75rem;
+}
+
+.cluster-legend {
+  margin-bottom: 0.75rem;
+}
+
+.cluster-legend-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: flex-start;
+}
+
+.cluster-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cluster-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 7px;
+  display: inline-block;
+}
+
+.cluster-dot-neutral,
+.cluster-dot-resistant {
+  margin-left: 0;
+}
+
+.cluster-dot-engaged {
+  background: #17bd2b;
+}
+
+.cluster-dot-neutral {
+  background: #5a5754;
+}
+
+.cluster-dot-resistant {
+  background: #d10707;
+}
+
+.cluster-filter-title {
+  margin: 0 0 0.5rem 0;
+}
