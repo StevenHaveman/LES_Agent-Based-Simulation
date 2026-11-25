@@ -300,11 +300,11 @@ class Environment(Model):
         """
         R = 6371000  # meter
 
-        lat1 = np.radians(lat1)
-        lat2 = np.radians(lat2)
-
         delta_lat = np.radians(lat2 - lat1)
         delta_lon = np.radians(lon2 - lon1)
+
+        lat1 = np.radians(lat1)
+        lat2 = np.radians(lat2)
 
         a = (
             np.sin(delta_lat / 2)**2
