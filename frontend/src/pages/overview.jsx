@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createRoute } from '@tanstack/react-router';
+import PropTypes from 'prop-types';
 import { rootRoute } from './root';
 import '../styles/overviewpage.css';
 import '../styles/globalPageStyles.css';
@@ -26,7 +27,7 @@ import '@fontsource/montserrat';
 
 const simulationYearStart = 2024;
 
-function OverviewContent() {
+function OverviewContent({ onReset }) {
     const state = useOverviewState();
     const dispatch = useOverviewDispatch();
     const [showGraphOptions, setShowGraphOptions] = useState(false);
@@ -124,7 +125,7 @@ function OverviewContent() {
     return (
         <>
             <OverviewNavbar title="INSIGHT: Integrated Neighborhood Simulation for Informing Green Housing Transitions
- " year={year + simulationYearStart} />
+ " year={year + simulationYearStart} onReset={onReset} />
             <div className={`overview-container${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
                 <div className={`sidebar-container${sidebarCollapsed ? ' collapsed' : ''}`}>
                     <SidebarToggle collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(v => !v)} />
@@ -186,13 +187,20 @@ function OverviewContent() {
     );
 }
 
+OverviewContent.propTypes = {
+    onReset: PropTypes.func,
+};
+
 export const overviewRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/overview',
     component: function Overview() {
+        // Bumping the key after a reset remounts the page, so charts, map,
+        // KPIs and the selected household all start fresh with the new run.
+        const [runKey, setRunKey] = useState(0);
         return (
-            <OverviewProvider>
-                <OverviewContent />
+            <OverviewProvider key={runKey}>
+                <OverviewContent onReset={() => setRunKey(k => k + 1)} />
             </OverviewProvider>
         );
     },

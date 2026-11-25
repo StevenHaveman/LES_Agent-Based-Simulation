@@ -103,6 +103,11 @@
     outline-offset: 2px;
 }
 
+.panel-button:disabled {
+    background-color: #c9c3a0;
+    cursor: not-allowed;
+}
+
 .panel-button-wide {
     width: 100%;
 }

@@ -8,26 +8,23 @@ import HelpModal from './HelpModal.jsx';
 
 /**
  * OverviewNavbar component provides a navigation bar for the simulation overview page.
- * It includes controls for pausing the simulation and adjusting the delay between simulation steps.
+ * It includes Restart (back to the configuration screen) and Reset (run again from year 0)
+ * buttons, plus controls for pausing the simulation and adjusting the delay between steps.
  *
  * @param {Object} props - The component props.
  * @param {string} props.title - The title to display in the navigation bar.
+ * @param {Function} [props.onReset] - Called after a successful reset so the page can clear its data.
  * @returns {JSX.Element} The rendered OverviewNavbar component.
  */
-const OverviewNavbar = ({ title, year }) => {
+const OverviewNavbar = ({ title, year, onReset }) => {
     const {
         paused,
         delay,
-        showModal,
-        setShowModal,
-        inputParams,
-        handleParamChange,
-        startSimulation,
         resetSimulation,
+        restartSimulation,
         togglePause,
         updateDelay,
-        openSimulationModal,
-    } = useOverviewNavbarLogic();
+    } = useOverviewNavbarLogic({ onReset });
 
     const [helpOpen, setHelpOpen] = useState(false);
     const showHelp = () => setHelpOpen(true);
@@ -51,78 +48,22 @@ const OverviewNavbar = ({ title, year }) => {
             <ToastContainer position="top-right" hideProgressBar={false} />
             <div className="overview-navbar">
                 <div className="navbar-left">
-                    <button className="start-button" onClick={openSimulationModal} title="Start Simulation">
+                    <button
+                        className="start-button"
+                        onClick={restartSimulation}
+                        title="Restart: stop this run and go back to the configuration screen"
+                        aria-label="Restart simulation"
+                    >
                         <span className="material-symbols-outlined">reset_settings</span>
                     </button>
-                    <button className="reset-button" onClick={resetSimulation} title="Reset Simulation">
+                    <button
+                        className="reset-button"
+                        onClick={resetSimulation}
+                        title="Reset: run this simulation again from the start, same settings"
+                        aria-label="Reset simulation"
+                    >
                         <span className="material-symbols-outlined">replay</span>
                     </button>
-                    {showModal && (
-                        <div
-                            style={{
-                                position: 'fixed',
-                                top: 0,
-                                left: 0,
-                                width: '100vw',
-                                height: '100vh',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                zIndex: 1000,
-                            }}
-                        >
-                            <form
-                                style={{
-                                    background: 'white',
-                                    padding: 24,
-                                    borderRadius: 8,
-                                    minWidth: 320,
-                                }}
-                                onSubmit={startSimulation}
-                            >
-                                <h3>Start New Simulation</h3>
-                                {/* <label>
-                                            Households:
-                                            <input type="number" name="nr_households" value={inputParams.nr_households} onChange={handleParamChange} min={1} required />
-                                        </label><br />
-                                        <label>
-                                            Residents:
-                                            <input type="number" name="nr_residents" value={inputParams.nr_residents} onChange={handleParamChange} min={1} required />
-                                        </label><br /> */}
-                                <label>
-                                    Years:
-                                    <input
-                                        type="number"
-                                        name="simulation_years"
-                                        value={inputParams.simulation_years}
-                                        onChange={handleParamChange}
-                                        min={1}
-                                        required
-                                    />
-                                </label>
-                                <br />
-                                <label>
-                                    Seed:
-                                    <input
-                                        type="number"
-                                        name="seed"
-                                        value={inputParams.seed}
-                                        onChange={handleParamChange}
-                                        required
-                                    />
-                                </label>
-                                <br />
-                                <button type="submit">Start</button>
-                                <button
-                                    type="button"
-                                    onClick={() => setShowModal(false)}
-                                    style={{ marginLeft: 8 }}
-                                >
-                                    Cancel
-                                </button>
-                            </form>
-                        </div>
-                    )}
                 </div>
                 <div className="overview-navbar-title">
                     <img className="overview-logo" src="LES_logo.png" alt="Logo links" />
@@ -168,6 +109,7 @@ const OverviewNavbar = ({ title, year }) => {
 OverviewNavbar.propTypes = {
     title: PropTypes.string.isRequired,
     year: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    onReset: PropTypes.func,
 };
 
 export default OverviewNavbar;

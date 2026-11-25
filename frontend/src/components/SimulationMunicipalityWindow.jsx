@@ -1,8 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/MunicipalityWindow.css';
 
 const SimulationMunicipalityWindow = () => {
-    const [socialNormRadius, setSocialNormRadius] = useState(30);
+    // Radius the running simulation actually uses; null until loaded.
+    const [socialNormRadius, setSocialNormRadius] = useState(null);
+
+    useEffect(() => {
+        const loadRadius = async () => {
+            try {
+                const response = await fetch(
+                    'http://localhost:5000/social_norm_radius'
+                );
+                const data = await response.json();
+                if (response.ok) {
+                    setSocialNormRadius(Number(data.social_norm_radius));
+                }
+            } catch (error) {
+                console.error(
+                    'Failed to load social norm radius:',
+                    error
+                );
+            }
+        };
+
+        loadRadius();
+    }, []);
 
     const applySocialNormRadius = async () => {
         try {
@@ -47,7 +69,9 @@ const SimulationMunicipalityWindow = () => {
                     <label className="panel-label" htmlFor="socialNormRadius">
                         Social norm radius
                     </label>
-                    <span className="panel-value">{socialNormRadius} m</span>
+                    <span className="panel-value">
+                        {socialNormRadius === null ? '–' : `${socialNormRadius} m`}
+                    </span>
                 </div>
 
                 <input
@@ -57,7 +81,8 @@ const SimulationMunicipalityWindow = () => {
                     min="10"
                     max="3000"
                     step="10"
-                    value={socialNormRadius}
+                    value={socialNormRadius ?? 10}
+                    disabled={socialNormRadius === null}
                     onChange={(e) =>
                         setSocialNormRadius(Number(e.target.value))
                     }
@@ -72,6 +97,7 @@ const SimulationMunicipalityWindow = () => {
                     type="button"
                     className="panel-button panel-button-wide"
                     onClick={applySocialNormRadius}
+                    disabled={socialNormRadius === null}
                 >
                     Apply
                 </button>

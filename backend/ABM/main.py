@@ -10,6 +10,7 @@ visualisation and analysis.
 import glob
 import os
 import random
+import threading
 import time
 
 import numpy as np
@@ -39,6 +40,9 @@ simulation_paused = False
 
 model = None
 """Reference to the currently active Environment instance."""
+
+stop_event = threading.Event()
+"""Set to ask the running simulation to stop after its current step."""
 
 
 # =============================================================================
@@ -89,6 +93,23 @@ def toggle_simulation_pause() -> bool:
 
     simulation_paused = not simulation_paused
     return simulation_paused
+
+
+def set_simulation_paused(paused: bool) -> None:
+    """Set the paused state of the simulation explicitly."""
+    global simulation_paused
+
+    simulation_paused = paused
+
+
+def request_simulation_stop() -> None:
+    """
+    Ask the running simulation to stop.
+
+    The loop checks this between years, while paused and during the delay
+    between years, so a stop takes effect within one model step.
+    """
+    stop_event.set()
 
 
 def is_simulation_paused() -> bool:
@@ -147,8 +168,12 @@ def run_simulation(config: dict, simulation_years: int = 30):
 
     for year in range(simulation_years):
 
-        while is_simulation_paused():
-            time.sleep(1)
+        while is_simulation_paused() and not stop_event.is_set():
+            time.sleep(0.2)
+
+        if stop_event.is_set():
+            print(f"=== Simulation stopped before year {year + 1} ===")
+            break
 
         model.current_year = year + 1
 
@@ -189,4 +214,7 @@ def run_simulation(config: dict, simulation_years: int = 30):
             f"{len(households_data)} households."
         )
 
-        time.sleep(get_delay())
+        # Wait out the delay, but wake up immediately when a stop is requested.
+        if stop_event.wait(get_delay()):
+            print(f"=== Simulation stopped after year {model.current_year} ===")
+            break

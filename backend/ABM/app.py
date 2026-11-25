@@ -32,16 +32,33 @@ llm_handler = AgentLLMHandler("llama3.1:8b", chosen_config)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 simulation_thread = None
 simulation_running = False
+last_run_request = None  # body of the last accepted /simulation request, replayed by reset
+current_social_norm_radius = None  # radius the current run uses; shown by the frontend slider
 
 
-@app.route('/simulation', methods=['POST'])
-def start_simulation():
-    global simulation_thread, simulation_running
+def _simulation_is_running() -> bool:
+    return simulation_thread is not None and simulation_thread.is_alive()
 
-    data = request.get_json()
-    config_id = int(data["config_id"])
 
-    simulation_config = config.configs[config_id].copy()
+def _launch_simulation(data: dict):
+    """
+    Build a run config from a start request and start it in a background thread.
+
+    Returns a (json, status) tuple for the Flask route. The caller must make
+    sure no other simulation is running.
+    """
+    global simulation_thread, last_run_request, current_social_norm_radius
+
+    try:
+        config_id = int(data["config_id"])
+        base_config = config.configs[config_id]
+    except (KeyError, ValueError, TypeError):
+        return jsonify({
+            "status": "error",
+            "message": f"Unknown or missing config_id: {data.get('config_id')!r}."
+        }), 400
+
+    simulation_config = base_config.copy()
 
     for key, value in data.items():
 
@@ -60,15 +77,9 @@ def start_simulation():
     simulation_config["gis_data_path"] = area["gis_data_path"]
     simulation_config["gis_column_map"] = area["column_map"]
 
-    if simulation_thread and simulation_thread.is_alive():
-        return jsonify({
-            "status": "error",
-            "message": "Simulation already running. Please wait for it to finish or stop it before starting a new one."
-        }), 400
-
     try:
         simulation_years = int(data.get("simulation_years"))
-        seed = int(data.get("seed", config.configs[config_id].get("seed", None)))
+        seed = int(data.get("seed", base_config.get("seed", None)))
 
         simulation_config["simulation_years"] = simulation_years
         simulation_config["seed"] = seed
@@ -95,6 +106,19 @@ def start_simulation():
         finally:
             simulation_running = False
 
+    # A fresh run starts unpaused, without a pending stop request and with no
+    # data from the previous run (so a page that polls right away sees year 0).
+    main.stop_event.clear()
+    main.set_simulation_paused(False)
+    main.graphics_data.clear()
+    main.households_data.clear()
+    main.households_historical_data.clear()
+    main.kpi_data.clear()
+
+    # Remember the request so /simulation/reset can replay this exact run.
+    last_run_request = dict(data)
+    current_social_norm_radius = simulation_config.get("social_norm_radius")
+
     simulation_thread = threading.Thread(target=run)
     simulation_thread.daemon = True  # stopt automatisch bij server shutdown
     simulation_thread.start()
@@ -104,9 +128,69 @@ def start_simulation():
         "message": "Simulation started",
         "parameters": {
             "simulation_years": simulation_years,
-            "seed": seed
+            "seed": seed,
+            "area": area_key,
         }
-    })
+    }), 200
+
+
+def _stop_running_simulation(timeout: float = 60.0) -> bool:
+    """
+    Ask the running simulation to stop and wait for its thread to end.
+
+    Returns True when no simulation is running afterwards.
+    """
+    if not _simulation_is_running():
+        return True
+
+    main.request_simulation_stop()
+    main.set_simulation_paused(False)  # a paused run must wake up to stop
+    simulation_thread.join(timeout)
+    return not _simulation_is_running()
+
+
+@app.route('/simulation', methods=['POST'])
+def start_simulation():
+    if _simulation_is_running():
+        return jsonify({
+            "status": "error",
+            "message": "Simulation already running. Please wait for it to finish or stop it before starting a new one."
+        }), 400
+
+    return _launch_simulation(request.get_json() or {})
+
+
+@app.route('/simulation/stop', methods=['POST'])
+def stop_simulation():
+    """Stops the running simulation (if any), e.g. before going back to the config screen."""
+    if not _stop_running_simulation():
+        return jsonify({
+            "status": "error",
+            "message": "The simulation did not stop in time. Please try again."
+        }), 500
+
+    return jsonify({"status": "ok", "message": "Simulation stopped"})
+
+
+@app.route('/simulation/reset', methods=['POST'])
+def reset_simulation():
+    """Stops the running simulation and starts the last run again from year 0, same settings."""
+    if last_run_request is None:
+        return jsonify({
+            "status": "error",
+            "message": "No previous simulation to reset. Start one from the configuration screen."
+        }), 400
+
+    if not _stop_running_simulation():
+        return jsonify({
+            "status": "error",
+            "message": "The simulation did not stop in time. Please try again."
+        }), 500
+
+    response, status = _launch_simulation(last_run_request)
+    if status == 200:
+        response = jsonify({**response.get_json(), "message": "Simulation reset"})
+    return response, status
 
 @app.route("/graphics_data", methods=["GET"])
 def get_graphics_data():
@@ -341,8 +425,22 @@ def heat_grid():
 
     return jsonify({"status": "ok"})
 
+@app.route("/social_norm_radius", methods=["GET"])
+def get_social_norm_radius():
+    """The social norm radius (meters) of the current run, for the frontend slider."""
+    if current_social_norm_radius is None:
+        return jsonify({
+            "status": "error",
+            "message": "No simulation has been started yet."
+        }), 404
+
+    return jsonify({"status": "ok", "social_norm_radius": current_social_norm_radius})
+
+
 @app.route("/update_social_norm_radius", methods=["POST"])
 def update_social_norm_radius():
+    global current_social_norm_radius
+
     if main.model is None:
         return jsonify({"error": "Simulation not running"}), 400
 
@@ -365,6 +463,7 @@ def update_social_norm_radius():
 
     old_radius = main.model.social_norm_radius
     main.model.social_norm_radius = radius
+    current_social_norm_radius = radius
 
     main.model.log_municipality_event(
         "Social Norm Radius Changed",
