@@ -195,38 +195,74 @@ class Environment(Model):
                 self.streets[chosen_list].append(self.households[i])
 
     def update_social_norms(self):
+        """
+        Set each resident's perceived norm to the average attitude and PBC of the
+        other residents living within ``social_norm_radius`` meters.
 
-        radius = self.social_norm_radius  # meters
+        Residents without any neighbours within the radius keep their current
+        perceived norm.
+        """
+        neighbours, neighbour_counts = self._get_resident_neighbour_matrix(
+            self.social_norm_radius
+        )
 
-        for resident in self.residents:
+        attitudes = np.array([r.attitude for r in self.residents], dtype=float)
+        pbc_scores = np.array([r.survey_pbc for r in self.residents], dtype=float)
 
-            household = resident.household
+        has_neighbours = neighbour_counts > 0
+        safe_counts = np.where(has_neighbours, neighbour_counts, 1)
 
-            nearby_residents = self.get_residents_within_radius(
-                household,
-                radius
+        perceived_norms = (
+            0.5 * (neighbours @ attitudes) / safe_counts +
+            0.5 * (neighbours @ pbc_scores) / safe_counts
+        )
+
+        for resident, has_any, norm in zip(self.residents, has_neighbours, perceived_norms):
+            if has_any:
+                resident.perceived_norm = norm
+
+    def _get_household_distance_matrix(self):
+        """
+        Return the pairwise distance matrix (in meters) between all households.
+
+        Household locations never change during a simulation, so the matrix is
+        computed once and cached.
+        """
+        if getattr(self, "_household_distances", None) is None:
+            lat = np.array([h.gis_attributes["Latitude"] for h in self.households], dtype=float)
+            lon = np.array([h.gis_attributes["Longitude"] for h in self.households], dtype=float)
+            self._household_distances = self.calculate_distance(
+                lat[:, None], lon[:, None], lat[None, :], lon[None, :]
             )
+        return self._household_distances
 
-            other_residents = [
-                r for r in nearby_residents
-                if r.unique_id != resident.unique_id
-            ]
+    def _get_resident_neighbour_matrix(self, radius):
+        """
+        Return ``(neighbours, counts)`` for the given radius, where ``neighbours``
+        is a resident x resident 0/1 matrix marking residents whose households
+        lie within ``radius`` meters (a resident is never its own neighbour),
+        and ``counts`` is the number of neighbours per resident.
 
-            if not other_residents:
-                continue
+        The result is cached and only rebuilt when the radius changes (e.g. via
+        the /update_social_norm_radius endpoint).
+        """
+        cache = getattr(self, "_neighbour_cache", None)
+        if cache is not None and cache[0] == radius:
+            return cache[1], cache[2]
 
-            avg_attitude = np.mean(
-                [r.attitude for r in other_residents]
-            )
+        household_index = {id(h): i for i, h in enumerate(self.households)}
+        resident_household = np.array(
+            [household_index[id(r.household)] for r in self.residents], dtype=int
+        )
 
-            avg_pbc = np.mean(
-                [r.survey_pbc for r in other_residents]
-            )
+        within_radius = self._get_household_distance_matrix() <= radius
+        neighbours = within_radius[np.ix_(resident_household, resident_household)]
+        np.fill_diagonal(neighbours, False)
+        neighbours = neighbours.astype(float)
+        counts = neighbours.sum(axis=1)
 
-            resident.perceived_norm = (
-                0.5 * avg_attitude +
-                0.5 * avg_pbc
-            )
+        self._neighbour_cache = (radius, neighbours, counts)
+        return neighbours, counts
 
     def get_residents_within_radius(self, household, radius):
 
@@ -258,7 +294,10 @@ class Environment(Model):
         return nearby_residents
     
     def calculate_distance(self, lat1, lon1, lat2, lon2):
-
+        """
+        Great-circle (haversine) distance in meters between coordinates given in
+        degrees. Works on scalars and on numpy arrays (with broadcasting).
+        """
         R = 6371000  # meter
 
         lat1 = np.radians(lat1)
